@@ -3,180 +3,1471 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="So Easy a Monkey Can Do It - Making technology accessible to everyone.">
-  <title>So Easy a Monkey Can Do It</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <meta name="description" content="So Easy Monkey Can Do It - We're in business, Monkey Business.">
+  <title>So Easy Monkey Can Do It</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐵</text></svg>">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Righteous&family=Space+Grotesk:wght@300;400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --gold: #D4AF37;
+      --jade: #00A86B;
+      --turquoise: #40E0D0;
+      --terracotta: #C84C32;
+      --stone-dark: #2C2416;
+      --stone-mid: #4A3C2A;
+      --stone-light: #8B7355;
+      --cream: #F5E6C8;
+      --flame-orange: #FF6B35;
+      --flame-yellow: #FFD93D;
+    }
 
     body {
-      font-family: 'Space Grotesk', sans-serif;
-      background: linear-gradient(135deg, #0a1628, #240046, #0a1628);
-      color: #fff;
+      font-family: 'Press Start 2P', cursive;
+      background: var(--stone-dark);
       min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--gold);
     }
 
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 2rem;
+    /* Stone texture overlay */
+    .stone-texture {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      background-image:
+        repeating-linear-gradient(
+          90deg,
+          transparent 0px,
+          transparent 2px,
+          rgba(0,0,0,0.03) 2px,
+          rgba(0,0,0,0.03) 4px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          transparent 0px,
+          transparent 2px,
+          rgba(0,0,0,0.03) 2px,
+          rgba(0,0,0,0.03) 4px
+        );
     }
 
-    /* Header */
-    header {
-      text-align: center;
-      padding: 4rem 2rem;
+    /* Background */
+    .mayan-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: linear-gradient(to bottom,
+        #1a1408 0%,
+        #2C2416 30%,
+        #3d3020 60%,
+        #2C2416 100%
+      );
     }
 
-    .logo {
-      font-size: 4rem;
-      margin-bottom: 1rem;
+    /* Vignette overlay for depth */
+    .vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 40%,
+        rgba(0, 0, 0, 0.4) 100%
+      );
     }
 
-    h1 {
-      font-family: 'Righteous', cursive;
-      font-size: clamp(2rem, 6vw, 3.5rem);
-      background: linear-gradient(135deg, #ff006e, #9d4edd, #00d4ff, #39ff14);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 1rem;
+    /* Subtle ambient glow */
+    .ambient-glow {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(
+        circle,
+        rgba(212, 175, 55, 0.08) 0%,
+        transparent 60%
+      );
+      pointer-events: none;
+      z-index: 1;
     }
 
-    .tagline {
-      font-size: 1.2rem;
-      color: rgba(255,255,255,0.8);
-      max-width: 500px;
-      margin: 0 auto;
+    /* Circuit Board Jungle Trees */
+    .circuit-trees {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    /* Sections */
-    section {
-      padding: 3rem 0;
+    .circuit-tree {
+      position: absolute;
+      bottom: 0;
     }
 
-    h2 {
-      font-family: 'Righteous', cursive;
-      font-size: 1.8rem;
-      margin-bottom: 1.5rem;
-      color: #00d4ff;
+    /* Tree trunk - vertical circuit trace */
+    .tree-trunk {
+      position: absolute;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(to top, var(--jade), rgba(0, 168, 107, 0.3));
+      box-shadow: 0 0 8px rgba(0, 168, 107, 0.4);
     }
 
-    p {
-      line-height: 1.8;
-      color: rgba(255,255,255,0.9);
+    /* Tree branches - horizontal circuit traces */
+    .tree-branch {
+      position: absolute;
+      height: 3px;
+      background: linear-gradient(to right, var(--jade), rgba(64, 224, 208, 0.4));
+      box-shadow: 0 0 6px rgba(0, 168, 107, 0.3);
     }
 
-    /* Cards */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
+    .tree-branch.left {
+      right: 100%;
     }
 
-    .card {
-      background: rgba(157, 78, 221, 0.1);
-      border: 1px solid rgba(157, 78, 221, 0.3);
-      border-radius: 15px;
-      padding: 2rem;
-      transition: transform 0.3s, border-color 0.3s;
+    .tree-branch.right {
+      left: 100%;
     }
 
-    .card:hover {
-      transform: translateY(-5px);
-      border-color: #00d4ff;
+    /* Circuit nodes (connection points) */
+    .circuit-node {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--jade);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--jade), 0 0 20px rgba(0, 168, 107, 0.5);
+      animation: nodeGlow 2s ease-in-out infinite;
     }
 
-    .card h3 {
-      font-family: 'Righteous', cursive;
-      color: #9d4edd;
-      margin-bottom: 0.5rem;
+    @keyframes nodeGlow {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
     }
 
-    .card p {
-      font-size: 0.95rem;
-      color: rgba(255,255,255,0.7);
+    /* Tree 1 - Left side */
+    .circuit-tree.tree-1 {
+      left: 12%;
     }
 
-    /* Contact */
-    .contact-info {
+    .circuit-tree.tree-1 .tree-trunk {
+      height: 320px;
+      left: 0;
+    }
+
+    .circuit-tree.tree-1 .branch-1 { bottom: 280px; width: 50px; }
+    .circuit-tree.tree-1 .branch-2 { bottom: 220px; width: 70px; }
+    .circuit-tree.tree-1 .branch-3 { bottom: 160px; width: 45px; }
+    .circuit-tree.tree-1 .branch-4 { bottom: 100px; width: 60px; }
+
+    /* Tree 2 - Right side */
+    .circuit-tree.tree-2 {
+      right: 12%;
+    }
+
+    .circuit-tree.tree-2 .tree-trunk {
+      height: 280px;
+      right: 0;
+    }
+
+    .circuit-tree.tree-2 .branch-1 { bottom: 240px; width: 55px; }
+    .circuit-tree.tree-2 .branch-2 { bottom: 180px; width: 65px; }
+    .circuit-tree.tree-2 .branch-3 { bottom: 120px; width: 40px; }
+
+    /* Tree 3 - Far left */
+    .circuit-tree.tree-3 {
+      left: 5%;
+    }
+
+    .circuit-tree.tree-3 .tree-trunk {
+      height: 200px;
+      left: 0;
+    }
+
+    .circuit-tree.tree-3 .branch-1 { bottom: 170px; width: 35px; }
+    .circuit-tree.tree-3 .branch-2 { bottom: 120px; width: 50px; }
+
+    /* Tree 4 - Far right */
+    .circuit-tree.tree-4 {
+      right: 5%;
+    }
+
+    .circuit-tree.tree-4 .tree-trunk {
+      height: 240px;
+      right: 0;
+    }
+
+    .circuit-tree.tree-4 .branch-1 { bottom: 200px; width: 40px; }
+    .circuit-tree.tree-4 .branch-2 { bottom: 140px; width: 55px; }
+
+    /* Swinging Vines */
+    .vines-container {
+      position: fixed;
+      top: 40px;
+      left: 0;
+      width: 100%;
+      height: 300px;
+      pointer-events: none;
+      z-index: 3;
+      overflow: hidden;
+    }
+
+    .vine {
+      position: absolute;
+      top: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, var(--jade), rgba(0, 168, 107, 0.2));
+      transform-origin: top center;
+      border-radius: 0 0 3px 3px;
+    }
+
+    .vine::before {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 12px;
+      height: 12px;
+      background: var(--jade);
+      clip-path: polygon(50% 100%, 0% 30%, 20% 0%, 80% 0%, 100% 30%);
+      opacity: 0.8;
+    }
+
+    .vine-1 {
+      left: 8%;
+      height: 120px;
+      animation: vineSwing 4s ease-in-out infinite;
+    }
+
+    .vine-2 {
+      left: 15%;
+      height: 180px;
+      animation: vineSwing 5s ease-in-out infinite;
+      animation-delay: -1s;
+    }
+
+    .vine-3 {
+      left: 22%;
+      height: 100px;
+      animation: vineSwing 3.5s ease-in-out infinite;
+      animation-delay: -2s;
+    }
+
+    .vine-4 {
+      right: 8%;
+      height: 140px;
+      animation: vineSwing 4.5s ease-in-out infinite;
+      animation-delay: -0.5s;
+    }
+
+    .vine-5 {
+      right: 16%;
+      height: 160px;
+      animation: vineSwing 5.5s ease-in-out infinite;
+      animation-delay: -1.5s;
+    }
+
+    .vine-6 {
+      right: 24%;
+      height: 90px;
+      animation: vineSwing 3s ease-in-out infinite;
+      animation-delay: -2.5s;
+    }
+
+    @keyframes vineSwing {
+      0%, 100% { transform: rotate(-8deg); }
+      50% { transform: rotate(8deg); }
+    }
+
+    /* Main Temple - Large centered pyramid */
+    .main-temple {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 450px;
+      pointer-events: none;
+    }
+
+    .temple-base {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(to top, var(--stone-mid), rgba(74, 60, 42, 0.8));
+      opacity: 0.7;
+      box-shadow: inset 0 2px 0 rgba(212, 175, 55, 0.1);
+    }
+
+    /* Temple steps */
+    .temple-step-1 { width: 600px; height: 50px; bottom: 0; }
+    .temple-step-2 { width: 520px; height: 50px; bottom: 50px; }
+    .temple-step-3 { width: 440px; height: 50px; bottom: 100px; }
+    .temple-step-4 { width: 360px; height: 50px; bottom: 150px; }
+    .temple-step-5 { width: 280px; height: 50px; bottom: 200px; }
+    .temple-step-6 { width: 200px; height: 50px; bottom: 250px; }
+    .temple-step-7 { width: 120px; height: 80px; bottom: 300px; }
+
+    /* Temple doorway */
+    .temple-door {
+      position: absolute;
+      bottom: 300px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 70px;
+      background: #1a1408;
+      opacity: 0.8;
+      clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
+    }
+
+    /* Temple decorative elements */
+    .temple-ornament {
+      position: absolute;
+      width: 40px;
+      height: 30px;
+      background: var(--gold);
+      opacity: 0.3;
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    }
+
+    .temple-ornament-1 { bottom: 380px; left: calc(50% - 20px); }
+    .temple-ornament-2 { bottom: 310px; left: calc(50% - 80px); }
+    .temple-ornament-3 { bottom: 310px; left: calc(50% + 40px); }
+
+    /* Side stepped pyramid silhouettes */
+    .pyramids {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 400px;
+      pointer-events: none;
+    }
+
+    .pyramid {
+      position: absolute;
+      bottom: 0;
+    }
+
+    .pyramid-1 {
+      left: -5%;
+      width: 300px;
+      height: 280px;
+      background: var(--stone-mid);
+      clip-path: polygon(
+        50% 0%,
+        55% 15%, 45% 15%,
+        60% 30%, 40% 30%,
+        65% 45%, 35% 45%,
+        70% 60%, 30% 60%,
+        75% 75%, 25% 75%,
+        80% 90%, 20% 90%,
+        100% 100%, 0% 100%
+      );
+      opacity: 0.3;
+    }
+
+    .pyramid-2 {
+      right: -3%;
+      width: 280px;
+      height: 250px;
+      background: var(--stone-mid);
+      clip-path: polygon(
+        50% 0%,
+        55% 18%, 45% 18%,
+        60% 36%, 40% 36%,
+        65% 54%, 35% 54%,
+        70% 72%, 30% 72%,
+        100% 100%, 0% 100%
+      );
+      opacity: 0.35;
+    }
+
+    /* Mayan border patterns with shimmer animation */
+    .border-top, .border-bottom {
+      position: fixed;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: var(--stone-mid);
+      z-index: 50;
+      overflow: hidden;
+    }
+
+    .border-top {
+      top: 0;
+      border-bottom: 4px solid var(--gold);
+    }
+
+    .border-bottom {
+      bottom: 0;
+      border-top: 4px solid var(--gold);
+    }
+
+    .border-pattern {
+      position: absolute;
+      width: 200%;
+      height: 100%;
+      background-image: repeating-linear-gradient(
+        90deg,
+        var(--gold) 0px,
+        var(--gold) 20px,
+        transparent 20px,
+        transparent 30px,
+        var(--jade) 30px,
+        var(--jade) 35px,
+        transparent 35px,
+        transparent 45px
+      );
+      background-size: 60px 8px;
+      background-repeat: repeat-x;
+      animation: borderShimmer 8s linear infinite;
+    }
+
+    .border-top .border-pattern {
+      bottom: 4px;
+    }
+
+    .border-bottom .border-pattern {
+      top: 4px;
+    }
+
+    /* Shimmer overlay */
+    .border-shimmer {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(212, 175, 55, 0.3) 50%,
+        transparent 100%
+      );
+      animation: shimmerMove 4s ease-in-out infinite;
+    }
+
+    @keyframes borderShimmer {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    @keyframes shimmerMove {
+      0%, 100% { left: -50%; opacity: 0; }
+      50% { left: 100%; opacity: 1; }
+    }
+
+    /* Torch columns - cleaner design */
+    .torch-column {
+      position: fixed;
+      top: 50px;
+      width: 60px;
+      height: calc(100% - 100px);
+      background: linear-gradient(to right, var(--stone-mid), rgba(74, 60, 42, 0.9));
+      z-index: 40;
       display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-      margin-top: 1.5rem;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-evenly;
+      padding: 25px 5px;
     }
 
-    .contact-info a {
-      color: #00d4ff;
-      text-decoration: none;
+    .torch-column.left {
+      left: 0;
+      border-right: 2px solid var(--gold);
+      background: linear-gradient(to left, var(--stone-mid), rgba(74, 60, 42, 0.9));
+    }
+
+    .torch-column.right {
+      right: 0;
+      border-left: 2px solid var(--gold);
+    }
+
+    /* Mayan number glyphs - refined */
+    .mayan-numeral {
+      width: 44px;
+      height: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 6px;
+      background: rgba(44, 36, 22, 0.8);
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      border-radius: 4px;
+    }
+
+    .mayan-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--jade);
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(0, 168, 107, 0.6);
+    }
+
+    .mayan-bar {
+      width: 26px;
+      height: 5px;
+      background: linear-gradient(to bottom, #e6c84a, var(--gold));
+      border-radius: 2px;
+    }
+
+    .dot-row {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+    }
+
+    /* Glowing Banana holders */
+    .torch-holder {
+      width: 44px;
+      height: 55px;
+      position: relative;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: center;
     }
 
-    .contact-info a:hover {
-      color: #39ff14;
+    .torch-bracket {
+      display: none;
+    }
+
+    /* Simple Banana Icon */
+    .flame-container {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flame {
+      width: 32px;
+      height: 12px;
+      background: #FFE135;
+      border-radius: 30px 30px 30px 30px / 15px 15px 8px 8px;
+      transform: rotate(-35deg);
+      position: relative;
+      box-shadow:
+        0 0 10px rgba(255, 225, 53, 0.8),
+        0 0 20px rgba(255, 200, 0, 0.4);
+      animation: bananaGlow 2.5s ease-in-out infinite;
+    }
+
+    /* Brown stem */
+    .flame::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: -4px;
+      width: 6px;
+      height: 5px;
+      background: #5D4037;
+      border-radius: 1px;
+      transform: rotate(15deg);
+    }
+
+    /* Brown tip */
+    .flame::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: -3px;
+      width: 5px;
+      height: 4px;
+      background: #5D4037;
+      border-radius: 50%;
+    }
+
+    @keyframes bananaGlow {
+      0%, 100% {
+        box-shadow:
+          0 0 12px rgba(255, 215, 0, 0.7),
+          0 0 25px rgba(255, 200, 0, 0.4);
+        filter: brightness(1) saturate(1);
+      }
+      50% {
+        box-shadow:
+          0 0 18px rgba(255, 215, 0, 0.9),
+          0 0 35px rgba(255, 200, 0, 0.6),
+          0 0 50px rgba(255, 180, 0, 0.3);
+        filter: brightness(1.15) saturate(1.1);
+      }
+    }
+
+    /* Serpent decorations - elegant simplified */
+    .serpent {
+      position: fixed;
+      z-index: 35;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .serpent-left {
+      left: 75px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .serpent-right {
+      right: 75px;
+      top: 50%;
+      transform: translateY(-50%) scaleX(-1);
+    }
+
+    .serpent-body {
+      position: relative;
+      width: 35px;
+      height: 280px;
+    }
+
+    /* Serpent head - refined Quetzalcoatl style */
+    .serpent-head {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--jade) 0%, #007a50 100%);
+      clip-path: polygon(
+        30% 0%, 70% 0%, 100% 30%, 100% 70%,
+        70% 100%, 30% 100%, 0% 70%, 0% 30%
+      );
+      box-shadow: 0 0 15px rgba(0, 168, 107, 0.3);
+    }
+
+    .serpent-eye {
+      position: absolute;
+      top: 12px;
+      width: 8px;
+      height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--gold);
+    }
+
+    .serpent-eye.left { left: 7px; }
+    .serpent-eye.right { right: 7px; }
+
+    .serpent-fang {
+      position: absolute;
+      bottom: -6px;
+      width: 5px;
+      height: 10px;
+      background: var(--cream);
+      clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+    }
+
+    .serpent-fang.left { left: 9px; }
+    .serpent-fang.right { right: 9px; }
+
+    /* Feathered crest - more elegant */
+    .serpent-feathers {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 3px;
+    }
+
+    .feather {
+      width: 5px;
+      background: linear-gradient(to top, var(--jade), var(--turquoise));
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+      animation: featherSway 3s ease-in-out infinite;
+    }
+
+    .feather:nth-child(1) { animation-delay: 0s; height: 16px; }
+    .feather:nth-child(2) { animation-delay: 0.3s; height: 22px; }
+    .feather:nth-child(3) { animation-delay: 0.15s; height: 20px; }
+    .feather:nth-child(4) { animation-delay: 0.4s; height: 22px; }
+    .feather:nth-child(5) { animation-delay: 0.2s; height: 16px; }
+
+    @keyframes featherSway {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+
+    /* Serpent body segments - cleaner */
+    .serpent-segment {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 22px;
+      height: 22px;
+      background: linear-gradient(135deg, var(--jade) 0%, #007a50 100%);
+      border: 1px solid rgba(64, 224, 208, 0.4);
+      clip-path: polygon(
+        25% 0%, 75% 0%, 100% 25%, 100% 75%,
+        75% 100%, 25% 100%, 0% 75%, 0% 25%
+      );
+    }
+
+    .serpent-segment:nth-child(2) { top: 45px; }
+    .serpent-segment:nth-child(3) { top: 72px; }
+    .serpent-segment:nth-child(4) { top: 99px; }
+    .serpent-segment:nth-child(5) { top: 126px; }
+    .serpent-segment:nth-child(6) { top: 153px; }
+    .serpent-segment:nth-child(7) { top: 180px; }
+    .serpent-segment:nth-child(8) { top: 207px; }
+
+    /* Serpent tail */
+    .serpent-tail {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 18px;
+      height: 35px;
+      background: linear-gradient(135deg, var(--jade) 0%, #007a50 100%);
+      clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+    }
+
+    .serpent-tail-feathers {
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 2px;
+    }
+
+    .tail-feather {
+      width: 4px;
+      height: 16px;
+      background: linear-gradient(to top, var(--jade), var(--turquoise));
+      clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+      animation: featherSway 3s ease-in-out infinite;
+    }
+
+    /* Floating torch embers */
+    .torches-embers {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .ember {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--flame-orange);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--flame-orange), 0 0 20px var(--flame-yellow);
+      animation: emberFloat 6s ease-in-out infinite;
+    }
+
+    .ember:nth-child(1) { top: 30%; left: 80px; animation-delay: 0s; }
+    .ember:nth-child(2) { top: 50%; left: 85px; animation-delay: 1s; }
+    .ember:nth-child(3) { top: 20%; right: 85px; animation-delay: 2s; }
+    .ember:nth-child(4) { top: 60%; right: 80px; animation-delay: 0.5s; }
+    .ember:nth-child(5) { top: 40%; left: 90px; animation-delay: 3s; }
+    .ember:nth-child(6) { top: 70%; right: 90px; animation-delay: 1.5s; }
+    .ember:nth-child(7) { top: 25%; right: 75px; animation-delay: 2.5s; }
+    .ember:nth-child(8) { top: 55%; left: 75px; animation-delay: 4s; }
+
+    @keyframes emberFloat {
+      0%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.4;
+      }
+      50% {
+        transform: translateY(-40px) scale(1.5);
+        opacity: 1;
+      }
+    }
+
+    /* Main content */
+    .content {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 120px;
+      text-align: center;
+    }
+
+    /* Mayan monkey logo */
+    .monkey-logo {
+      width: 150px;
+      height: 150px;
+      margin-bottom: 2rem;
+      position: relative;
+      animation: logoGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes logoGlow {
+      0%, 100% {
+        filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.4))
+                drop-shadow(0 0 20px rgba(212, 175, 55, 0.2));
+      }
+      50% {
+        filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.7))
+                drop-shadow(0 0 40px rgba(212, 175, 55, 0.4));
+      }
+    }
+
+    /* Mayan-style monkey glyph */
+    .monkey-glyph {
+      position: absolute;
+      background: var(--gold);
+    }
+
+    /* Outer frame */
+    .mg-frame {
+      width: 150px;
+      height: 150px;
+      top: 0;
+      left: 0;
+      background: transparent;
+      border: 6px solid var(--gold);
+      clip-path: polygon(
+        0 20%, 20% 0, 80% 0, 100% 20%,
+        100% 80%, 80% 100%, 20% 100%, 0 80%
+      );
+    }
+
+    /* Inner background */
+    .mg-inner {
+      width: 130px;
+      height: 130px;
+      top: 10px;
+      left: 10px;
+      background: var(--stone-dark);
+      clip-path: polygon(
+        0 15%, 15% 0, 85% 0, 100% 15%,
+        100% 85%, 85% 100%, 15% 100%, 0 85%
+      );
+    }
+
+    /* Monkey face - angular Mayan style */
+    .mg-head {
+      width: 80px;
+      height: 65px;
+      top: 45px;
+      left: 35px;
+      background: var(--terracotta);
+      clip-path: polygon(
+        20% 0%, 80% 0%, 100% 30%, 100% 70%,
+        80% 100%, 20% 100%, 0% 70%, 0% 30%
+      );
+    }
+
+    .mg-face {
+      width: 50px;
+      height: 36px;
+      top: 62px;
+      left: 50px;
+      background: var(--cream);
+      clip-path: polygon(
+        10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%
+      );
+    }
+
+    /* Eyes - angular */
+    .mg-eye-l {
+      width: 14px;
+      height: 10px;
+      top: 64px;
+      left: 54px;
+      background: var(--stone-dark);
+      clip-path: polygon(0 50%, 50% 0, 100% 50%, 50% 100%);
+    }
+
+    .mg-eye-r {
+      width: 14px;
+      height: 10px;
+      top: 64px;
+      right: 54px;
+      background: var(--stone-dark);
+      clip-path: polygon(0 50%, 50% 0, 100% 50%, 50% 100%);
+    }
+
+    .mg-eye-jade-l {
+      width: 6px;
+      height: 6px;
+      top: 66px;
+      left: 58px;
+      background: var(--jade);
+      border-radius: 50%;
+    }
+
+    .mg-eye-jade-r {
+      width: 6px;
+      height: 6px;
+      top: 66px;
+      right: 58px;
+      background: var(--jade);
+      border-radius: 50%;
+    }
+
+    /* Nose */
+    .mg-nose {
+      width: 18px;
+      height: 12px;
+      top: 77px;
+      left: 66px;
+      background: var(--terracotta);
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    }
+
+    /* Mouth */
+    .mg-mouth {
+      width: 26px;
+      height: 6px;
+      top: 91px;
+      left: 62px;
+      background: var(--stone-dark);
+      clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+    }
+
+    /* Ears - stepped */
+    .mg-ear-l {
+      width: 18px;
+      height: 26px;
+      top: 55px;
+      left: 27px;
+      background: var(--terracotta);
+      clip-path: polygon(100% 0%, 100% 100%, 0% 80%, 0% 20%);
+    }
+
+    .mg-ear-r {
+      width: 18px;
+      height: 26px;
+      top: 55px;
+      right: 27px;
+      background: var(--terracotta);
+      clip-path: polygon(0% 0%, 0% 100%, 100% 80%, 100% 20%);
+    }
+
+    /* Headdress */
+    .mg-headdress {
+      width: 56px;
+      height: 18px;
+      top: 33px;
+      left: 47px;
+      background: var(--jade);
+      clip-path: polygon(0% 100%, 20% 0%, 50% 30%, 80% 0%, 100% 100%);
+    }
+
+    .mg-headdress-gold {
+      width: 36px;
+      height: 10px;
+      top: 39px;
+      left: 57px;
+      background: var(--gold);
+      clip-path: polygon(0% 100%, 30% 0%, 70% 0%, 100% 100%);
+    }
+
+    /* Corner decorations */
+    .mg-corner-tl, .mg-corner-tr, .mg-corner-bl, .mg-corner-br {
+      width: 15px;
+      height: 15px;
+      background: var(--jade);
+    }
+
+    .mg-corner-tl { top: 15px; left: 15px; clip-path: polygon(0 0, 100% 0, 0 100%); }
+    .mg-corner-tr { top: 15px; right: 15px; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+    .mg-corner-bl { bottom: 15px; left: 15px; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+    .mg-corner-br { bottom: 15px; right: 15px; clip-path: polygon(100% 0, 0 100%, 100% 100%); }
+
+    /* Title */
+    h1 {
+      font-size: clamp(1rem, 4vw, 2rem);
+      color: var(--gold);
+      margin-bottom: 1rem;
+      line-height: 1.8;
+      text-shadow:
+        2px 2px 0 var(--stone-dark),
+        4px 4px 0 rgba(0,0,0,0.3);
+      letter-spacing: 3px;
+    }
+
+    /* Slogan */
+    .slogan {
+      font-size: clamp(0.6rem, 2vw, 0.9rem);
+      color: var(--jade);
+      letter-spacing: 2px;
+      margin-bottom: 3rem;
+      text-shadow:
+        1px 1px 0 var(--stone-dark),
+        2px 2px 3px rgba(0,0,0,0.4);
+    }
+
+    /* CTA Button - Mayan stone tablet style */
+    .cta-button {
+      display: inline-block;
+      padding: 1.2rem 2.5rem;
+      font-family: 'Press Start 2P', cursive;
+      font-size: clamp(0.6rem, 1.5vw, 0.8rem);
+      color: var(--cream);
+      background: linear-gradient(to bottom, var(--stone-light) 0%, var(--stone-mid) 100%);
+      border: 3px solid var(--gold);
+      cursor: pointer;
+      text-decoration: none;
+      position: relative;
+      transition: all 0.2s;
+      clip-path: polygon(
+        0 10%, 10% 0, 90% 0, 100% 10%,
+        100% 90%, 90% 100%, 10% 100%, 0 90%
+      );
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      right: 4px;
+      bottom: 4px;
+      border: 1px solid var(--jade);
+      clip-path: polygon(
+        0 10%, 10% 0, 90% 0, 100% 10%,
+        100% 90%, 90% 100%, 10% 100%, 0 90%
+      );
+    }
+
+    .cta-button:hover {
+      background: linear-gradient(to bottom, var(--stone-mid) 0%, var(--stone-dark) 100%);
+      border-color: var(--turquoise);
+      transform: scale(1.02);
+    }
+
+    /* Contact section - stone tablet */
+    .contact {
+      margin-top: 4rem;
+      padding: 2rem;
+      background: var(--stone-mid);
+      border: 3px solid var(--gold);
+      max-width: 500px;
+      width: 100%;
+      position: relative;
+      clip-path: polygon(
+        0 5%, 5% 0, 95% 0, 100% 5%,
+        100% 95%, 95% 100%, 5% 100%, 0 95%
+      );
+    }
+
+    .contact::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      border: 2px solid var(--jade);
+      pointer-events: none;
+    }
+
+    .contact h2 {
+      font-size: 0.8rem;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      letter-spacing: 3px;
+    }
+
+    .contact-link {
+      display: block;
+      color: var(--cream);
+      text-decoration: none;
+      font-size: 0.65rem;
+      padding: 0.6rem 0;
+      transition: all 0.2s;
+      opacity: 0.8;
+    }
+
+    .contact-link:hover {
+      opacity: 1;
+      color: var(--turquoise);
+      transform: translateX(5px);
+    }
+
+    /* Decorative divider */
+    .divider {
+      width: 200px;
+      height: 20px;
+      margin: 2rem 0;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--gold) 0px,
+        var(--gold) 10px,
+        transparent 10px,
+        transparent 15px,
+        var(--jade) 15px,
+        var(--jade) 20px,
+        transparent 20px,
+        transparent 25px
+      );
     }
 
     /* Footer */
     footer {
-      text-align: center;
-      padding: 2rem;
-      color: rgba(255,255,255,0.5);
-      font-size: 0.9rem;
+      margin-top: 3rem;
+      font-size: 0.5rem;
+      color: var(--stone-light);
+      letter-spacing: 2px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .torch-column {
+        width: 50px;
+      }
+
+      .serpent {
+        display: none;
+      }
+
+      .content {
+        padding: 60px 70px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .torch-column {
+        display: none;
+      }
+
+      .content {
+        padding: 60px 20px;
+      }
+
+      .monkey-logo {
+        width: 120px;
+        height: 120px;
+      }
+
+      .main-temple {
+        width: 300px;
+        height: 250px;
+      }
+
+      .temple-step-1 { width: 300px; height: 30px; }
+      .temple-step-2 { width: 260px; height: 30px; bottom: 30px; }
+      .temple-step-3 { width: 220px; height: 30px; bottom: 60px; }
+      .temple-step-4 { width: 180px; height: 30px; bottom: 90px; }
+      .temple-step-5 { width: 140px; height: 30px; bottom: 120px; }
+      .temple-step-6 { width: 100px; height: 30px; bottom: 150px; }
+      .temple-step-7 { width: 60px; height: 50px; bottom: 180px; }
+
+      .temple-door {
+        bottom: 180px;
+        width: 30px;
+        height: 40px;
+      }
+
+      .circuit-trees,
+      .vines-container {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="logo">🐵</div>
-      <h1>So Easy a Monkey Can Do It</h1>
-      <p class="tagline">Making technology accessible, intuitive, and fun for everyone.</p>
-    </header>
+  <!-- Stone texture overlay -->
+  <div class="stone-texture"></div>
 
-    <section>
-      <h2>🌿 Our Mission</h2>
-      <p>We believe technology should feel like second nature. Our mission is to bridge the gap between complex innovation and everyday usability—creating products and experiences that anyone can master.</p>
-    </section>
+  <!-- Vignette and ambient effects -->
+  <div class="vignette"></div>
+  <div class="ambient-glow"></div>
 
-    <section>
-      <h2>🚀 What We Do</h2>
-      <div class="grid">
-        <div class="card">
-          <h3>🎯 JungleStack</h3>
-          <p>No-code platform for building powerful web apps. Drag, drop, deploy.</p>
+  <!-- Circuit Board Jungle Trees -->
+  <div class="circuit-trees">
+    <!-- Tree 1 - Left -->
+    <div class="circuit-tree tree-1">
+      <div class="tree-trunk"></div>
+      <div class="tree-branch left branch-1"></div>
+      <div class="tree-branch right branch-2"></div>
+      <div class="tree-branch left branch-3"></div>
+      <div class="tree-branch right branch-4"></div>
+      <div class="circuit-node" style="bottom: 280px; left: -50px;"></div>
+      <div class="circuit-node" style="bottom: 220px; left: 70px;"></div>
+      <div class="circuit-node" style="bottom: 160px; left: -45px;"></div>
+      <div class="circuit-node" style="bottom: 320px; left: 0;"></div>
+    </div>
+    <!-- Tree 2 - Right -->
+    <div class="circuit-tree tree-2">
+      <div class="tree-trunk"></div>
+      <div class="tree-branch left branch-1"></div>
+      <div class="tree-branch left branch-2"></div>
+      <div class="tree-branch right branch-3"></div>
+      <div class="circuit-node" style="bottom: 240px; right: 55px;"></div>
+      <div class="circuit-node" style="bottom: 180px; right: 65px;"></div>
+      <div class="circuit-node" style="bottom: 280px; right: 0;"></div>
+    </div>
+    <!-- Tree 3 - Far left -->
+    <div class="circuit-tree tree-3">
+      <div class="tree-trunk"></div>
+      <div class="tree-branch right branch-1"></div>
+      <div class="tree-branch right branch-2"></div>
+      <div class="circuit-node" style="bottom: 170px; left: 35px;"></div>
+      <div class="circuit-node" style="bottom: 200px; left: 0;"></div>
+    </div>
+    <!-- Tree 4 - Far right -->
+    <div class="circuit-tree tree-4">
+      <div class="tree-trunk"></div>
+      <div class="tree-branch left branch-1"></div>
+      <div class="tree-branch left branch-2"></div>
+      <div class="circuit-node" style="bottom: 200px; right: 40px;"></div>
+      <div class="circuit-node" style="bottom: 240px; right: 0;"></div>
+    </div>
+  </div>
+
+  <!-- Swinging Vines -->
+  <div class="vines-container">
+    <div class="vine vine-1"></div>
+    <div class="vine vine-2"></div>
+    <div class="vine vine-3"></div>
+    <div class="vine vine-4"></div>
+    <div class="vine vine-5"></div>
+    <div class="vine vine-6"></div>
+  </div>
+
+  <!-- Background with temple and pyramids -->
+  <div class="mayan-bg">
+    <!-- Main temple -->
+    <div class="main-temple">
+      <div class="temple-base temple-step-1"></div>
+      <div class="temple-base temple-step-2"></div>
+      <div class="temple-base temple-step-3"></div>
+      <div class="temple-base temple-step-4"></div>
+      <div class="temple-base temple-step-5"></div>
+      <div class="temple-base temple-step-6"></div>
+      <div class="temple-base temple-step-7"></div>
+      <div class="temple-door"></div>
+      <div class="temple-ornament temple-ornament-1"></div>
+      <div class="temple-ornament temple-ornament-2"></div>
+      <div class="temple-ornament temple-ornament-3"></div>
+    </div>
+    <!-- Side pyramids -->
+    <div class="pyramids">
+      <div class="pyramid pyramid-1"></div>
+      <div class="pyramid pyramid-2"></div>
+    </div>
+  </div>
+
+  <!-- Mayan border patterns with shimmer -->
+  <div class="border-top">
+    <div class="border-pattern"></div>
+    <div class="border-shimmer"></div>
+  </div>
+  <div class="border-bottom">
+    <div class="border-pattern"></div>
+    <div class="border-shimmer"></div>
+  </div>
+
+  <!-- Left torch column with Mayan numerals -->
+  <div class="torch-column left">
+    <div class="torch-holder">
+      <div class="flame-container"><div class="flame"></div></div>
+      <div class="torch-bracket"></div>
+    </div>
+    <div class="mayan-numeral">
+      <div class="dot-row"><div class="mayan-dot"></div></div>
+    </div>
+    <div class="mayan-numeral">
+      <div class="dot-row">
+        <div class="mayan-dot"></div>
+        <div class="mayan-dot"></div>
+      </div>
+    </div>
+    <div class="mayan-numeral">
+      <div class="mayan-bar"></div>
+    </div>
+    <div class="torch-holder">
+      <div class="flame-container"><div class="flame"></div></div>
+      <div class="torch-bracket"></div>
+    </div>
+  </div>
+
+  <!-- Right torch column with Mayan numerals -->
+  <div class="torch-column right">
+    <div class="torch-holder">
+      <div class="flame-container"><div class="flame"></div></div>
+      <div class="torch-bracket"></div>
+    </div>
+    <div class="mayan-numeral">
+      <div class="dot-row"><div class="mayan-dot"></div></div>
+      <div class="mayan-bar"></div>
+    </div>
+    <div class="mayan-numeral">
+      <div class="mayan-bar"></div>
+      <div class="mayan-bar"></div>
+    </div>
+    <div class="mayan-numeral">
+      <div class="dot-row">
+        <div class="mayan-dot"></div>
+        <div class="mayan-dot"></div>
+        <div class="mayan-dot"></div>
+      </div>
+      <div class="mayan-bar"></div>
+      <div class="mayan-bar"></div>
+    </div>
+    <div class="torch-holder">
+      <div class="flame-container"><div class="flame"></div></div>
+      <div class="torch-bracket"></div>
+    </div>
+  </div>
+
+  <!-- Serpent decorations (Quetzalcoatl) -->
+  <div class="serpent serpent-left">
+    <div class="serpent-body">
+      <div class="serpent-head">
+        <div class="serpent-feathers">
+          <div class="feather"></div>
+          <div class="feather"></div>
+          <div class="feather"></div>
+          <div class="feather"></div>
+          <div class="feather"></div>
         </div>
-        <div class="card">
-          <h3>🎨 VineUI</h3>
-          <p>Beautiful, accessible component library that grows with your project.</p>
-        </div>
-        <div class="card">
-          <h3>📊 DataCanopy</h3>
-          <p>Analytics dashboard that tells stories, not just numbers.</p>
+        <div class="serpent-eye left"></div>
+        <div class="serpent-eye right"></div>
+        <div class="serpent-fang left"></div>
+        <div class="serpent-fang right"></div>
+      </div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-tail">
+        <div class="serpent-tail-feathers">
+          <div class="tail-feather"></div>
+          <div class="tail-feather"></div>
+          <div class="tail-feather"></div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
 
-    <section>
-      <h2>📬 Get In Touch</h2>
-      <p>Have an idea? Want to collaborate? We'd love to hear from you.</p>
-      <div class="contact-info">
-        <a href="mailto:hello@soeasymonkeycandoit.com">
-          <i class="fas fa-envelope"></i> hello@soeasymonkeycandoit.com
-        </a>
-        <a href="#">
-          <i class="fab fa-twitter"></i> @soeasymonkey
-        </a>
+  <div class="serpent serpent-right">
+    <div class="serpent-body">
+      <div class="serpent-head">
+        <div class="serpent-feathers">
+          <div class="feather"></div>
+          <div class="feather"></div>
+          <div class="feather"></div>
+          <div class="feather"></div>
+          <div class="feather"></div>
+        </div>
+        <div class="serpent-eye left"></div>
+        <div class="serpent-eye right"></div>
+        <div class="serpent-fang left"></div>
+        <div class="serpent-fang right"></div>
       </div>
-    </section>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-segment"></div>
+      <div class="serpent-tail">
+        <div class="serpent-tail-feathers">
+          <div class="tail-feather"></div>
+          <div class="tail-feather"></div>
+          <div class="tail-feather"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating torch embers -->
+  <div class="torches-embers">
+    <div class="ember"></div>
+    <div class="ember"></div>
+    <div class="ember"></div>
+    <div class="ember"></div>
+    <div class="ember"></div>
+    <div class="ember"></div>
+    <div class="ember"></div>
+    <div class="ember"></div>
+  </div>
+
+  <!-- Main content -->
+  <div class="content">
+    <!-- Mayan monkey glyph logo -->
+    <div class="monkey-logo">
+      <div class="monkey-glyph mg-frame"></div>
+      <div class="monkey-glyph mg-inner"></div>
+      <div class="monkey-glyph mg-headdress"></div>
+      <div class="monkey-glyph mg-headdress-gold"></div>
+      <div class="monkey-glyph mg-ear-l"></div>
+      <div class="monkey-glyph mg-ear-r"></div>
+      <div class="monkey-glyph mg-head"></div>
+      <div class="monkey-glyph mg-face"></div>
+      <div class="monkey-glyph mg-eye-l"></div>
+      <div class="monkey-glyph mg-eye-r"></div>
+      <div class="monkey-glyph mg-eye-jade-l"></div>
+      <div class="monkey-glyph mg-eye-jade-r"></div>
+      <div class="monkey-glyph mg-nose"></div>
+      <div class="monkey-glyph mg-mouth"></div>
+      <div class="monkey-glyph mg-corner-tl"></div>
+      <div class="monkey-glyph mg-corner-tr"></div>
+      <div class="monkey-glyph mg-corner-bl"></div>
+      <div class="monkey-glyph mg-corner-br"></div>
+    </div>
+
+    <h1>So Easy Monkey<br>Can Do It</h1>
+
+    <p class="slogan">We're in business, Monkey Business.</p>
+
+    <div class="divider"></div>
+
+    <a href="mailto:hello@soeasymonkeycandoit.com" class="cta-button">GET IN TOUCH</a>
+
+    <div class="contact">
+      <h2>CONTACT</h2>
+      <a href="mailto:hello@soeasymonkeycandoit.com" class="contact-link">
+        > hello@soeasymonkeycandoit.com
+      </a>
+      <a href="#" class="contact-link">
+        > @soeasymonkey
+      </a>
+    </div>
 
     <footer>
-      <p>© 2024 So Easy a Monkey Can Do It 🍌</p>
+      <p>2026 So Easy Monkey Can Do It</p>
     </footer>
   </div>
 </body>
