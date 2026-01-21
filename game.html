@@ -23,15 +23,11 @@
       --stone-mid: #4A3C2A;
       --stone-light: #8B7355;
       --cream: #F5E6C8;
-      --sky-top: #1a3a1a;
-      --sky-bottom: #2d5a2d;
-      --tree-dark: #1a4a1a;
-      --tree-light: #2d6a2d;
     }
 
     body {
       font-family: 'Press Start 2P', cursive;
-      background: var(--stone-dark);
+      background: #000;
       min-height: 100vh;
       color: var(--cream);
       overflow: hidden;
@@ -53,7 +49,7 @@
       background: var(--stone-mid);
       border: 3px solid var(--gold);
       padding: 8px 15px;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
       flex-shrink: 0;
     }
 
@@ -67,126 +63,207 @@
       margin-left: 5px;
     }
 
-    /* Game Scene */
-    #game-scene {
+    /* 3D Game Viewport */
+    #game-viewport {
       flex: 1;
-      background: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bottom) 40%, #3d2a1a 100%);
+      background: linear-gradient(to bottom,
+        #0a1a0a 0%,
+        #1a3a1a 30%,
+        #2a4a2a 50%,
+        #3a2a1a 50%,
+        #2a1a0a 100%
+      );
       border: 3px solid var(--gold);
       position: relative;
       overflow: hidden;
-      min-height: 300px;
+      min-height: 280px;
+      perspective: 500px;
     }
 
-    /* Jungle Background Layers */
-    .bg-layer {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      pointer-events: none;
-    }
-
-    /* Ground */
-    .ground {
-      height: 60px;
-      background: linear-gradient(to bottom, #5a4a2a, #3d2a1a);
-      z-index: 10;
-    }
-
-    .ground::before {
-      content: '';
+    /* Sky */
+    .sky {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 10px;
-      background: repeating-linear-gradient(90deg, #6a5a3a 0px, #6a5a3a 20px, #5a4a2a 20px, #5a4a2a 40px);
-    }
-
-    /* Background Trees */
-    .bg-trees {
-      height: 200px;
+      height: 50%;
+      background: linear-gradient(to bottom, #0a1a0a 0%, #1a3a1a 50%, #2a5a2a 100%);
       z-index: 1;
     }
 
-    .bg-tree {
-      position: absolute;
-      bottom: 60px;
-    }
-
-    .tree-trunk {
+    /* 3D Ground plane */
+    .ground-plane {
       position: absolute;
       bottom: 0;
-      background: linear-gradient(90deg, #3d2a1a, #5a4030, #3d2a1a);
-      border-radius: 5px;
+      left: -50%;
+      width: 200%;
+      height: 55%;
+      background: linear-gradient(to bottom, #3a5a2a 0%, #2a3a1a 30%, #1a2a0a 100%);
+      transform: rotateX(60deg);
+      transform-origin: bottom center;
+      z-index: 2;
     }
 
-    .tree-canopy {
+    /* Path through jungle */
+    .jungle-path {
       position: absolute;
-      background: var(--tree-dark);
-      border-radius: 50%;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30%;
+      height: 50%;
+      background: linear-gradient(to top,
+        #4a3a2a 0%,
+        #3a2a1a 50%,
+        transparent 100%
+      );
+      clip-path: polygon(30% 100%, 70% 100%, 55% 0%, 45% 0%);
+      z-index: 3;
     }
 
-    /* Vines */
-    .vine {
+    /* 3D Tree rows - Left side */
+    .tree-row {
       position: absolute;
-      top: 0;
-      width: 4px;
-      background: linear-gradient(to bottom, var(--jade), #1a4a1a);
-      transform-origin: top center;
       z-index: 5;
     }
 
-    .vine-1 { left: 15%; height: 150px; animation: vineSwing 3s ease-in-out infinite; }
-    .vine-2 { left: 35%; height: 180px; animation: vineSwing 4s ease-in-out infinite -1s; }
-    .vine-3 { left: 55%; height: 140px; animation: vineSwing 3.5s ease-in-out infinite -0.5s; }
-    .vine-4 { left: 75%; height: 170px; animation: vineSwing 4.5s ease-in-out infinite -2s; }
-    .vine-5 { left: 90%; height: 130px; animation: vineSwing 3s ease-in-out infinite -1.5s; }
-
-    @keyframes vineSwing {
-      0%, 100% { transform: rotate(-5deg); }
-      50% { transform: rotate(5deg); }
+    .tree-3d {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    /* Monkey Character */
-    #monkey {
+    .tree-trunk-3d {
+      background: linear-gradient(90deg, #2a1a0a, #4a3020, #2a1a0a);
+      border-radius: 3px;
+    }
+
+    .tree-canopy-3d {
+      background: radial-gradient(ellipse at center, #2a6a2a 0%, #1a4a1a 50%, #0a3a0a 100%);
+      border-radius: 50%;
+      margin-bottom: -10px;
+    }
+
+    /* Left trees - near to far */
+    .tree-left-1 { left: 5%; bottom: 15%; }
+    .tree-left-1 .tree-trunk-3d { width: 30px; height: 120px; }
+    .tree-left-1 .tree-canopy-3d { width: 100px; height: 80px; }
+
+    .tree-left-2 { left: 12%; bottom: 25%; }
+    .tree-left-2 .tree-trunk-3d { width: 20px; height: 80px; }
+    .tree-left-2 .tree-canopy-3d { width: 70px; height: 55px; }
+
+    .tree-left-3 { left: 18%; bottom: 33%; }
+    .tree-left-3 .tree-trunk-3d { width: 14px; height: 50px; }
+    .tree-left-3 .tree-canopy-3d { width: 45px; height: 35px; }
+
+    .tree-left-4 { left: 23%; bottom: 38%; }
+    .tree-left-4 .tree-trunk-3d { width: 8px; height: 30px; }
+    .tree-left-4 .tree-canopy-3d { width: 28px; height: 22px; }
+
+    /* Right trees - near to far */
+    .tree-right-1 { right: 5%; bottom: 15%; }
+    .tree-right-1 .tree-trunk-3d { width: 30px; height: 120px; }
+    .tree-right-1 .tree-canopy-3d { width: 100px; height: 80px; }
+
+    .tree-right-2 { right: 12%; bottom: 25%; }
+    .tree-right-2 .tree-trunk-3d { width: 20px; height: 80px; }
+    .tree-right-2 .tree-canopy-3d { width: 70px; height: 55px; }
+
+    .tree-right-3 { right: 18%; bottom: 33%; }
+    .tree-right-3 .tree-trunk-3d { width: 14px; height: 50px; }
+    .tree-right-3 .tree-canopy-3d { width: 45px; height: 35px; }
+
+    .tree-right-4 { right: 23%; bottom: 38%; }
+    .tree-right-4 .tree-trunk-3d { width: 8px; height: 30px; }
+    .tree-right-4 .tree-canopy-3d { width: 28px; height: 22px; }
+
+    /* Vines hanging from top */
+    .vine-3d {
       position: absolute;
-      width: 60px;
-      height: 70px;
+      top: 0;
+      width: 6px;
+      background: linear-gradient(to bottom, var(--jade), #1a4a1a 70%, transparent);
+      z-index: 6;
+      transform-origin: top center;
+    }
+
+    .vine-3d-1 { left: 10%; height: 40%; animation: vineSwing3d 3s ease-in-out infinite; }
+    .vine-3d-2 { left: 25%; height: 30%; animation: vineSwing3d 4s ease-in-out infinite -1s; }
+    .vine-3d-3 { right: 25%; height: 35%; animation: vineSwing3d 3.5s ease-in-out infinite -0.5s; }
+    .vine-3d-4 { right: 10%; height: 45%; animation: vineSwing3d 4s ease-in-out infinite -2s; }
+
+    @keyframes vineSwing3d {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+
+    /* Monkey from behind (3rd person) */
+    #monkey-3d {
+      position: absolute;
+      bottom: 5%;
       left: 50%;
-      top: 120px;
       transform: translateX(-50%);
       z-index: 20;
-      transition: all 0.5s ease;
+      transition: transform 0.3s ease;
     }
 
-    #monkey.swinging {
-      animation: monkeySwing 0.6s ease-in-out;
+    #monkey-3d.swing-left {
+      animation: swingLeft3d 0.6s ease-out;
     }
 
-    @keyframes monkeySwing {
-      0% { transform: translateX(-50%) rotate(0deg); }
-      25% { transform: translateX(-30%) rotate(-20deg) translateY(-20px); }
-      50% { transform: translateX(0%) rotate(0deg) translateY(-40px); }
-      75% { transform: translateX(30%) rotate(20deg) translateY(-20px); }
-      100% { transform: translateX(-50%) rotate(0deg); }
+    #monkey-3d.swing-right {
+      animation: swingRight3d 0.6s ease-out;
     }
 
-    .monkey-body {
+    #monkey-3d.swing-forward {
+      animation: swingForward3d 0.6s ease-out;
+    }
+
+    @keyframes swingLeft3d {
+      0% { transform: translateX(-50%) scale(1); }
+      30% { transform: translateX(-80%) scale(0.9) rotate(-15deg); }
+      60% { transform: translateX(-60%) scale(0.85) translateY(-30px); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+
+    @keyframes swingRight3d {
+      0% { transform: translateX(-50%) scale(1); }
+      30% { transform: translateX(-20%) scale(0.9) rotate(15deg); }
+      60% { transform: translateX(-40%) scale(0.85) translateY(-30px); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+
+    @keyframes swingForward3d {
+      0% { transform: translateX(-50%) scale(1); }
+      40% { transform: translateX(-50%) scale(0.7) translateY(-50px); }
+      70% { transform: translateX(-50%) scale(0.6) translateY(-80px); }
+      100% { transform: translateX(-50%) scale(1) translateY(0); }
+    }
+
+    /* Monkey body from behind */
+    .monkey-back {
+      position: relative;
+      width: 80px;
+      height: 100px;
+    }
+
+    .monkey-back-body {
       position: absolute;
-      width: 35px;
-      height: 40px;
+      width: 50px;
+      height: 55px;
       background: var(--terracotta);
-      border-radius: 50% 50% 40% 40%;
+      border-radius: 25px 25px 20px 20px;
       left: 50%;
-      top: 25px;
+      bottom: 10px;
       transform: translateX(-50%);
     }
 
-    .monkey-head {
+    .monkey-back-head {
       position: absolute;
-      width: 40px;
-      height: 35px;
+      width: 45px;
+      height: 40px;
       background: var(--terracotta);
       border-radius: 50%;
       left: 50%;
@@ -194,376 +271,481 @@
       transform: translateX(-50%);
     }
 
-    .monkey-face {
+    .monkey-back-ear {
       position: absolute;
-      width: 25px;
-      height: 20px;
-      background: var(--cream);
-      border-radius: 50%;
-      left: 50%;
-      top: 12px;
-      transform: translateX(-50%);
-    }
-
-    .monkey-eye {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: var(--stone-dark);
-      border-radius: 50%;
-      top: 8px;
-    }
-
-    .monkey-eye.left { left: 8px; }
-    .monkey-eye.right { right: 8px; }
-
-    .monkey-nose {
-      position: absolute;
-      width: 8px;
-      height: 5px;
-      background: var(--terracotta);
-      border-radius: 50%;
-      left: 50%;
-      top: 18px;
-      transform: translateX(-50%);
-    }
-
-    .monkey-ear {
-      position: absolute;
-      width: 12px;
-      height: 12px;
+      width: 18px;
+      height: 18px;
       background: var(--terracotta);
       border-radius: 50%;
       top: 10px;
     }
 
-    .monkey-ear.left { left: -5px; }
-    .monkey-ear.right { right: -5px; }
+    .monkey-back-ear.left { left: 5px; }
+    .monkey-back-ear.right { right: 5px; }
 
-    .monkey-arm {
-      position: absolute;
-      width: 8px;
-      height: 30px;
-      background: var(--terracotta);
-      border-radius: 4px;
-      top: 30px;
-    }
-
-    .monkey-arm.left { left: 5px; transform: rotate(30deg); }
-    .monkey-arm.right { right: 5px; transform: rotate(-30deg); }
-
-    .monkey-tail {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      border: 5px solid var(--terracotta);
-      border-radius: 50%;
-      border-top-color: transparent;
-      border-left-color: transparent;
-      bottom: -10px;
-      right: -15px;
-      transform: rotate(45deg);
-    }
-
-    /* Event Objects */
-    .event-object {
-      position: absolute;
-      z-index: 15;
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
-
-    .event-object.visible {
-      opacity: 1;
-    }
-
-    /* Snake */
-    #snake {
-      bottom: 60px;
-      right: 20%;
-    }
-
-    .snake-body {
-      width: 80px;
-      height: 20px;
-      background: linear-gradient(90deg, #4a7a2a, #6a9a3a, #4a7a2a);
-      border-radius: 10px;
-      position: relative;
-    }
-
-    .snake-head {
-      position: absolute;
-      right: -15px;
-      top: -5px;
-      width: 25px;
-      height: 25px;
-      background: #4a7a2a;
-      border-radius: 50% 50% 50% 20%;
-    }
-
-    .snake-eye {
-      position: absolute;
-      width: 5px;
-      height: 5px;
-      background: red;
-      border-radius: 50%;
-      top: 5px;
-      right: 5px;
-    }
-
-    .snake-tongue {
-      position: absolute;
-      right: -10px;
-      top: 10px;
-      width: 15px;
-      height: 3px;
-      background: red;
-      animation: flickTongue 0.3s infinite;
-    }
-
-    @keyframes flickTongue {
-      0%, 100% { width: 15px; }
-      50% { width: 20px; }
-    }
-
-    /* Banana Tree */
-    #banana-tree {
-      bottom: 60px;
-      right: 15%;
-    }
-
-    .banana-trunk {
-      width: 20px;
-      height: 100px;
-      background: linear-gradient(90deg, #6a5030, #8a7050, #6a5030);
-      border-radius: 5px;
-    }
-
-    .banana-leaves {
-      position: absolute;
-      top: -30px;
-      left: -30px;
-      width: 80px;
-      height: 60px;
-    }
-
-    .banana-leaf {
-      position: absolute;
-      width: 40px;
-      height: 15px;
-      background: var(--jade);
-      border-radius: 50%;
-    }
-
-    .banana-leaf:nth-child(1) { transform: rotate(-30deg); left: 0; top: 20px; }
-    .banana-leaf:nth-child(2) { transform: rotate(30deg); right: 0; top: 20px; }
-    .banana-leaf:nth-child(3) { transform: rotate(-60deg); left: 10px; top: 0; }
-    .banana-leaf:nth-child(4) { transform: rotate(60deg); right: 10px; top: 0; }
-
-    .banana-bunch {
-      position: absolute;
-      top: 10px;
-      left: 25px;
-    }
-
-    .banana {
-      width: 20px;
-      height: 8px;
-      background: #FFE135;
-      border-radius: 10px;
-      margin: 2px;
-      transform: rotate(-20deg);
-      box-shadow: 0 0 5px rgba(255, 225, 53, 0.5);
-    }
-
-    /* Muddy Pit */
-    #muddy-pit {
-      bottom: 50px;
-      left: 30%;
-    }
-
-    .pit {
-      width: 100px;
-      height: 30px;
-      background: linear-gradient(to bottom, #4a3a2a, #3a2a1a);
-      border-radius: 50%;
-      position: relative;
-    }
-
-    .pit::before {
-      content: '';
-      position: absolute;
-      width: 80px;
-      height: 20px;
-      background: #5a4a3a;
-      border-radius: 50%;
-      top: 5px;
-      left: 10px;
-      animation: mudBubble 2s infinite;
-    }
-
-    @keyframes mudBubble {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    /* Golden Banana */
-    #golden-banana {
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .golden-banana-icon {
-      width: 50px;
-      height: 20px;
-      background: linear-gradient(to bottom, #FFD700, #FFA500);
-      border-radius: 25px;
-      transform: rotate(-30deg);
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 200, 0, 0.5);
-      animation: goldenGlow 1s ease-in-out infinite;
-    }
-
-    @keyframes goldenGlow {
-      0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 200, 0, 0.5); }
-      50% { box-shadow: 0 0 30px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 200, 0, 0.8); }
-    }
-
-    /* Friends */
-    #friend-kaa {
-      bottom: 100px;
-      left: 20%;
-    }
-
-    .kaa-body {
-      width: 100px;
-      height: 15px;
-      background: linear-gradient(90deg, #7a6a3a, #9a8a4a, #7a6a3a);
-      border-radius: 8px;
-      position: relative;
-    }
-
-    .kaa-head {
-      position: absolute;
-      left: -20px;
-      top: -8px;
-      width: 30px;
-      height: 30px;
-      background: #9a8a4a;
-      border-radius: 50%;
-    }
-
-    .kaa-eye {
+    .monkey-back-ear-inner {
       position: absolute;
       width: 10px;
       height: 10px;
-      background: yellow;
+      background: #a85c42;
       border-radius: 50%;
-      top: 8px;
-      left: 15px;
-      animation: hypnotize 1s infinite;
+      top: 4px;
+      left: 4px;
     }
 
-    @keyframes hypnotize {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.3); }
+    .monkey-back-arm {
+      position: absolute;
+      width: 12px;
+      height: 45px;
+      background: var(--terracotta);
+      border-radius: 6px;
+      top: 35px;
     }
 
-    #friend-baloo {
-      bottom: 60px;
-      right: 25%;
+    .monkey-back-arm.left {
+      left: 8px;
+      transform: rotate(20deg);
+      transform-origin: top center;
+    }
+    .monkey-back-arm.right {
+      right: 8px;
+      transform: rotate(-20deg);
+      transform-origin: top center;
     }
 
-    .baloo-body {
-      width: 70px;
-      height: 80px;
-      background: #5a5a6a;
-      border-radius: 35px 35px 25px 25px;
-      position: relative;
+    .monkey-back-arm.reaching {
+      animation: armReach 0.6s ease-out;
     }
 
-    .baloo-belly {
+    @keyframes armReach {
+      0%, 100% { transform: rotate(20deg); }
+      50% { transform: rotate(-30deg) translateY(-20px); }
+    }
+
+    .monkey-back-tail {
       position: absolute;
       width: 50px;
       height: 50px;
-      background: #7a7a8a;
+      border: 6px solid var(--terracotta);
       border-radius: 50%;
-      bottom: 10px;
-      left: 10px;
+      border-top-color: transparent;
+      border-left-color: transparent;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%) rotate(135deg);
     }
 
-    .baloo-head {
+    /* Event objects in 3D space */
+    .event-3d {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      opacity: 0;
+      transition: all 0.5s ease;
+    }
+
+    .event-3d.visible {
+      opacity: 1;
+      animation: eventAppear 0.5s ease-out;
+    }
+
+    @keyframes eventAppear {
+      0% { transform: translateX(-50%) scale(0.3); opacity: 0; }
+      100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    }
+
+    /* Snake in 3D view */
+    #snake-3d {
+      bottom: 35%;
+    }
+
+    .snake-3d-body {
+      width: 100px;
+      height: 25px;
+      background: linear-gradient(90deg, #3a6a2a, #5a8a3a, #3a6a2a);
+      border-radius: 12px;
+      position: relative;
+      animation: snakeSlither 0.5s ease-in-out infinite;
+    }
+
+    @keyframes snakeSlither {
+      0%, 100% { transform: scaleX(1); }
+      50% { transform: scaleX(1.1); }
+    }
+
+    .snake-3d-head {
+      position: absolute;
+      left: -20px;
+      top: -5px;
+      width: 35px;
+      height: 35px;
+      background: #4a7a2a;
+      border-radius: 50%;
+    }
+
+    .snake-3d-eye {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #ff0000;
+      border-radius: 50%;
+      top: 8px;
+      left: 8px;
+      box-shadow: 0 0 10px #ff0000;
+    }
+
+    .snake-3d-eye::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 10px;
+      background: #000;
+      border-radius: 2px;
+      top: 1px;
+      left: 4px;
+    }
+
+    .snake-3d-tongue {
+      position: absolute;
+      left: -15px;
+      top: 12px;
+      width: 20px;
+      height: 4px;
+      background: red;
+      animation: tongue3d 0.2s infinite;
+    }
+
+    .snake-3d-tongue::before,
+    .snake-3d-tongue::after {
+      content: '';
+      position: absolute;
+      left: -8px;
+      width: 10px;
+      height: 2px;
+      background: red;
+    }
+
+    .snake-3d-tongue::before { top: -2px; transform: rotate(-20deg); }
+    .snake-3d-tongue::after { top: 4px; transform: rotate(20deg); }
+
+    @keyframes tongue3d {
+      0%, 100% { width: 20px; }
+      50% { width: 30px; }
+    }
+
+    /* Banana tree in 3D */
+    #banana-tree-3d {
+      bottom: 30%;
+    }
+
+    .banana-tree-3d-trunk {
+      width: 30px;
+      height: 100px;
+      background: linear-gradient(90deg, #5a4020, #7a6040, #5a4020);
+      border-radius: 5px;
+      position: relative;
+    }
+
+    .banana-tree-3d-leaves {
+      position: absolute;
+      top: -40px;
+      left: -40px;
+      width: 110px;
+      height: 70px;
+    }
+
+    .banana-tree-3d-leaf {
       position: absolute;
       width: 50px;
-      height: 45px;
-      background: #5a5a6a;
+      height: 20px;
+      background: linear-gradient(to right, #2a7a2a, #4a9a4a, #2a7a2a);
       border-radius: 50%;
-      top: -30px;
-      left: 10px;
     }
 
-    .baloo-snout {
+    .banana-tree-3d-leaf:nth-child(1) { transform: rotate(-40deg); left: 0; top: 30px; }
+    .banana-tree-3d-leaf:nth-child(2) { transform: rotate(40deg); right: 0; top: 30px; }
+    .banana-tree-3d-leaf:nth-child(3) { transform: rotate(-70deg); left: 15px; top: 5px; }
+    .banana-tree-3d-leaf:nth-child(4) { transform: rotate(70deg); right: 15px; top: 5px; }
+    .banana-tree-3d-leaf:nth-child(5) { left: 30px; top: 0; }
+
+    .banana-tree-3d-bunch {
       position: absolute;
-      width: 25px;
-      height: 15px;
-      background: #7a7a8a;
-      border-radius: 50%;
-      bottom: 5px;
-      left: 12px;
+      top: 20px;
+      left: 35px;
     }
 
-    .baloo-ear {
+    .banana-3d {
+      width: 25px;
+      height: 10px;
+      background: linear-gradient(to bottom, #FFE135, #FFD700);
+      border-radius: 15px;
+      margin: 3px;
+      transform: rotate(-25deg);
+      box-shadow: 0 0 10px rgba(255, 225, 53, 0.6);
+    }
+
+    /* Muddy pit in 3D */
+    #muddy-pit-3d {
+      bottom: 25%;
+    }
+
+    .pit-3d {
+      width: 150px;
+      height: 40px;
+      background: radial-gradient(ellipse at center, #5a4a3a 0%, #3a2a1a 70%, #2a1a0a 100%);
+      border-radius: 50%;
+      position: relative;
+      animation: pitBubble 1.5s infinite;
+    }
+
+    @keyframes pitBubble {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .pit-3d::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: rgba(90, 70, 50, 0.8);
+      border-radius: 50%;
+      top: 10px;
+      left: 30px;
+      animation: bubble 1s infinite;
+    }
+
+    .pit-3d::after {
+      content: '';
       position: absolute;
       width: 15px;
       height: 15px;
-      background: #5a5a6a;
+      background: rgba(90, 70, 50, 0.8);
+      border-radius: 50%;
+      top: 15px;
+      right: 40px;
+      animation: bubble 1.3s infinite 0.5s;
+    }
+
+    @keyframes bubble {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.5) translateY(-10px); opacity: 0; }
+    }
+
+    /* Golden banana in 3D */
+    #golden-banana-3d {
+      bottom: 40%;
+    }
+
+    .golden-banana-3d {
+      width: 80px;
+      height: 30px;
+      background: linear-gradient(to bottom, #FFD700, #FFA500, #FFD700);
+      border-radius: 40px;
+      transform: rotate(-20deg);
+      box-shadow:
+        0 0 30px rgba(255, 215, 0, 0.9),
+        0 0 60px rgba(255, 200, 0, 0.6),
+        0 0 90px rgba(255, 180, 0, 0.3);
+      animation: goldenPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes goldenPulse {
+      0%, 100% {
+        transform: rotate(-20deg) scale(1);
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 60px rgba(255, 200, 0, 0.6);
+      }
+      50% {
+        transform: rotate(-20deg) scale(1.1);
+        box-shadow: 0 0 50px rgba(255, 215, 0, 1), 0 0 100px rgba(255, 200, 0, 0.8);
+      }
+    }
+
+    /* Friend Kaa in 3D */
+    #friend-kaa-3d {
+      bottom: 30%;
+    }
+
+    .kaa-3d-body {
+      width: 120px;
+      height: 20px;
+      background: linear-gradient(90deg, #8a7a4a, #aa9a5a, #8a7a4a);
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .kaa-3d-head {
+      position: absolute;
+      left: -25px;
+      top: -15px;
+      width: 45px;
+      height: 45px;
+      background: radial-gradient(circle at 30% 30%, #aa9a5a, #8a7a4a);
+      border-radius: 50%;
+    }
+
+    .kaa-3d-eye {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle, #ffff00 0%, #aaaa00 50%, #888800 100%);
+      border-radius: 50%;
+      top: 10px;
+      left: 18px;
+      animation: hypnoEye 0.8s infinite;
+    }
+
+    @keyframes hypnoEye {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 10px #ffff00; }
+      50% { transform: scale(1.3); box-shadow: 0 0 25px #ffff00; }
+    }
+
+    .kaa-3d-eye::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 14px;
+      background: #000;
+      border-radius: 3px;
+      top: 3px;
+      left: 7px;
+    }
+
+    /* Friend Baloo in 3D */
+    #friend-baloo-3d {
+      bottom: 25%;
+    }
+
+    .baloo-3d {
+      position: relative;
+      width: 100px;
+      height: 130px;
+    }
+
+    .baloo-3d-body {
+      position: absolute;
+      width: 80px;
+      height: 100px;
+      background: linear-gradient(to bottom, #5a5a6a, #4a4a5a);
+      border-radius: 40px 40px 30px 30px;
+      bottom: 0;
+      left: 10px;
+    }
+
+    .baloo-3d-belly {
+      position: absolute;
+      width: 55px;
+      height: 60px;
+      background: #7a7a8a;
+      border-radius: 50%;
+      bottom: 15px;
+      left: 22px;
+    }
+
+    .baloo-3d-head {
+      position: absolute;
+      width: 65px;
+      height: 55px;
+      background: radial-gradient(circle at 50% 40%, #6a6a7a, #4a4a5a);
       border-radius: 50%;
       top: 0;
+      left: 17px;
     }
 
-    .baloo-ear.left { left: 0; }
-    .baloo-ear.right { right: 0; }
-
-    #friend-wolves {
-      bottom: 60px;
-      left: 15%;
+    .baloo-3d-ear {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #5a5a6a;
+      border-radius: 50%;
+      top: 5px;
     }
 
-    .wolf {
+    .baloo-3d-ear.left { left: 20px; }
+    .baloo-3d-ear.right { right: 20px; }
+
+    .baloo-3d-snout {
+      position: absolute;
+      width: 35px;
+      height: 25px;
+      background: #8a8a9a;
+      border-radius: 50%;
+      bottom: 25px;
+      left: 32px;
+    }
+
+    .baloo-3d-nose {
+      position: absolute;
+      width: 15px;
+      height: 10px;
+      background: #2a2a3a;
+      border-radius: 50%;
+      bottom: 40px;
+      left: 42px;
+    }
+
+    /* Wolf Pack in 3D */
+    #friend-wolves-3d {
+      bottom: 28%;
+    }
+
+    .wolves-3d {
+      display: flex;
+      gap: 15px;
+    }
+
+    .wolf-3d {
+      position: relative;
+      width: 60px;
+      height: 50px;
+    }
+
+    .wolf-3d-body {
+      position: absolute;
       width: 50px;
       height: 35px;
-      background: #6a6a7a;
-      border-radius: 25px 25px 10px 10px;
-      position: relative;
-      display: inline-block;
-      margin-right: 5px;
+      background: linear-gradient(to bottom, #6a6a7a, #5a5a6a);
+      border-radius: 25px 25px 15px 15px;
+      bottom: 0;
     }
 
-    .wolf-head {
+    .wolf-3d-head {
       position: absolute;
-      width: 25px;
-      height: 20px;
+      width: 30px;
+      height: 25px;
       background: #6a6a7a;
-      border-radius: 50% 50% 30% 30%;
-      top: -10px;
+      border-radius: 15px 15px 10px 10px;
+      top: 5px;
       left: 0;
     }
 
-    .wolf-ear {
+    .wolf-3d-ear {
       position: absolute;
-      width: 8px;
-      height: 12px;
+      width: 10px;
+      height: 15px;
       background: #6a6a7a;
       clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
       top: -10px;
     }
 
-    .wolf-ear.left { left: 3px; }
-    .wolf-ear.right { left: 12px; }
+    .wolf-3d-ear.left { left: 5px; }
+    .wolf-3d-ear.right { left: 15px; }
+
+    .wolf-3d-eye {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #aaffaa;
+      border-radius: 50%;
+      top: 8px;
+      left: 8px;
+      box-shadow: 0 0 5px #aaffaa;
+    }
 
     /* Text Log */
     #text-log {
-      height: 120px;
+      height: 100px;
       background: var(--stone-dark);
       border: 3px solid var(--gold);
       border-top: none;
@@ -574,23 +756,15 @@
       flex-shrink: 0;
     }
 
-    #text-log::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    #text-log::-webkit-scrollbar-track {
-      background: var(--stone-dark);
-    }
-
-    #text-log::-webkit-scrollbar-thumb {
-      background: var(--gold);
-    }
+    #text-log::-webkit-scrollbar { width: 8px; }
+    #text-log::-webkit-scrollbar-track { background: var(--stone-dark); }
+    #text-log::-webkit-scrollbar-thumb { background: var(--gold); }
 
     /* Controls */
     .controls {
       display: flex;
-      gap: 10px;
-      margin-top: 10px;
+      gap: 8px;
+      margin-top: 8px;
       flex-shrink: 0;
     }
 
@@ -600,10 +774,10 @@
       background: linear-gradient(to bottom, var(--stone-light) 0%, var(--stone-mid) 100%);
       color: var(--cream);
       border: 3px solid var(--gold);
-      padding: 12px 8px;
+      padding: 12px 6px;
       cursor: pointer;
       transition: all 0.2s;
-      font-size: 0.45rem;
+      font-size: 0.4rem;
     }
 
     .controls button:hover {
@@ -611,15 +785,8 @@
       transform: scale(1.02);
     }
 
-    .controls button:active {
-      transform: scale(0.98);
-    }
-
-    .controls button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
+    .controls button:active { transform: scale(0.98); }
+    .controls button:disabled { opacity: 0.5; cursor: not-allowed; }
     .controls button.quit-btn:hover {
       background: linear-gradient(to bottom, var(--terracotta) 0%, #8a3020 100%);
     }
@@ -631,7 +798,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: var(--stone-mid);
+      background: rgba(44, 36, 22, 0.95);
       border: 4px solid var(--gold);
       padding: 20px;
       z-index: 100;
@@ -641,20 +808,20 @@
 
     #minigame-modal h3 {
       color: var(--gold);
-      font-size: 0.7rem;
-      margin-bottom: 15px;
+      font-size: 0.6rem;
+      margin-bottom: 12px;
     }
 
     #minigame-modal p {
-      font-size: 0.5rem;
-      margin-bottom: 15px;
+      font-size: 0.45rem;
+      margin-bottom: 12px;
       line-height: 1.6;
     }
 
     .minigame-options {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
 
     .minigame-options button {
@@ -662,9 +829,9 @@
       background: var(--stone-dark);
       color: var(--cream);
       border: 2px solid var(--jade);
-      padding: 10px;
+      padding: 8px;
       cursor: pointer;
-      font-size: 0.4rem;
+      font-size: 0.35rem;
       transition: all 0.2s;
     }
 
@@ -681,75 +848,50 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.85);
       z-index: 90;
       justify-content: center;
       align-items: center;
       flex-direction: column;
     }
 
-    #game-overlay h2 {
-      font-size: 1rem;
-      margin-bottom: 20px;
-    }
-
-    #game-overlay.victory h2 {
-      color: var(--gold);
-    }
-
-    #game-overlay.defeat h2 {
-      color: var(--terracotta);
-    }
+    #game-overlay h2 { font-size: 0.9rem; margin-bottom: 20px; }
+    #game-overlay.victory h2 { color: var(--gold); text-shadow: 0 0 20px var(--gold); }
+    #game-overlay.defeat h2 { color: var(--terracotta); }
 
     #game-overlay button {
       font-family: 'Press Start 2P', cursive;
       background: var(--jade);
       color: var(--cream);
       border: 3px solid var(--gold);
-      padding: 15px 30px;
+      padding: 12px 25px;
       cursor: pointer;
-      font-size: 0.6rem;
+      font-size: 0.5rem;
     }
 
     .back-link {
       display: block;
       text-align: center;
-      margin-top: 10px;
+      margin-top: 8px;
       color: var(--gold);
       text-decoration: none;
-      font-size: 0.5rem;
+      font-size: 0.45rem;
       flex-shrink: 0;
     }
 
-    .back-link:hover {
-      color: var(--turquoise);
-    }
+    .back-link:hover { color: var(--turquoise); }
 
     @media (max-width: 600px) {
-      .status-bar {
-        flex-wrap: wrap;
-        gap: 5px;
-      }
-
-      .status-item {
-        font-size: 0.4rem;
-      }
-
-      .controls button {
-        font-size: 0.35rem;
-        padding: 10px 5px;
-      }
-
-      #text-log {
-        height: 100px;
-        font-size: 0.4rem;
-      }
+      .status-bar { flex-wrap: wrap; gap: 5px; }
+      .status-item { font-size: 0.4rem; }
+      .controls button { font-size: 0.3rem; padding: 10px 4px; }
+      #text-log { height: 80px; font-size: 0.4rem; }
+      .monkey-back { transform: scale(0.8); }
     }
   </style>
 </head>
 <body>
   <div id="game-wrapper">
-    <!-- Status Bar -->
     <div class="status-bar">
       <div class="status-item">HEALTH:<span id="health">100</span></div>
       <div class="status-item">BANANAS:<span id="bananas">0</span>/69</div>
@@ -757,120 +899,151 @@
       <div class="status-item">GOLDEN:<span id="golden">NO</span></div>
     </div>
 
-    <!-- Game Scene -->
-    <div id="game-scene">
-      <!-- Vines -->
-      <div class="vine vine-1"></div>
-      <div class="vine vine-2"></div>
-      <div class="vine vine-3"></div>
-      <div class="vine vine-4"></div>
-      <div class="vine vine-5"></div>
+    <div id="game-viewport">
+      <!-- Sky -->
+      <div class="sky"></div>
 
-      <!-- Background Trees -->
-      <div class="bg-trees">
-        <div class="bg-tree" style="left: 5%;">
-          <div class="tree-trunk" style="width: 25px; height: 120px;"></div>
-          <div class="tree-canopy" style="width: 80px; height: 60px; top: -50px; left: -28px;"></div>
-        </div>
-        <div class="bg-tree" style="left: 25%;">
-          <div class="tree-trunk" style="width: 20px; height: 100px;"></div>
-          <div class="tree-canopy" style="width: 70px; height: 50px; top: -40px; left: -25px;"></div>
-        </div>
-        <div class="bg-tree" style="right: 25%;">
-          <div class="tree-trunk" style="width: 22px; height: 110px;"></div>
-          <div class="tree-canopy" style="width: 75px; height: 55px; top: -45px; left: -27px;"></div>
-        </div>
-        <div class="bg-tree" style="right: 5%;">
-          <div class="tree-trunk" style="width: 28px; height: 130px;"></div>
-          <div class="tree-canopy" style="width: 90px; height: 65px; top: -55px; left: -31px;"></div>
-        </div>
+      <!-- Jungle path -->
+      <div class="jungle-path"></div>
+
+      <!-- Trees - Left side (near to far) -->
+      <div class="tree-3d tree-left-1">
+        <div class="tree-canopy-3d"></div>
+        <div class="tree-trunk-3d"></div>
+      </div>
+      <div class="tree-3d tree-left-2">
+        <div class="tree-canopy-3d"></div>
+        <div class="tree-trunk-3d"></div>
+      </div>
+      <div class="tree-3d tree-left-3">
+        <div class="tree-canopy-3d"></div>
+        <div class="tree-trunk-3d"></div>
+      </div>
+      <div class="tree-3d tree-left-4">
+        <div class="tree-canopy-3d"></div>
+        <div class="tree-trunk-3d"></div>
       </div>
 
-      <!-- Ground -->
-      <div class="bg-layer ground"></div>
-
-      <!-- Monkey -->
-      <div id="monkey">
-        <div class="monkey-head">
-          <div class="monkey-ear left"></div>
-          <div class="monkey-ear right"></div>
-          <div class="monkey-face">
-            <div class="monkey-eye left"></div>
-            <div class="monkey-eye right"></div>
-            <div class="monkey-nose"></div>
-          </div>
-        </div>
-        <div class="monkey-body"></div>
-        <div class="monkey-arm left"></div>
-        <div class="monkey-arm right"></div>
-        <div class="monkey-tail"></div>
+      <!-- Trees - Right side (near to far) -->
+      <div class="tree-3d tree-right-1">
+        <div class="tree-canopy-3d"></div>
+        <div class="tree-trunk-3d"></div>
+      </div>
+      <div class="tree-3d tree-right-2">
+        <div class="tree-canopy-3d"></div>
+        <div class="tree-trunk-3d"></div>
+      </div>
+      <div class="tree-3d tree-right-3">
+        <div class="tree-canopy-3d"></div>
+        <div class="tree-trunk-3d"></div>
+      </div>
+      <div class="tree-3d tree-right-4">
+        <div class="tree-canopy-3d"></div>
+        <div class="tree-trunk-3d"></div>
       </div>
 
-      <!-- Event Objects (hidden by default) -->
-      <div id="snake" class="event-object">
-        <div class="snake-body">
-          <div class="snake-head">
-            <div class="snake-eye"></div>
-            <div class="snake-tongue"></div>
-          </div>
-        </div>
-      </div>
+      <!-- Hanging vines -->
+      <div class="vine-3d vine-3d-1"></div>
+      <div class="vine-3d vine-3d-2"></div>
+      <div class="vine-3d vine-3d-3"></div>
+      <div class="vine-3d vine-3d-4"></div>
 
-      <div id="banana-tree" class="event-object">
-        <div class="banana-trunk">
-          <div class="banana-leaves">
-            <div class="banana-leaf"></div>
-            <div class="banana-leaf"></div>
-            <div class="banana-leaf"></div>
-            <div class="banana-leaf"></div>
-          </div>
-          <div class="banana-bunch">
-            <div class="banana"></div>
-            <div class="banana"></div>
-            <div class="banana"></div>
+      <!-- Event Objects -->
+      <div id="snake-3d" class="event-3d">
+        <div class="snake-3d-body">
+          <div class="snake-3d-head">
+            <div class="snake-3d-eye"></div>
+            <div class="snake-3d-tongue"></div>
           </div>
         </div>
       </div>
 
-      <div id="muddy-pit" class="event-object">
-        <div class="pit"></div>
-      </div>
-
-      <div id="golden-banana" class="event-object">
-        <div class="golden-banana-icon"></div>
-      </div>
-
-      <div id="friend-kaa" class="event-object">
-        <div class="kaa-body">
-          <div class="kaa-head">
-            <div class="kaa-eye"></div>
+      <div id="banana-tree-3d" class="event-3d">
+        <div class="banana-tree-3d-trunk">
+          <div class="banana-tree-3d-leaves">
+            <div class="banana-tree-3d-leaf"></div>
+            <div class="banana-tree-3d-leaf"></div>
+            <div class="banana-tree-3d-leaf"></div>
+            <div class="banana-tree-3d-leaf"></div>
+            <div class="banana-tree-3d-leaf"></div>
+          </div>
+          <div class="banana-tree-3d-bunch">
+            <div class="banana-3d"></div>
+            <div class="banana-3d"></div>
+            <div class="banana-3d"></div>
           </div>
         </div>
       </div>
 
-      <div id="friend-baloo" class="event-object">
-        <div class="baloo-body">
-          <div class="baloo-belly"></div>
-          <div class="baloo-head">
-            <div class="baloo-ear left"></div>
-            <div class="baloo-ear right"></div>
-            <div class="baloo-snout"></div>
+      <div id="muddy-pit-3d" class="event-3d">
+        <div class="pit-3d"></div>
+      </div>
+
+      <div id="golden-banana-3d" class="event-3d">
+        <div class="golden-banana-3d"></div>
+      </div>
+
+      <div id="friend-kaa-3d" class="event-3d">
+        <div class="kaa-3d-body">
+          <div class="kaa-3d-head">
+            <div class="kaa-3d-eye"></div>
           </div>
         </div>
       </div>
 
-      <div id="friend-wolves" class="event-object">
-        <div class="wolf">
-          <div class="wolf-head">
-            <div class="wolf-ear left"></div>
-            <div class="wolf-ear right"></div>
+      <div id="friend-baloo-3d" class="event-3d">
+        <div class="baloo-3d">
+          <div class="baloo-3d-body"></div>
+          <div class="baloo-3d-belly"></div>
+          <div class="baloo-3d-head">
+            <div class="baloo-3d-ear left"></div>
+            <div class="baloo-3d-ear right"></div>
+            <div class="baloo-3d-snout"></div>
+            <div class="baloo-3d-nose"></div>
           </div>
         </div>
-        <div class="wolf">
-          <div class="wolf-head">
-            <div class="wolf-ear left"></div>
-            <div class="wolf-ear right"></div>
+      </div>
+
+      <div id="friend-wolves-3d" class="event-3d">
+        <div class="wolves-3d">
+          <div class="wolf-3d">
+            <div class="wolf-3d-body"></div>
+            <div class="wolf-3d-head">
+              <div class="wolf-3d-ear left"></div>
+              <div class="wolf-3d-ear right"></div>
+              <div class="wolf-3d-eye"></div>
+            </div>
           </div>
+          <div class="wolf-3d">
+            <div class="wolf-3d-body"></div>
+            <div class="wolf-3d-head">
+              <div class="wolf-3d-ear left"></div>
+              <div class="wolf-3d-ear right"></div>
+              <div class="wolf-3d-eye"></div>
+            </div>
+          </div>
+          <div class="wolf-3d">
+            <div class="wolf-3d-body"></div>
+            <div class="wolf-3d-head">
+              <div class="wolf-3d-ear left"></div>
+              <div class="wolf-3d-ear right"></div>
+              <div class="wolf-3d-eye"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Monkey (view from behind) -->
+      <div id="monkey-3d">
+        <div class="monkey-back">
+          <div class="monkey-back-head">
+            <div class="monkey-back-ear left"><div class="monkey-back-ear-inner"></div></div>
+            <div class="monkey-back-ear right"><div class="monkey-back-ear-inner"></div></div>
+          </div>
+          <div class="monkey-back-arm left"></div>
+          <div class="monkey-back-arm right"></div>
+          <div class="monkey-back-body"></div>
+          <div class="monkey-back-tail"></div>
         </div>
       </div>
 
@@ -893,15 +1066,13 @@
       </div>
     </div>
 
-    <!-- Text Log -->
     <div id="text-log"></div>
 
-    <!-- Controls -->
     <div class="controls">
-      <button onclick="game.swing('left')">SWING LEFT</button>
-      <button onclick="game.swing('straight')">SWING STRAIGHT</button>
-      <button onclick="game.swing('right')">SWING RIGHT</button>
-      <button id="climb-btn" onclick="game.swing('up')" style="display: none;">CLIMB UP</button>
+      <button onclick="game.swing('left')">SWING LEFT (L)</button>
+      <button onclick="game.swing('straight')">FORWARD (S)</button>
+      <button onclick="game.swing('right')">SWING RIGHT (R)</button>
+      <button id="climb-btn" onclick="game.swing('up')" style="display: none;">CLIMB UP (U)</button>
       <button class="quit-btn" onclick="game.quit()">QUIT</button>
     </div>
 
@@ -933,8 +1104,7 @@
         this.updateUI();
         this.hideAllEvents();
         this.log("Welcome to SWINGER MONKEY!");
-        this.log("Swing through the jungle and collect 69 bananas + the Golden Banana to win!");
-        this.log("Use the buttons or keyboard (L/S/R/U) to swing.");
+        this.log("Swing through the jungle! Collect 69 bananas + Golden Banana to win!");
       }
 
       setupKeyboard() {
@@ -951,7 +1121,7 @@
 
       log(text) {
         const logEl = document.getElementById('text-log');
-        logEl.innerHTML += `<div>${text}</div>`;
+        logEl.innerHTML += `<div>> ${text}</div>`;
         logEl.scrollTop = logEl.scrollHeight;
       }
 
@@ -965,7 +1135,7 @@
       }
 
       hideAllEvents() {
-        document.querySelectorAll('.event-object').forEach(el => el.classList.remove('visible'));
+        document.querySelectorAll('.event-3d').forEach(el => el.classList.remove('visible'));
       }
 
       showEvent(eventId) {
@@ -974,13 +1144,30 @@
         if (el) el.classList.add('visible');
       }
 
-      animateMonkey() {
+      animateMonkey(direction) {
         return new Promise(resolve => {
           this.isAnimating = true;
-          const monkey = document.getElementById('monkey');
-          monkey.classList.add('swinging');
+          const monkey = document.getElementById('monkey-3d');
+          const arms = document.querySelectorAll('.monkey-back-arm');
+
+          // Remove old classes
+          monkey.classList.remove('swing-left', 'swing-right', 'swing-forward');
+
+          // Add direction class
+          if (direction === 'left') {
+            monkey.classList.add('swing-left');
+          } else if (direction === 'right') {
+            monkey.classList.add('swing-right');
+          } else {
+            monkey.classList.add('swing-forward');
+          }
+
+          // Animate arms reaching
+          arms.forEach(arm => arm.classList.add('reaching'));
+
           setTimeout(() => {
-            monkey.classList.remove('swinging');
+            monkey.classList.remove('swing-left', 'swing-right', 'swing-forward');
+            arms.forEach(arm => arm.classList.remove('reaching'));
             this.isAnimating = false;
             resolve();
           }, 600);
@@ -993,55 +1180,55 @@
         this.canClimbUp = false;
         this.updateUI();
 
-        await this.animateMonkey();
+        await this.animateMonkey(direction);
 
-        const dirText = direction.toUpperCase();
-        this.log(`You swing ${dirText}...`);
+        const dirText = direction === 'straight' ? 'FORWARD' : direction.toUpperCase();
+        this.log(`Swinging ${dirText}...`);
 
         const event = this.events[Math.floor(Math.random() * this.events.length)];
 
         switch(event) {
           case 'snake':
-            this.showEvent('snake');
+            this.showEvent('snake-3d');
             if (this.jungleSongs > 0) {
               this.jungleSongs--;
-              this.log("A snake appears! You sing a jungle song and scare it away!");
+              this.log("A SNAKE! You sing and scare it away!");
             } else {
               const damage = Math.floor(Math.random() * 16) + 10;
               this.health -= damage;
-              this.log(`A snake bites you! You lost ${damage} health.`);
+              this.log(`SNAKE BITE! Lost ${damage} health!`);
             }
             break;
 
           case 'banana_tree':
-            this.showEvent('banana-tree');
+            this.showEvent('banana-tree-3d');
             const reward = Math.floor(Math.random() * 5) + 1;
             this.bananas += reward;
-            this.log(`You found a banana tree! +${reward} bananas!`);
+            this.log(`Banana tree! +${reward} bananas!`);
             break;
 
           case 'banana_stash':
-            this.showEvent('banana-tree');
+            this.showEvent('banana-tree-3d');
             const stash = Math.floor(Math.random() * 11) + 5;
             this.bananas += stash;
-            this.log(`You found a hidden banana stash! +${stash} bananas!`);
+            this.log(`Hidden stash! +${stash} bananas!`);
             break;
 
           case 'muddy_pit':
-            this.showEvent('muddy-pit');
+            this.showEvent('muddy-pit-3d');
             const pitDmg = Math.floor(Math.random() * 11) + 5;
             this.health -= pitDmg;
-            this.log(`You fell into a muddy pit! -${pitDmg} health.`);
+            this.log(`Fell in mud! -${pitDmg} health!`);
             break;
 
           case 'golden_banana':
             if (!this.hasGoldenBanana) {
-              this.showEvent('golden-banana');
-              this.log("You found the GOLDEN BANANA! Answer the riddle to claim it!");
+              this.showEvent('golden-banana-3d');
+              this.log("THE GOLDEN BANANA! Answer to claim it!");
               document.getElementById('minigame-modal').style.display = 'block';
               return;
             } else {
-              this.log("You swing through familiar territory...");
+              this.log("Swinging through the jungle...");
             }
             break;
 
@@ -1050,23 +1237,23 @@
             const friend = friends[Math.floor(Math.random() * friends.length)];
 
             if (friend === 'kaa') {
-              this.showEvent('friend-kaa');
-              this.log("You meet Kaa the snake! He shows you how to climb higher.");
+              this.showEvent('friend-kaa-3d');
+              this.log("KAA appears! Shows you how to climb!");
               this.canClimbUp = true;
             } else if (friend === 'baloo') {
-              this.showEvent('friend-baloo');
+              this.showEvent('friend-baloo-3d');
               this.jungleSongs++;
-              this.log("You meet Baloo! He teaches you a jungle song. (+1 Song)");
+              this.log("BALOO! Teaches you a jungle song! (+1 Song)");
             } else {
-              this.showEvent('friend-wolves');
+              this.showEvent('friend-wolves-3d');
               this.health = Math.min(100, this.health + 15);
-              this.log("The Wolf Pack protects you! +15 health!");
+              this.log("WOLF PACK! They protect you! +15 health!");
             }
             break;
 
           default:
             this.hideAllEvents();
-            this.log("You swing through the jungle... nothing happens.");
+            this.log("Nothing but jungle ahead...");
         }
 
         this.updateUI();
@@ -1079,9 +1266,9 @@
         if (answer === 'B') {
           this.hasGoldenBanana = true;
           this.bananas += 20;
-          this.log("CORRECT! You earned the Golden Banana! +20 bananas!");
+          this.log("CORRECT! Golden Banana is yours! +20 bananas!");
         } else {
-          this.log("Wrong answer! The Golden Banana slips away...");
+          this.log("Wrong! The Golden Banana vanishes...");
         }
 
         this.hideAllEvents();
@@ -1096,19 +1283,19 @@
           overlay.className = 'defeat';
           overlay.style.display = 'flex';
           document.getElementById('overlay-title').textContent = 'GAME OVER';
-          this.log("You ran out of health! The jungle claims another...");
+          this.log("The jungle claims another victim...");
         } else if (this.bananas >= 69 && this.hasGoldenBanana) {
           this.gameOver = true;
           const overlay = document.getElementById('game-overlay');
           overlay.className = 'victory';
           overlay.style.display = 'flex';
           document.getElementById('overlay-title').textContent = 'VICTORY!';
-          this.log("YOU SAVED THE JUNGLE! Congratulations, mighty monkey!");
+          this.log("YOU SAVED THE JUNGLE!");
         }
       }
 
       quit() {
-        if (confirm('Are you sure you want to quit?')) {
+        if (confirm('Quit game?')) {
           window.location.href = 'index.html';
         }
       }
