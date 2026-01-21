@@ -12,21 +12,41 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      image-rendering: pixelated;
+      -webkit-font-smoothing: none;
     }
 
     :root {
-      --gold: #D4AF37;
-      --jade: #00A86B;
-      --turquoise: #40E0D0;
-      --terracotta: #C84C32;
-      --stone-dark: #2C2416;
-      --hud-red: #b91c1c;
-      --hud-bg: #3a2a1a;
+      /* Atari 2600 style limited palette */
+      --sky: #1a4a1a;
+      --ground: #4a7a2a;
+      --ground-dark: #2a5a1a;
+      --tree-trunk: #6a3a1a;
+      --tree-dark: #4a2a0a;
+      --vine: #2a8a2a;
+      --vine-dark: #1a6a1a;
+      --monkey-orange: #da6a2a;
+      --monkey-dark: #aa4a1a;
+      --monkey-light: #ea9a6a;
+      --snake-green: #4a9a2a;
+      --snake-dark: #2a7a1a;
+      --banana-yellow: #eaea2a;
+      --banana-dark: #baba1a;
+      --golden: #fada2a;
+      --mud-brown: #5a4a3a;
+      --mud-dark: #3a2a1a;
+      --hud-bg: #1a1a1a;
+      --hud-border: #4a4a4a;
+      --text-green: #2aea2a;
+      --text-red: #ea2a2a;
+      --text-yellow: #eaea2a;
+      --white: #eaeaea;
+      --black: #0a0a0a;
     }
 
     body {
-      font-family: 'Press Start 2P', cursive;
-      background: #000;
+      font-family: 'Press Start 2P', monospace;
+      background: var(--black);
       height: 100vh;
       overflow: hidden;
       display: flex;
@@ -36,661 +56,483 @@
 
     #game-container {
       width: 100%;
-      max-width: 900px;
+      max-width: 800px;
       height: 100vh;
-      max-height: 700px;
+      max-height: 650px;
       display: flex;
       flex-direction: column;
-      background: #000;
+      background: var(--black);
       position: relative;
+      border: 4px solid var(--hud-border);
     }
 
-    /* 3D Viewport */
+    /* Scanline effect for CRT look */
+    #game-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0.15) 0px,
+        rgba(0,0,0,0.15) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    /* 8-bit Viewport */
     #viewport {
       flex: 1;
       position: relative;
       overflow: hidden;
-      background: linear-gradient(to bottom,
-        #0a1a0a 0%,
-        #1a3a1a 30%,
-        #2a5a2a 60%,
-        #3a7a3a 100%
-      );
-      perspective: 400px;
-      perspective-origin: 50% 60%;
+      background: var(--sky);
     }
 
-    /* Sky/Canopy */
-    .canopy {
+    /* Pixelated sky bands */
+    .sky-band {
       position: absolute;
-      top: 0;
+      left: 0;
+      width: 100%;
+      height: 20%;
+    }
+    .sky-band:nth-child(1) { top: 0; background: #0a2a0a; }
+    .sky-band:nth-child(2) { top: 20%; background: #1a3a1a; }
+    .sky-band:nth-child(3) { top: 40%; background: #2a4a2a; }
+
+    /* 8-bit Ground - flat colored strips */
+    .ground-8bit {
+      position: absolute;
+      bottom: 0;
       left: 0;
       width: 100%;
       height: 45%;
-      background:
-        radial-gradient(ellipse at 30% 20%, rgba(50,100,50,0.8) 0%, transparent 40%),
-        radial-gradient(ellipse at 70% 30%, rgba(40,90,40,0.7) 0%, transparent 35%),
-        radial-gradient(ellipse at 50% 10%, rgba(60,110,60,0.9) 0%, transparent 50%),
-        radial-gradient(ellipse at 20% 40%, rgba(45,95,45,0.6) 0%, transparent 30%),
-        radial-gradient(ellipse at 80% 15%, rgba(55,105,55,0.7) 0%, transparent 35%),
-        linear-gradient(to bottom, #0a1a0a, transparent);
-      z-index: 10;
+      background: repeating-linear-gradient(
+        to bottom,
+        var(--ground) 0px,
+        var(--ground) 16px,
+        var(--ground-dark) 16px,
+        var(--ground-dark) 32px
+      );
     }
 
-    /* Sun rays through canopy */
-    .sun-rays {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 60%;
-      background:
-        linear-gradient(170deg, rgba(255,255,200,0.15) 0%, transparent 30%),
-        linear-gradient(190deg, rgba(255,255,180,0.1) 0%, transparent 25%),
-        linear-gradient(160deg, rgba(255,255,150,0.08) 0%, transparent 35%);
-      z-index: 11;
-      pointer-events: none;
-    }
-
-    /* 3D Floor (jungle ground rushing towards you) */
-    .floor-3d {
+    /* 8-bit Path - simple triangle perspective */
+    .path-8bit {
       position: absolute;
       bottom: 0;
-      left: -50%;
-      width: 200%;
-      height: 55%;
-      background:
-        repeating-linear-gradient(
-          to bottom,
-          #2a4a1a 0px,
-          #3a5a2a 20px,
-          #2a4a1a 40px
-        );
-      transform: rotateX(60deg);
-      transform-origin: center top;
-      z-index: 5;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 120px solid transparent;
+      border-right: 120px solid transparent;
+      border-bottom: 200px solid var(--mud-brown);
     }
 
-    .floor-3d.moving {
-      animation: floorMove 0.5s linear;
-    }
-
-    @keyframes floorMove {
-      0% { background-position: 0 0; }
-      100% { background-position: 0 100px; }
-    }
-
-    /* 3D Walls/Trees on sides */
-    .wall-left, .wall-right {
+    /* 8-bit Tree trunks - simple rectangles */
+    .tree-8bit {
       position: absolute;
-      top: 0;
-      width: 35%;
-      height: 100%;
-      z-index: 8;
+      bottom: 45%;
+      width: 24px;
+      background: var(--tree-trunk);
+      border: 4px solid var(--tree-dark);
     }
 
-    .wall-left {
-      left: 0;
-      background: linear-gradient(to right,
-        #1a2a0a 0%,
-        #2a4a1a 40%,
-        transparent 100%
-      );
-      transform: perspective(300px) rotateY(20deg);
-      transform-origin: left center;
+    .tree-8bit.l1 { left: 8%; height: 55%; }
+    .tree-8bit.l2 { left: 20%; height: 45%; width: 20px; }
+    .tree-8bit.r1 { right: 8%; height: 55%; }
+    .tree-8bit.r2 { right: 20%; height: 45%; width: 20px; }
+
+    .tree-8bit.moving {
+      animation: tree8bitMove 0.4s steps(4);
     }
 
-    .wall-right {
-      right: 0;
-      background: linear-gradient(to left,
-        #1a2a0a 0%,
-        #2a4a1a 40%,
-        transparent 100%
-      );
-      transform: perspective(300px) rotateY(-20deg);
-      transform-origin: right center;
+    @keyframes tree8bitMove {
+      0% { transform: scale(0.7); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
     }
 
-    /* Tree trunks rushing past */
-    .tree-trunk {
-      position: absolute;
-      bottom: 10%;
-      width: 30px;
-      background: linear-gradient(90deg, #2a1a0a, #5a3a1a, #2a1a0a);
-      z-index: 15;
-      border-radius: 5px;
-    }
-
-    .tree-trunk.left-1 { left: 5%; height: 70%; }
-    .tree-trunk.left-2 { left: 15%; height: 55%; }
-    .tree-trunk.right-1 { right: 5%; height: 70%; }
-    .tree-trunk.right-2 { right: 15%; height: 55%; }
-
-    .tree-trunk.moving {
-      animation: treePast 0.5s ease-out;
-    }
-
-    @keyframes treePast {
-      0% { transform: scale(0.5) translateY(-50px); opacity: 0.5; }
-      50% { transform: scale(1.2) translateY(0); opacity: 1; }
-      100% { transform: scale(1) translateY(0); opacity: 1; }
-    }
-
-    /* Vines hanging down */
-    .hanging-vine {
+    /* 8-bit Vines - simple lines */
+    .vine-8bit {
       position: absolute;
       top: 0;
       width: 8px;
-      background: linear-gradient(to bottom,
-        #2a7a3a,
-        #3a9a4a,
-        #2a7a3a
-      );
-      border-radius: 4px;
-      z-index: 12;
-      transform-origin: top center;
+      background: var(--vine);
+      border: 2px solid var(--vine-dark);
     }
 
-    .hanging-vine::after {
+    .vine-8bit::after {
       content: '';
       position: absolute;
-      bottom: -15px;
-      left: -8px;
-      width: 24px;
-      height: 20px;
-      background: #3a9a4a;
-      clip-path: polygon(50% 100%, 0 30%, 30% 0, 70% 0, 100% 30%);
+      bottom: -12px;
+      left: -4px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 12px solid var(--vine);
     }
 
-    .vine-l1 { left: 10%; height: 35%; animation: vineSwing 3s ease-in-out infinite; }
-    .vine-l2 { left: 25%; height: 25%; animation: vineSwing 4s ease-in-out infinite -1s; }
-    .vine-r1 { right: 10%; height: 30%; animation: vineSwing 3.5s ease-in-out infinite -0.5s; }
-    .vine-r2 { right: 25%; height: 28%; animation: vineSwing 4s ease-in-out infinite -2s; }
-    .vine-center { left: 48%; height: 40%; animation: vineSwing 3s ease-in-out infinite; }
+    .vine-8bit.v1 { left: 12%; height: 30%; }
+    .vine-8bit.v2 { left: 28%; height: 22%; }
+    .vine-8bit.v3 { left: 50%; transform: translateX(-50%); height: 35%; }
+    .vine-8bit.v4 { right: 28%; height: 25%; }
+    .vine-8bit.v5 { right: 12%; height: 28%; }
 
-    @keyframes vineSwing {
-      0%, 100% { transform: rotate(-8deg); }
-      50% { transform: rotate(8deg); }
+    .vine-8bit.swing {
+      animation: vineSwing8bit 0.5s steps(3);
     }
 
-    /* Grabbed vine (when swinging) */
-    .grabbed-vine {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 12px;
-      height: 50%;
-      background: linear-gradient(to bottom, #2a7a3a, #4aaa5a, #2a7a3a);
-      border-radius: 6px;
-      z-index: 25;
-      opacity: 0;
-      transition: opacity 0.2s;
+    @keyframes vineSwing8bit {
+      0% { transform: translateX(0); }
+      33% { transform: translateX(-8px); }
+      66% { transform: translateX(8px); }
+      100% { transform: translateX(0); }
     }
 
-    .grabbed-vine.visible {
-      opacity: 1;
-      animation: grabbedVineSwing 0.6s ease-out;
-    }
-
-    @keyframes grabbedVineSwing {
-      0% { transform: translateX(-50%) rotate(0); }
-      30% { transform: translateX(-50%) rotate(-15deg); }
-      60% { transform: translateX(-50%) rotate(10deg); }
-      100% { transform: translateX(-50%) rotate(0); }
-    }
-
-    /* Center tunnel effect */
-    .tunnel {
-      position: absolute;
-      top: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40%;
-      height: 50%;
-      background: radial-gradient(ellipse,
-        rgba(50,100,50,0.3) 0%,
-        rgba(30,70,30,0.5) 40%,
-        transparent 70%
-      );
-      z-index: 6;
-    }
-
-    .tunnel.zooming {
-      animation: tunnelZoom 0.5s ease-out;
-    }
-
-    @keyframes tunnelZoom {
-      0% { transform: translateX(-50%) scale(0.5); opacity: 0.3; }
-      50% { transform: translateX(-50%) scale(1.3); opacity: 0.8; }
-      100% { transform: translateX(-50%) scale(1); opacity: 1; }
-    }
-
-    /* Event objects (appearing in 3D space) */
-    .event-object {
+    /* Event objects - 8-bit style */
+    .event-8bit {
       position: absolute;
       left: 50%;
-      top: 30%;
       transform: translateX(-50%) scale(0);
       z-index: 20;
       opacity: 0;
-      transition: all 0.3s ease-out;
     }
 
-    .event-object.visible {
+    .event-8bit.visible {
       opacity: 1;
       transform: translateX(-50%) scale(1);
-      animation: eventAppear 0.5s ease-out;
+      animation: eventPop8bit 0.3s steps(3);
     }
 
-    @keyframes eventAppear {
-      0% { transform: translateX(-50%) scale(0.2) translateY(-100px); opacity: 0; }
-      60% { transform: translateX(-50%) scale(1.1) translateY(0); opacity: 1; }
-      100% { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; }
+    @keyframes eventPop8bit {
+      0% { transform: translateX(-50%) scale(0); }
+      50% { transform: translateX(-50%) scale(1.2); }
+      100% { transform: translateX(-50%) scale(1); }
     }
 
-    /* Snake */
-    #snake-obj {
+    /* 8-bit Snake */
+    #snake-8bit {
       top: 25%;
     }
 
-    .snake-3d {
-      position: relative;
+    .snake-body-8bit {
+      display: flex;
+      align-items: center;
     }
 
-    .snake-3d .body {
-      width: 150px;
-      height: 40px;
-      background: linear-gradient(90deg, #3a7a2a, #5a9a3a, #4a8a2a, #3a7a2a);
-      border-radius: 20px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-      animation: snakeSlither 0.3s ease-in-out infinite;
-    }
-
-    @keyframes snakeSlither {
-      0%, 100% { transform: scaleX(1); }
-      50% { transform: scaleX(1.05); }
-    }
-
-    .snake-3d .head {
-      position: absolute;
-      left: -35px;
-      top: -12px;
-      width: 60px;
-      height: 60px;
-      background: radial-gradient(circle at 30% 30%, #5a9a3a, #3a7a2a);
-      border-radius: 50%;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    }
-
-    .snake-3d .eye {
-      position: absolute;
+    .snake-segment {
       width: 20px;
       height: 20px;
-      background: radial-gradient(circle, #ff0000, #990000);
-      border-radius: 50%;
-      top: 15px;
-      left: 18px;
-      box-shadow: 0 0 20px rgba(255,0,0,0.8);
-      animation: snakeEyePulse 0.5s infinite;
+      background: var(--snake-green);
+      border: 3px solid var(--snake-dark);
     }
 
-    @keyframes snakeEyePulse {
-      0%, 100% { box-shadow: 0 0 20px rgba(255,0,0,0.8); }
-      50% { box-shadow: 0 0 35px rgba(255,0,0,1); }
-    }
-
-    .snake-3d .eye::after {
-      content: '';
-      position: absolute;
-      width: 6px;
-      height: 16px;
-      background: #000;
-      border-radius: 3px;
-      top: 2px;
-      left: 7px;
-    }
-
-    .snake-3d .tongue {
-      position: absolute;
-      left: -25px;
-      top: 25px;
-      width: 30px;
-      height: 6px;
-      background: #ff3333;
-      animation: tongueFlick 0.15s infinite;
-    }
-
-    .snake-3d .tongue::before,
-    .snake-3d .tongue::after {
-      content: '';
-      position: absolute;
-      left: -12px;
-      width: 14px;
-      height: 4px;
-      background: #ff3333;
-    }
-
-    .snake-3d .tongue::before { top: -5px; transform: rotate(-25deg); }
-    .snake-3d .tongue::after { top: 7px; transform: rotate(25deg); }
-
-    @keyframes tongueFlick {
-      0%, 100% { width: 30px; }
-      50% { width: 45px; }
-    }
-
-    /* Banana Tree */
-    #banana-obj {
-      top: 20%;
-    }
-
-    .banana-tree-3d {
+    .snake-head-8bit {
+      width: 28px;
+      height: 28px;
+      background: var(--snake-green);
+      border: 3px solid var(--snake-dark);
       position: relative;
     }
 
-    .banana-tree-3d .trunk {
-      width: 45px;
-      height: 140px;
-      background: linear-gradient(90deg, #5a4020, #8a6840, #5a4020);
-      border-radius: 8px;
-      margin: 0 auto;
-      box-shadow: -8px 0 20px rgba(0,0,0,0.4);
+    .snake-eye-8bit {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--text-red);
+      top: 6px;
+      left: 6px;
     }
 
-    .banana-tree-3d .leaves {
+    .snake-tongue-8bit {
       position: absolute;
-      top: -60px;
+      left: -16px;
+      top: 10px;
+      width: 16px;
+      height: 4px;
+      background: var(--text-red);
+    }
+
+    .snake-tongue-8bit::before,
+    .snake-tongue-8bit::after {
+      content: '';
+      position: absolute;
+      left: -8px;
+      width: 8px;
+      height: 4px;
+      background: var(--text-red);
+    }
+    .snake-tongue-8bit::before { top: -4px; }
+    .snake-tongue-8bit::after { top: 4px; }
+
+    /* 8-bit Banana Tree */
+    #banana-8bit {
+      top: 18%;
+    }
+
+    .banana-tree-8bit {
+      position: relative;
+    }
+
+    .btree-trunk {
+      width: 20px;
+      height: 100px;
+      background: var(--tree-trunk);
+      border: 3px solid var(--tree-dark);
+      margin: 0 auto;
+    }
+
+    .btree-leaves {
+      position: absolute;
+      top: -40px;
       left: 50%;
       transform: translateX(-50%);
-      width: 180px;
-      height: 100px;
     }
 
-    .banana-tree-3d .leaf {
+    .btree-leaf {
+      width: 48px;
+      height: 12px;
+      background: var(--vine);
+      border: 2px solid var(--vine-dark);
       position: absolute;
-      width: 70px;
-      height: 25px;
-      background: linear-gradient(to right, #2a8a3a, #4aaa5a, #2a8a3a);
-      border-radius: 50%;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
 
-    .banana-tree-3d .leaf:nth-child(1) { transform: rotate(-55deg); left: 0; top: 45px; }
-    .banana-tree-3d .leaf:nth-child(2) { transform: rotate(55deg); right: 0; top: 45px; }
-    .banana-tree-3d .leaf:nth-child(3) { transform: rotate(-75deg); left: 25px; top: 15px; }
-    .banana-tree-3d .leaf:nth-child(4) { transform: rotate(75deg); right: 25px; top: 15px; }
-    .banana-tree-3d .leaf:nth-child(5) { left: 50%; transform: translateX(-50%); top: 0; }
+    .btree-leaf:nth-child(1) { transform: rotate(-45deg); left: -40px; top: 20px; }
+    .btree-leaf:nth-child(2) { transform: rotate(45deg); left: 0; top: 20px; }
+    .btree-leaf:nth-child(3) { transform: rotate(-20deg); left: -30px; top: 0; }
+    .btree-leaf:nth-child(4) { transform: rotate(20deg); left: -10px; top: 0; }
 
-    .banana-tree-3d .bunch {
+    .banana-bunch-8bit {
       position: absolute;
-      top: 50px;
-      left: 60%;
-    }
-
-    .banana-tree-3d .banana {
-      width: 40px;
-      height: 15px;
-      background: linear-gradient(to bottom, #ffe135, #ffc800);
-      border-radius: 20px;
-      margin: 5px 0;
-      transform: rotate(-30deg);
-      box-shadow: 0 0 20px rgba(255,225,53,0.6);
-      animation: bananaGlow 1s ease-in-out infinite;
-    }
-
-    @keyframes bananaGlow {
-      0%, 100% { box-shadow: 0 0 20px rgba(255,225,53,0.6); }
-      50% { box-shadow: 0 0 35px rgba(255,225,53,0.9); }
-    }
-
-    /* Mud Pit */
-    #pit-obj {
-      top: 40%;
-    }
-
-    .mud-pit-3d {
-      width: 200px;
-      height: 60px;
-      background: radial-gradient(ellipse, #6a5a4a 0%, #4a3a2a 50%, #3a2a1a 100%);
-      border-radius: 50%;
-      box-shadow: inset 0 -15px 30px rgba(0,0,0,0.5), 0 10px 25px rgba(0,0,0,0.4);
-      position: relative;
-    }
-
-    .mud-pit-3d .bubble {
-      position: absolute;
-      width: 25px;
-      height: 25px;
-      background: rgba(90,70,50,0.8);
-      border-radius: 50%;
-      animation: mudBubble 2s infinite;
-    }
-
-    .mud-pit-3d .bubble:nth-child(1) { left: 35px; top: 18px; animation-delay: 0s; }
-    .mud-pit-3d .bubble:nth-child(2) { left: 90px; top: 22px; animation-delay: 0.7s; }
-    .mud-pit-3d .bubble:nth-child(3) { right: 35px; top: 15px; animation-delay: 1.3s; }
-
-    @keyframes mudBubble {
-      0%, 100% { transform: scale(0); opacity: 0; }
-      30% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.4) translateY(-20px); opacity: 0.4; }
-      70% { transform: scale(1.6) translateY(-30px); opacity: 0; }
-    }
-
-    /* Golden Banana */
-    #golden-obj {
-      top: 28%;
-    }
-
-    .golden-banana-3d {
-      width: 120px;
-      height: 50px;
-      background: linear-gradient(to bottom, #ffd700, #ffaa00, #ffd700);
-      border-radius: 60px;
-      transform: rotate(-20deg);
-      box-shadow:
-        0 0 50px rgba(255,215,0,1),
-        0 0 100px rgba(255,180,0,0.7),
-        0 0 150px rgba(255,150,0,0.4),
-        inset 0 -8px 20px rgba(200,150,0,0.5);
-      animation: goldenFloat 1.5s ease-in-out infinite, goldenPulse 0.8s ease-in-out infinite;
-    }
-
-    @keyframes goldenFloat {
-      0%, 100% { transform: rotate(-20deg) translateY(0); }
-      50% { transform: rotate(-20deg) translateY(-20px); }
-    }
-
-    @keyframes goldenPulse {
-      0%, 100% { box-shadow: 0 0 50px rgba(255,215,0,1), 0 0 100px rgba(255,180,0,0.7); }
-      50% { box-shadow: 0 0 80px rgba(255,215,0,1), 0 0 150px rgba(255,180,0,0.9); }
-    }
-
-    /* Friends */
-    #kaa-obj { top: 25%; }
-    #baloo-obj { top: 20%; }
-    #wolves-obj { top: 30%; }
-
-    /* Kaa */
-    .kaa-3d .body {
-      width: 160px;
-      height: 28px;
-      background: linear-gradient(90deg, #9a8a5a, #baa86a, #9a8a5a);
-      border-radius: 14px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    }
-
-    .kaa-3d .head {
-      position: absolute;
-      left: -40px;
-      top: -20px;
-      width: 70px;
-      height: 70px;
-      background: radial-gradient(circle at 40% 40%, #baa86a, #9a8a5a);
-      border-radius: 50%;
-    }
-
-    .kaa-3d .eye {
-      position: absolute;
-      width: 35px;
-      height: 35px;
-      background: radial-gradient(circle, #ffff00 0%, #cccc00 50%, #999900 100%);
-      border-radius: 50%;
-      top: 15px;
-      left: 25px;
-      box-shadow: 0 0 30px rgba(255,255,0,0.9);
-      animation: hypnoEye 0.5s infinite;
-    }
-
-    @keyframes hypnoEye {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(255,255,0,0.9); }
-      50% { transform: scale(1.2); box-shadow: 0 0 50px rgba(255,255,0,1); }
-    }
-
-    .kaa-3d .eye::after {
-      content: '';
-      position: absolute;
-      width: 10px;
-      height: 25px;
-      background: #000;
-      border-radius: 5px;
-      top: 5px;
-      left: 12px;
-    }
-
-    /* Baloo */
-    .baloo-3d {
-      position: relative;
-      width: 130px;
-      height: 180px;
-    }
-
-    .baloo-3d .body {
-      position: absolute;
-      width: 110px;
-      height: 130px;
-      background: linear-gradient(to bottom, #5a5a6a, #4a4a5a);
-      border-radius: 55px 55px 45px 45px;
-      bottom: 0;
-      left: 10px;
-      box-shadow: -10px 0 25px rgba(0,0,0,0.4);
-    }
-
-    .baloo-3d .belly {
-      position: absolute;
-      width: 70px;
-      height: 85px;
-      background: linear-gradient(to bottom, #8a8a9a, #7a7a8a);
-      border-radius: 50%;
-      bottom: 20px;
+      top: 30px;
       left: 30px;
     }
 
-    .baloo-3d .head {
-      position: absolute;
-      width: 90px;
-      height: 80px;
-      background: radial-gradient(circle at 50% 40%, #6a6a7a, #4a4a5a);
-      border-radius: 50%;
-      top: 0;
-      left: 20px;
+    .banana-pixel {
+      width: 24px;
+      height: 10px;
+      background: var(--banana-yellow);
+      border: 2px solid var(--banana-dark);
+      margin: 4px 0;
+      transform: skewX(-15deg);
     }
 
-    .baloo-3d .ear {
+    /* 8-bit Mud Pit */
+    #pit-8bit {
+      top: 35%;
+    }
+
+    .mud-pit-8bit {
+      width: 140px;
+      height: 40px;
+      background: var(--mud-brown);
+      border: 4px solid var(--mud-dark);
+      position: relative;
+    }
+
+    .mud-bubble-8bit {
       position: absolute;
-      width: 30px;
-      height: 30px;
+      width: 12px;
+      height: 12px;
+      background: var(--mud-dark);
+      animation: mudBubble8bit 1s steps(4) infinite;
+    }
+
+    .mud-bubble-8bit:nth-child(1) { left: 20px; top: 10px; animation-delay: 0s; }
+    .mud-bubble-8bit:nth-child(2) { left: 60px; top: 14px; animation-delay: 0.3s; }
+    .mud-bubble-8bit:nth-child(3) { right: 20px; top: 8px; animation-delay: 0.6s; }
+
+    @keyframes mudBubble8bit {
+      0%, 100% { transform: translateY(0); opacity: 1; }
+      50% { transform: translateY(-16px); opacity: 0.5; }
+      75% { opacity: 0; }
+    }
+
+    /* 8-bit Golden Banana */
+    #golden-8bit {
+      top: 28%;
+    }
+
+    .golden-banana-8bit {
+      width: 64px;
+      height: 24px;
+      background: var(--golden);
+      border: 4px solid var(--banana-dark);
+      animation: goldenFlash8bit 0.5s steps(2) infinite;
+    }
+
+    @keyframes goldenFlash8bit {
+      0%, 100% { background: var(--golden); box-shadow: 0 0 0 4px var(--banana-yellow); }
+      50% { background: var(--banana-yellow); box-shadow: 0 0 0 8px var(--golden); }
+    }
+
+    /* 8-bit Friends */
+    #kaa-8bit { top: 25%; }
+    #baloo-8bit { top: 20%; }
+    #wolves-8bit { top: 30%; }
+
+    /* Kaa */
+    .kaa-body-8bit {
+      display: flex;
+      align-items: center;
+    }
+
+    .kaa-seg {
+      width: 16px;
+      height: 16px;
+      background: #baba6a;
+      border: 2px solid #8a8a4a;
+    }
+
+    .kaa-head-8bit {
+      width: 32px;
+      height: 32px;
+      background: #baba6a;
+      border: 3px solid #8a8a4a;
+      position: relative;
+    }
+
+    .kaa-eye-8bit {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: var(--banana-yellow);
+      border: 2px solid #8a8a1a;
+      top: 6px;
+      left: 10px;
+      animation: kaaEye8bit 0.3s steps(2) infinite;
+    }
+
+    @keyframes kaaEye8bit {
+      0%, 100% { background: var(--banana-yellow); }
+      50% { background: var(--white); }
+    }
+
+    /* Baloo */
+    .baloo-8bit {
+      position: relative;
+      width: 80px;
+      height: 100px;
+    }
+
+    .baloo-body-8bit {
+      position: absolute;
+      bottom: 0;
+      left: 10px;
+      width: 60px;
+      height: 70px;
       background: #5a5a6a;
-      border-radius: 50%;
-      top: 8px;
+      border: 4px solid #3a3a4a;
     }
 
-    .baloo-3d .ear.left { left: 22px; }
-    .baloo-3d .ear.right { right: 22px; }
-
-    .baloo-3d .snout {
+    .baloo-belly-8bit {
       position: absolute;
+      bottom: 8px;
+      left: 20px;
+      width: 40px;
+      height: 50px;
+      background: #8a8a9a;
+      border: 3px solid #6a6a7a;
+    }
+
+    .baloo-head-8bit {
+      position: absolute;
+      top: 0;
+      left: 15px;
       width: 50px;
-      height: 38px;
-      background: #9a9aaa;
-      border-radius: 50%;
-      bottom: 32px;
-      left: 40px;
+      height: 45px;
+      background: #5a5a6a;
+      border: 4px solid #3a3a4a;
     }
 
-    .baloo-3d .nose {
+    .baloo-ear-8bit {
       position: absolute;
-      width: 22px;
-      height: 15px;
-      background: #2a2a3a;
-      border-radius: 50%;
-      bottom: 58px;
-      left: 54px;
+      width: 16px;
+      height: 16px;
+      background: #5a5a6a;
+      border: 3px solid #3a3a4a;
+      top: 0;
+    }
+
+    .baloo-ear-8bit.left { left: 12px; }
+    .baloo-ear-8bit.right { right: 12px; }
+
+    .baloo-snout-8bit {
+      position: absolute;
+      bottom: 35px;
+      left: 25px;
+      width: 30px;
+      height: 20px;
+      background: #9a9aaa;
+      border: 3px solid #7a7a8a;
     }
 
     /* Wolves */
-    .wolves-3d {
+    .wolves-8bit {
       display: flex;
-      gap: 25px;
+      gap: 16px;
     }
 
-    .wolf-3d {
+    .wolf-8bit {
+      width: 40px;
+      height: 36px;
       position: relative;
-      width: 80px;
-      height: 70px;
     }
 
-    .wolf-3d .body {
+    .wolf-body-8bit {
       position: absolute;
-      width: 65px;
-      height: 48px;
-      background: linear-gradient(to bottom, #6a6a7a, #5a5a6a);
-      border-radius: 32px 32px 22px 22px;
       bottom: 0;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      width: 36px;
+      height: 24px;
+      background: #6a6a7a;
+      border: 3px solid #4a4a5a;
     }
 
-    .wolf-3d .head {
+    .wolf-head-8bit {
       position: absolute;
-      width: 42px;
-      height: 38px;
-      background: #6a6a7a;
-      border-radius: 22px 22px 15px 15px;
-      top: 10px;
+      top: 4px;
       left: 0;
-    }
-
-    .wolf-3d .ear {
-      position: absolute;
-      width: 15px;
-      height: 22px;
+      width: 24px;
+      height: 20px;
       background: #6a6a7a;
-      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-      top: -15px;
+      border: 3px solid #4a4a5a;
     }
 
-    .wolf-3d .ear.left { left: 8px; }
-    .wolf-3d .ear.right { left: 22px; }
-
-    .wolf-3d .eye {
+    .wolf-ear-8bit {
       position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #aaffaa;
-      border-radius: 50%;
-      top: 12px;
-      left: 14px;
-      box-shadow: 0 0 15px #aaffaa;
-      animation: wolfGlow 1.5s infinite;
+      width: 8px;
+      height: 12px;
+      background: #6a6a7a;
+      border: 2px solid #4a4a5a;
+      top: -10px;
     }
 
-    @keyframes wolfGlow {
-      0%, 100% { box-shadow: 0 0 15px #aaffaa; }
-      50% { box-shadow: 0 0 30px #aaffaa, 0 0 45px #88ff88; }
+    .wolf-ear-8bit.left { left: 2px; }
+    .wolf-ear-8bit.right { left: 12px; }
+
+    .wolf-eye-8bit {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--text-green);
+      top: 6px;
+      left: 8px;
+      animation: wolfEye8bit 1s steps(2) infinite;
     }
 
-    /* MONKEY HANDS (First Person) */
-    .monkey-hands {
+    @keyframes wolfEye8bit {
+      0%, 100% { background: var(--text-green); }
+      50% { background: #8afa8a; }
+    }
+
+    /* 8-BIT MONKEY HANDS */
+    .monkey-hands-8bit {
       position: absolute;
       bottom: 0;
       left: 0;
@@ -700,362 +542,328 @@
       pointer-events: none;
     }
 
-    .monkey-hand {
+    .hand-8bit {
       position: absolute;
-      bottom: -20px;
-      width: 120px;
-      height: 180px;
-      z-index: 31;
+      bottom: -10px;
     }
 
-    .monkey-hand.left {
-      left: 5%;
-      transform: rotate(15deg);
+    .hand-8bit.left { left: 8%; }
+    .hand-8bit.right { right: 8%; transform: scaleX(-1); }
+
+    /* Pixelated hand made of blocks */
+    .hand-arm-8bit {
+      width: 32px;
+      height: 100px;
+      background: var(--monkey-orange);
+      border: 4px solid var(--monkey-dark);
     }
 
-    .monkey-hand.right {
-      right: 5%;
-      transform: rotate(-15deg) scaleX(-1);
-    }
-
-    /* Hand/Arm */
-    .hand-arm {
+    .hand-palm-8bit {
       position: absolute;
-      bottom: 0;
-      width: 55px;
-      height: 140px;
-      background: linear-gradient(90deg, #a83c22, #c84c32, #a83c22);
-      border-radius: 28px 28px 25px 25px;
-      box-shadow: inset -8px 0 20px rgba(0,0,0,0.3);
+      top: -40px;
+      left: -12px;
+      width: 56px;
+      height: 48px;
+      background: var(--monkey-orange);
+      border: 4px solid var(--monkey-dark);
     }
 
-    .hand-palm {
+    .hand-palm-inner-8bit {
       position: absolute;
-      top: -30px;
-      left: -15px;
-      width: 85px;
-      height: 75px;
-      background: radial-gradient(ellipse at 50% 60%, #c84c32, #a83c22);
-      border-radius: 50% 50% 45% 45%;
-      box-shadow: inset -5px 0 15px rgba(0,0,0,0.2);
+      top: 12px;
+      left: 10px;
+      width: 32px;
+      height: 28px;
+      background: var(--monkey-light);
+      border: 3px solid var(--monkey-orange);
     }
 
-    .hand-palm-inner {
+    .finger-8bit {
       position: absolute;
-      top: 15px;
-      left: 15px;
-      width: 55px;
-      height: 50px;
-      background: #e8a090;
-      border-radius: 50%;
+      background: var(--monkey-orange);
+      border: 3px solid var(--monkey-dark);
     }
 
-    .finger {
-      position: absolute;
-      background: linear-gradient(90deg, #a83c22, #c84c32, #a83c22);
-      border-radius: 12px;
+    .finger-8bit.f1 { width: 12px; height: 32px; top: -60px; left: 0; }
+    .finger-8bit.f2 { width: 12px; height: 40px; top: -68px; left: 14px; }
+    .finger-8bit.f3 { width: 12px; height: 38px; top: -66px; left: 28px; }
+    .finger-8bit.f4 { width: 10px; height: 28px; top: -54px; left: 40px; }
+    .finger-8bit.thumb { width: 14px; height: 24px; top: 0px; left: -14px; }
+
+    /* Hand animations - 8-bit stepped */
+    .hand-8bit.left.swing-left {
+      animation: handLeft8bit 0.5s steps(4);
     }
 
-    .finger-1 { width: 22px; height: 50px; top: -65px; left: 5px; transform: rotate(15deg); }
-    .finger-2 { width: 22px; height: 60px; top: -75px; left: 25px; transform: rotate(5deg); }
-    .finger-3 { width: 22px; height: 58px; top: -72px; left: 45px; transform: rotate(-5deg); }
-    .finger-4 { width: 20px; height: 45px; top: -58px; left: 63px; transform: rotate(-15deg); }
-    .thumb { width: 24px; height: 40px; top: 5px; left: -18px; transform: rotate(40deg); }
-
-    /* Hand animations */
-    .monkey-hand.left.swing-left {
-      animation: leftHandGrab 0.6s ease-out;
+    .hand-8bit.right.swing-right {
+      animation: handRight8bit 0.5s steps(4);
     }
 
-    .monkey-hand.right.swing-right {
-      animation: rightHandGrab 0.6s ease-out;
+    .hand-8bit.swing-forward {
+      animation: handForward8bit 0.5s steps(4);
     }
 
-    .monkey-hand.left.swing-forward,
-    .monkey-hand.right.swing-forward {
-      animation: handsReachUp 0.6s ease-out;
+    @keyframes handLeft8bit {
+      0% { transform: translateY(0); }
+      25% { transform: translateY(-60px) translateX(20px); }
+      50% { transform: translateY(-40px) translateX(10px); }
+      100% { transform: translateY(0); }
     }
 
-    @keyframes leftHandGrab {
-      0% { transform: rotate(15deg) translateY(0); }
-      30% { transform: rotate(-10deg) translateY(-80px) translateX(30px); }
-      60% { transform: rotate(5deg) translateY(-50px) translateX(15px); }
-      100% { transform: rotate(15deg) translateY(0); }
+    @keyframes handRight8bit {
+      0% { transform: scaleX(-1) translateY(0); }
+      25% { transform: scaleX(-1) translateY(-60px) translateX(-20px); }
+      50% { transform: scaleX(-1) translateY(-40px) translateX(-10px); }
+      100% { transform: scaleX(-1) translateY(0); }
     }
 
-    @keyframes rightHandGrab {
-      0% { transform: rotate(-15deg) scaleX(-1) translateY(0); }
-      30% { transform: rotate(10deg) scaleX(-1) translateY(-80px) translateX(-30px); }
-      60% { transform: rotate(-5deg) scaleX(-1) translateY(-50px) translateX(-15px); }
-      100% { transform: rotate(-15deg) scaleX(-1) translateY(0); }
+    @keyframes handForward8bit {
+      0% { transform: translateY(0) scale(1); }
+      25% { transform: translateY(-80px) scale(0.7); }
+      50% { transform: translateY(-50px) scale(0.8); }
+      100% { transform: translateY(0) scale(1); }
     }
 
-    @keyframes handsReachUp {
-      0% { transform: rotate(15deg) translateY(0); }
-      40% { transform: rotate(-5deg) translateY(-100px) scale(0.8); }
-      70% { transform: rotate(5deg) translateY(-60px) scale(0.9); }
-      100% { transform: rotate(15deg) translateY(0); }
-    }
-
-    /* Screen shake */
-    #viewport.shake {
-      animation: viewportShake 0.4s ease-out;
-    }
-
-    @keyframes viewportShake {
-      0%, 100% { transform: translate(0, 0); }
-      20% { transform: translate(-8px, 5px); }
-      40% { transform: translate(8px, -5px); }
-      60% { transform: translate(-5px, 8px); }
-      80% { transform: translate(5px, -8px); }
-    }
-
-    /* Damage overlay */
-    .damage-overlay {
+    /* Damage flash */
+    .damage-flash {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: radial-gradient(ellipse, transparent 40%, rgba(180,0,0,0.6) 100%);
-      z-index: 35;
+      background: var(--text-red);
+      z-index: 40;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.1s;
     }
 
-    .damage-overlay.active {
-      opacity: 1;
-      animation: damageFlash 0.4s ease-out;
+    .damage-flash.active {
+      animation: damageFlash8bit 0.3s steps(3);
     }
 
-    @keyframes damageFlash {
-      0% { opacity: 0.8; }
+    @keyframes damageFlash8bit {
+      0% { opacity: 0.7; }
+      33% { opacity: 0; }
+      66% { opacity: 0.5; }
       100% { opacity: 0; }
     }
 
-    /* ==================== DOOM-STYLE HUD ==================== */
-    .hud {
-      height: 90px;
-      background: linear-gradient(to bottom, #4a3a2a, #2a1a0a);
-      border-top: 4px solid #6a5a4a;
+    /* Screen shake */
+    #viewport.shake {
+      animation: shake8bit 0.3s steps(4);
+    }
+
+    @keyframes shake8bit {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(-8px, 4px); }
+      50% { transform: translate(8px, -4px); }
+      75% { transform: translate(-4px, 8px); }
+    }
+
+    /* ==================== 8-BIT HUD ==================== */
+    .hud-8bit {
+      height: 80px;
+      background: var(--hud-bg);
+      border-top: 4px solid var(--hud-border);
       display: flex;
       justify-content: space-between;
       align-items: stretch;
-      position: relative;
-      box-shadow: inset 0 5px 20px rgba(0,0,0,0.5);
     }
 
-    .hud-section {
+    .hud-section-8bit {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 8px 15px;
-      min-width: 100px;
+      padding: 8px 12px;
+      min-width: 80px;
+      border-right: 4px solid var(--hud-border);
     }
 
-    .hud-section.left {
-      background: linear-gradient(to bottom, #3a2a1a, #1a0a00);
-      border-right: 3px solid #5a4a3a;
+    .hud-section-8bit:last-child {
+      border-right: none;
+      border-left: 4px solid var(--hud-border);
     }
 
-    .hud-section.right {
-      background: linear-gradient(to bottom, #3a2a1a, #1a0a00);
-      border-left: 3px solid #5a4a3a;
-    }
-
-    .hud-value {
-      font-size: 1.8rem;
-      color: var(--hud-red);
-      text-shadow: 0 0 10px rgba(185,28,28,0.8);
+    .hud-value-8bit {
+      font-size: 1.4rem;
       line-height: 1;
     }
 
-    .hud-value.health { color: #ff4444; }
-    .hud-value.bananas { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.8); }
-    .hud-value.songs { color: #44ff44; text-shadow: 0 0 10px rgba(68,255,68,0.8); }
-    .hud-value.golden { color: #888; }
-    .hud-value.golden.yes { color: #ffd700; text-shadow: 0 0 15px rgba(255,215,0,1); animation: goldenHudPulse 1s infinite; }
-
-    @keyframes goldenHudPulse {
-      0%, 100% { text-shadow: 0 0 15px rgba(255,215,0,1); }
-      50% { text-shadow: 0 0 30px rgba(255,215,0,1), 0 0 45px rgba(255,180,0,0.8); }
+    .hud-value-8bit.health { color: var(--text-red); }
+    .hud-value-8bit.bananas { color: var(--text-yellow); }
+    .hud-value-8bit.songs { color: var(--text-green); }
+    .hud-value-8bit.golden { color: #6a6a6a; }
+    .hud-value-8bit.golden.yes {
+      color: var(--golden);
+      animation: goldenText8bit 0.5s steps(2) infinite;
     }
 
-    .hud-label {
-      font-size: 0.5rem;
-      color: #aa9977;
-      margin-top: 5px;
-      text-transform: uppercase;
+    @keyframes goldenText8bit {
+      0%, 100% { color: var(--golden); }
+      50% { color: var(--text-yellow); }
     }
 
-    /* Monkey face in center */
-    .hud-center {
+    .hud-label-8bit {
+      font-size: 0.4rem;
+      color: var(--white);
+      margin-top: 4px;
+    }
+
+    /* 8-bit Monkey face */
+    .hud-center-8bit {
       flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+
+    .monkey-face-8bit {
+      width: 56px;
+      height: 56px;
+      background: var(--monkey-orange);
+      border: 4px solid var(--monkey-dark);
       position: relative;
     }
 
-    .monkey-face-hud {
-      width: 70px;
-      height: 70px;
-      background: linear-gradient(to bottom, #c84c32, #a83c22);
-      border-radius: 50%;
-      border: 4px solid #5a4a3a;
-      position: relative;
-      box-shadow: inset -5px -5px 15px rgba(0,0,0,0.4), 0 0 15px rgba(0,0,0,0.5);
-    }
-
-    .monkey-face-hud .ear {
+    .mf-ear-8bit {
       position: absolute;
-      width: 22px;
-      height: 22px;
-      background: #c84c32;
-      border-radius: 50%;
-      top: 5px;
-      border: 3px solid #5a4a3a;
+      width: 16px;
+      height: 16px;
+      background: var(--monkey-orange);
+      border: 3px solid var(--monkey-dark);
+      top: 4px;
     }
 
-    .monkey-face-hud .ear.left { left: -12px; }
-    .monkey-face-hud .ear.right { right: -12px; }
+    .mf-ear-8bit.left { left: -12px; }
+    .mf-ear-8bit.right { right: -12px; }
 
-    .monkey-face-hud .ear-inner {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #e8a090;
-      border-radius: 50%;
-      top: 3px;
-      left: 3px;
-    }
-
-    .monkey-face-hud .eye {
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      background: #fff;
-      border-radius: 50%;
-      top: 18px;
-    }
-
-    .monkey-face-hud .eye.left { left: 12px; }
-    .monkey-face-hud .eye.right { right: 12px; }
-
-    .monkey-face-hud .eye::after {
-      content: '';
+    .mf-ear-inner-8bit {
       position: absolute;
       width: 8px;
       height: 8px;
-      background: #222;
-      border-radius: 50%;
-      top: 3px;
-      left: 3px;
+      background: var(--monkey-light);
+      top: 2px;
+      left: 2px;
     }
 
-    .monkey-face-hud .snout {
+    .mf-eye-8bit {
       position: absolute;
-      width: 35px;
-      height: 25px;
-      background: #e8a090;
-      border-radius: 50%;
+      width: 10px;
+      height: 10px;
+      background: var(--white);
+      top: 14px;
+    }
+
+    .mf-eye-8bit.left { left: 8px; }
+    .mf-eye-8bit.right { right: 8px; }
+
+    .mf-eye-8bit::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--black);
+      top: 2px;
+      left: 2px;
+    }
+
+    .mf-snout-8bit {
+      position: absolute;
+      width: 28px;
+      height: 20px;
+      background: var(--monkey-light);
+      border: 3px solid var(--monkey-orange);
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .mf-nose-8bit {
+      position: absolute;
+      width: 8px;
+      height: 6px;
+      background: var(--monkey-dark);
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .mf-mouth-8bit {
+      position: absolute;
+      width: 16px;
+      height: 6px;
+      background: var(--monkey-dark);
       bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
     }
 
-    .monkey-face-hud .nose {
-      position: absolute;
-      width: 8px;
-      height: 6px;
-      background: #5a3020;
-      border-radius: 50%;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%);
+    /* Hurt face */
+    .monkey-face-8bit.hurt .mf-eye-8bit {
+      height: 4px;
+      top: 17px;
     }
 
-    .monkey-face-hud .mouth {
-      position: absolute;
+    .monkey-face-8bit.hurt .mf-eye-8bit::after {
+      display: none;
+    }
+
+    .monkey-face-8bit.hurt .mf-mouth-8bit {
       width: 20px;
-      height: 8px;
-      border: 3px solid #5a3020;
-      border-top: none;
-      border-radius: 0 0 15px 15px;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
+      height: 12px;
+      background: #3a1a1a;
+      bottom: 8px;
     }
 
-    /* Face states */
-    .monkey-face-hud.hurt .eye::after {
-      width: 10px;
-      height: 3px;
-      border-radius: 0;
-      top: 6px;
-      left: 2px;
-    }
-
-    .monkey-face-hud.hurt .mouth {
-      width: 25px;
-      height: 15px;
-      background: #3a2020;
-      border: none;
-      border-radius: 50%;
-    }
-
-    /* Controls area */
-    .controls-area {
+    /* Controls */
+    .controls-8bit {
       display: flex;
-      gap: 8px;
-      padding: 8px;
-      background: #000;
+      gap: 4px;
+      padding: 6px;
+      background: var(--black);
     }
 
-    .controls-area button {
+    .controls-8bit button {
       flex: 1;
-      font-family: 'Press Start 2P', cursive;
-      background: linear-gradient(to bottom, #5a4a3a 0%, #3a2a1a 100%);
-      color: #ddd;
-      border: 3px solid #6a5a4a;
-      padding: 12px 8px;
+      font-family: 'Press Start 2P', monospace;
+      background: var(--hud-bg);
+      color: var(--white);
+      border: 4px solid var(--hud-border);
+      padding: 10px 6px;
       cursor: pointer;
-      transition: all 0.15s;
-      font-size: 0.45rem;
-      text-shadow: 1px 1px 2px #000;
+      font-size: 0.4rem;
+      transition: none;
     }
 
-    .controls-area button:hover {
-      background: linear-gradient(to bottom, var(--jade) 0%, #007a50 100%);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(0,168,107,0.4);
+    .controls-8bit button:hover {
+      background: var(--text-green);
+      color: var(--black);
     }
 
-    .controls-area button:active {
-      transform: translateY(0);
+    .controls-8bit button:active {
+      background: var(--vine-dark);
     }
 
-    .controls-area button.quit-btn:hover {
-      background: linear-gradient(to bottom, var(--terracotta) 0%, #8a3020 100%);
+    .controls-8bit button.quit-btn:hover {
+      background: var(--text-red);
     }
 
     /* Text log */
     #text-log {
-      height: 60px;
-      background: rgba(0,0,0,0.9);
-      border-top: 2px solid #4a3a2a;
-      padding: 8px 12px;
+      height: 55px;
+      background: var(--black);
+      border-top: 4px solid var(--hud-border);
+      padding: 6px 10px;
       overflow-y: auto;
-      font-size: 0.45rem;
-      color: #aa9;
-      line-height: 1.6;
+      font-size: 0.4rem;
+      color: var(--text-green);
+      line-height: 1.5;
     }
 
-    #text-log::-webkit-scrollbar { width: 5px; }
-    #text-log::-webkit-scrollbar-track { background: transparent; }
-    #text-log::-webkit-scrollbar-thumb { background: #5a4a3a; border-radius: 3px; }
+    #text-log::-webkit-scrollbar { width: 8px; }
+    #text-log::-webkit-scrollbar-track { background: var(--black); }
+    #text-log::-webkit-scrollbar-thumb { background: var(--hud-border); }
 
     /* Modal */
     #minigame-modal {
@@ -1064,50 +872,44 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: linear-gradient(to bottom, rgba(44,36,22,0.98), rgba(30,24,14,0.98));
-      border: 4px solid var(--gold);
-      padding: 25px;
+      background: var(--black);
+      border: 4px solid var(--golden);
+      padding: 20px;
       z-index: 100;
       text-align: center;
-      max-width: 85%;
-      box-shadow: 0 0 60px rgba(0,0,0,0.9);
     }
 
     #minigame-modal h3 {
-      color: var(--gold);
-      font-size: 0.7rem;
-      margin-bottom: 15px;
-      text-shadow: 0 0 15px rgba(212,175,55,0.6);
+      color: var(--golden);
+      font-size: 0.6rem;
+      margin-bottom: 12px;
     }
 
     #minigame-modal p {
-      font-size: 0.5rem;
-      color: #ddd;
-      margin-bottom: 18px;
-      line-height: 1.8;
+      font-size: 0.45rem;
+      color: var(--white);
+      margin-bottom: 16px;
     }
 
     .minigame-options {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
 
     .minigame-options button {
-      font-family: 'Press Start 2P', cursive;
-      background: linear-gradient(to bottom, #3a3a4a, #2a2a3a);
-      color: #ddd;
-      border: 2px solid var(--jade);
-      padding: 12px;
+      font-family: 'Press Start 2P', monospace;
+      background: var(--hud-bg);
+      color: var(--white);
+      border: 3px solid var(--text-green);
+      padding: 10px;
       cursor: pointer;
-      font-size: 0.4rem;
-      transition: all 0.15s;
+      font-size: 0.35rem;
     }
 
     .minigame-options button:hover {
-      background: var(--jade);
-      color: #000;
-      transform: scale(1.03);
+      background: var(--text-green);
+      color: var(--black);
     }
 
     /* Game overlay */
@@ -1118,7 +920,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.92);
+      background: rgba(10,10,10,0.95);
       z-index: 90;
       justify-content: center;
       align-items: center;
@@ -1126,190 +928,195 @@
     }
 
     #game-overlay h2 {
-      font-size: 1.2rem;
-      margin-bottom: 25px;
-      text-shadow: 0 0 40px currentColor;
+      font-size: 1rem;
+      margin-bottom: 20px;
     }
 
-    #game-overlay.victory h2 { color: var(--gold); }
-    #game-overlay.defeat h2 { color: var(--terracotta); }
+    #game-overlay.victory h2 { color: var(--golden); }
+    #game-overlay.defeat h2 { color: var(--text-red); }
 
     #game-overlay button {
-      font-family: 'Press Start 2P', cursive;
-      background: var(--jade);
-      color: #fff;
-      border: 4px solid var(--gold);
-      padding: 15px 35px;
+      font-family: 'Press Start 2P', monospace;
+      background: var(--text-green);
+      color: var(--black);
+      border: 4px solid var(--vine-dark);
+      padding: 12px 24px;
       cursor: pointer;
-      font-size: 0.6rem;
-      transition: all 0.15s;
+      font-size: 0.5rem;
     }
 
     #game-overlay button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 35px rgba(0,168,107,0.7);
+      background: var(--vine);
     }
 
     .back-link {
       display: block;
       text-align: center;
-      padding: 8px;
-      background: #000;
-      color: var(--gold);
+      padding: 6px;
+      background: var(--black);
+      color: var(--text-green);
       text-decoration: none;
-      font-size: 0.4rem;
-      opacity: 0.8;
-      transition: opacity 0.2s;
+      font-size: 0.35rem;
     }
 
-    .back-link:hover { opacity: 1; color: var(--turquoise); }
+    .back-link:hover {
+      color: var(--text-yellow);
+    }
 
     @media (max-width: 600px) {
-      .hud { height: 75px; }
-      .hud-value { font-size: 1.3rem; }
-      .hud-label { font-size: 0.4rem; }
-      .monkey-face-hud { width: 55px; height: 55px; }
-      .controls-area button { font-size: 0.35rem; padding: 10px 5px; }
-      #text-log { height: 50px; font-size: 0.38rem; }
-      .monkey-hand { width: 90px; height: 140px; }
+      .hud-8bit { height: 65px; }
+      .hud-value-8bit { font-size: 1rem; }
+      .hud-label-8bit { font-size: 0.3rem; }
+      .monkey-face-8bit { width: 44px; height: 44px; }
+      .controls-8bit button { font-size: 0.3rem; padding: 8px 4px; }
+      #text-log { height: 45px; font-size: 0.35rem; }
+      .hand-8bit { transform: scale(0.7); }
+      .hand-8bit.right { transform: scale(0.7) scaleX(-1); }
     }
   </style>
 </head>
 <body>
   <div id="game-container">
-    <!-- 3D Viewport -->
+    <!-- 8-bit Viewport -->
     <div id="viewport">
-      <!-- Environment -->
-      <div class="canopy"></div>
-      <div class="sun-rays"></div>
-      <div class="floor-3d" id="floor"></div>
-      <div class="wall-left"></div>
-      <div class="wall-right"></div>
-      <div class="tunnel" id="tunnel"></div>
+      <!-- Sky bands -->
+      <div class="sky-band"></div>
+      <div class="sky-band"></div>
+      <div class="sky-band"></div>
+
+      <!-- Ground -->
+      <div class="ground-8bit"></div>
+      <div class="path-8bit"></div>
 
       <!-- Trees -->
-      <div class="tree-trunk left-1" id="tree-l1"></div>
-      <div class="tree-trunk left-2" id="tree-l2"></div>
-      <div class="tree-trunk right-1" id="tree-r1"></div>
-      <div class="tree-trunk right-2" id="tree-r2"></div>
+      <div class="tree-8bit l1" id="tree-l1"></div>
+      <div class="tree-8bit l2" id="tree-l2"></div>
+      <div class="tree-8bit r1" id="tree-r1"></div>
+      <div class="tree-8bit r2" id="tree-r2"></div>
 
       <!-- Vines -->
-      <div class="hanging-vine vine-l1"></div>
-      <div class="hanging-vine vine-l2"></div>
-      <div class="hanging-vine vine-r1"></div>
-      <div class="hanging-vine vine-r2"></div>
-      <div class="hanging-vine vine-center"></div>
-      <div class="grabbed-vine" id="grabbed-vine"></div>
+      <div class="vine-8bit v1" id="vine1"></div>
+      <div class="vine-8bit v2" id="vine2"></div>
+      <div class="vine-8bit v3" id="vine3"></div>
+      <div class="vine-8bit v4" id="vine4"></div>
+      <div class="vine-8bit v5" id="vine5"></div>
 
-      <!-- Event Objects -->
-      <div id="snake-obj" class="event-object">
-        <div class="snake-3d">
-          <div class="body"></div>
-          <div class="head">
-            <div class="eye"></div>
-            <div class="tongue"></div>
+      <!-- Events -->
+      <div id="snake-8bit" class="event-8bit">
+        <div class="snake-body-8bit">
+          <div class="snake-head-8bit">
+            <div class="snake-eye-8bit"></div>
+            <div class="snake-tongue-8bit"></div>
+          </div>
+          <div class="snake-segment"></div>
+          <div class="snake-segment"></div>
+          <div class="snake-segment"></div>
+          <div class="snake-segment"></div>
+          <div class="snake-segment"></div>
+        </div>
+      </div>
+
+      <div id="banana-8bit" class="event-8bit">
+        <div class="banana-tree-8bit">
+          <div class="btree-leaves">
+            <div class="btree-leaf"></div>
+            <div class="btree-leaf"></div>
+            <div class="btree-leaf"></div>
+            <div class="btree-leaf"></div>
+          </div>
+          <div class="banana-bunch-8bit">
+            <div class="banana-pixel"></div>
+            <div class="banana-pixel"></div>
+            <div class="banana-pixel"></div>
+          </div>
+          <div class="btree-trunk"></div>
+        </div>
+      </div>
+
+      <div id="pit-8bit" class="event-8bit">
+        <div class="mud-pit-8bit">
+          <div class="mud-bubble-8bit"></div>
+          <div class="mud-bubble-8bit"></div>
+          <div class="mud-bubble-8bit"></div>
+        </div>
+      </div>
+
+      <div id="golden-8bit" class="event-8bit">
+        <div class="golden-banana-8bit"></div>
+      </div>
+
+      <div id="kaa-8bit" class="event-8bit">
+        <div class="kaa-body-8bit">
+          <div class="kaa-head-8bit">
+            <div class="kaa-eye-8bit"></div>
+          </div>
+          <div class="kaa-seg"></div>
+          <div class="kaa-seg"></div>
+          <div class="kaa-seg"></div>
+          <div class="kaa-seg"></div>
+          <div class="kaa-seg"></div>
+          <div class="kaa-seg"></div>
+        </div>
+      </div>
+
+      <div id="baloo-8bit" class="event-8bit">
+        <div class="baloo-8bit">
+          <div class="baloo-body-8bit"></div>
+          <div class="baloo-belly-8bit"></div>
+          <div class="baloo-head-8bit">
+            <div class="baloo-ear-8bit left"></div>
+            <div class="baloo-ear-8bit right"></div>
+            <div class="baloo-snout-8bit"></div>
           </div>
         </div>
       </div>
 
-      <div id="banana-obj" class="event-object">
-        <div class="banana-tree-3d">
-          <div class="leaves">
-            <div class="leaf"></div>
-            <div class="leaf"></div>
-            <div class="leaf"></div>
-            <div class="leaf"></div>
-            <div class="leaf"></div>
+      <div id="wolves-8bit" class="event-8bit">
+        <div class="wolves-8bit">
+          <div class="wolf-8bit"><div class="wolf-body-8bit"></div><div class="wolf-head-8bit"><div class="wolf-ear-8bit left"></div><div class="wolf-ear-8bit right"></div><div class="wolf-eye-8bit"></div></div></div>
+          <div class="wolf-8bit"><div class="wolf-body-8bit"></div><div class="wolf-head-8bit"><div class="wolf-ear-8bit left"></div><div class="wolf-ear-8bit right"></div><div class="wolf-eye-8bit"></div></div></div>
+          <div class="wolf-8bit"><div class="wolf-body-8bit"></div><div class="wolf-head-8bit"><div class="wolf-ear-8bit left"></div><div class="wolf-ear-8bit right"></div><div class="wolf-eye-8bit"></div></div></div>
+        </div>
+      </div>
+
+      <!-- 8-bit Monkey Hands -->
+      <div class="monkey-hands-8bit">
+        <div class="hand-8bit left" id="hand-left">
+          <div class="hand-arm-8bit"></div>
+          <div class="hand-palm-8bit">
+            <div class="hand-palm-inner-8bit"></div>
           </div>
-          <div class="bunch">
-            <div class="banana"></div>
-            <div class="banana"></div>
-            <div class="banana"></div>
+          <div class="finger-8bit f1"></div>
+          <div class="finger-8bit f2"></div>
+          <div class="finger-8bit f3"></div>
+          <div class="finger-8bit f4"></div>
+          <div class="finger-8bit thumb"></div>
+        </div>
+        <div class="hand-8bit right" id="hand-right">
+          <div class="hand-arm-8bit"></div>
+          <div class="hand-palm-8bit">
+            <div class="hand-palm-inner-8bit"></div>
           </div>
-          <div class="trunk"></div>
+          <div class="finger-8bit f1"></div>
+          <div class="finger-8bit f2"></div>
+          <div class="finger-8bit f3"></div>
+          <div class="finger-8bit f4"></div>
+          <div class="finger-8bit thumb"></div>
         </div>
       </div>
 
-      <div id="pit-obj" class="event-object">
-        <div class="mud-pit-3d">
-          <div class="bubble"></div>
-          <div class="bubble"></div>
-          <div class="bubble"></div>
-        </div>
-      </div>
-
-      <div id="golden-obj" class="event-object">
-        <div class="golden-banana-3d"></div>
-      </div>
-
-      <div id="kaa-obj" class="event-object">
-        <div class="kaa-3d">
-          <div class="body"></div>
-          <div class="head">
-            <div class="eye"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="baloo-obj" class="event-object">
-        <div class="baloo-3d">
-          <div class="body"></div>
-          <div class="belly"></div>
-          <div class="head">
-            <div class="ear left"></div>
-            <div class="ear right"></div>
-            <div class="snout"></div>
-            <div class="nose"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="wolves-obj" class="event-object">
-        <div class="wolves-3d">
-          <div class="wolf-3d"><div class="body"></div><div class="head"><div class="ear left"></div><div class="ear right"></div><div class="eye"></div></div></div>
-          <div class="wolf-3d"><div class="body"></div><div class="head"><div class="ear left"></div><div class="ear right"></div><div class="eye"></div></div></div>
-          <div class="wolf-3d"><div class="body"></div><div class="head"><div class="ear left"></div><div class="ear right"></div><div class="eye"></div></div></div>
-        </div>
-      </div>
-
-      <!-- Monkey Hands -->
-      <div class="monkey-hands">
-        <div class="monkey-hand left" id="hand-left">
-          <div class="hand-arm"></div>
-          <div class="hand-palm">
-            <div class="hand-palm-inner"></div>
-          </div>
-          <div class="finger finger-1"></div>
-          <div class="finger finger-2"></div>
-          <div class="finger finger-3"></div>
-          <div class="finger finger-4"></div>
-          <div class="finger thumb"></div>
-        </div>
-        <div class="monkey-hand right" id="hand-right">
-          <div class="hand-arm"></div>
-          <div class="hand-palm">
-            <div class="hand-palm-inner"></div>
-          </div>
-          <div class="finger finger-1"></div>
-          <div class="finger finger-2"></div>
-          <div class="finger finger-3"></div>
-          <div class="finger finger-4"></div>
-          <div class="finger thumb"></div>
-        </div>
-      </div>
-
-      <!-- Damage overlay -->
-      <div class="damage-overlay" id="damage-overlay"></div>
+      <!-- Damage flash -->
+      <div class="damage-flash" id="damage-flash"></div>
 
       <!-- Modal -->
       <div id="minigame-modal">
-        <h3>GOLDEN BANANA CHALLENGE!</h3>
-        <p>Riddle: What can you catch but not throw?</p>
+        <h3>GOLDEN BANANA!</h3>
+        <p>RIDDLE: WHAT CAN YOU CATCH BUT NOT THROW?</p>
         <div class="minigame-options">
-          <button onclick="game.answerRiddle('A')">A: A ball</button>
-          <button onclick="game.answerRiddle('B')">B: A cold</button>
-          <button onclick="game.answerRiddle('C')">C: A fish</button>
-          <button onclick="game.answerRiddle('D')">D: A shadow</button>
+          <button onclick="game.answerRiddle('A')">A: BALL</button>
+          <button onclick="game.answerRiddle('B')">B: COLD</button>
+          <button onclick="game.answerRiddle('C')">C: FISH</button>
+          <button onclick="game.answerRiddle('D')">D: SHADOW</button>
         </div>
       </div>
 
@@ -1320,34 +1127,34 @@
       </div>
     </div>
 
-    <!-- DOOM-style HUD -->
-    <div class="hud">
-      <div class="hud-section left">
-        <div class="hud-value health" id="health-val">100</div>
-        <div class="hud-label">Health</div>
+    <!-- 8-bit HUD -->
+    <div class="hud-8bit">
+      <div class="hud-section-8bit">
+        <div class="hud-value-8bit health" id="health-val">100</div>
+        <div class="hud-label-8bit">HEALTH</div>
       </div>
-      <div class="hud-section left">
-        <div class="hud-value bananas" id="bananas-val">0</div>
-        <div class="hud-label">Bananas</div>
+      <div class="hud-section-8bit">
+        <div class="hud-value-8bit bananas" id="bananas-val">0</div>
+        <div class="hud-label-8bit">BANANAS</div>
       </div>
-      <div class="hud-center">
-        <div class="monkey-face-hud" id="monkey-face">
-          <div class="ear left"><div class="ear-inner"></div></div>
-          <div class="ear right"><div class="ear-inner"></div></div>
-          <div class="eye left"></div>
-          <div class="eye right"></div>
-          <div class="snout"></div>
-          <div class="nose"></div>
-          <div class="mouth"></div>
+      <div class="hud-center-8bit">
+        <div class="monkey-face-8bit" id="monkey-face">
+          <div class="mf-ear-8bit left"><div class="mf-ear-inner-8bit"></div></div>
+          <div class="mf-ear-8bit right"><div class="mf-ear-inner-8bit"></div></div>
+          <div class="mf-eye-8bit left"></div>
+          <div class="mf-eye-8bit right"></div>
+          <div class="mf-snout-8bit"></div>
+          <div class="mf-nose-8bit"></div>
+          <div class="mf-mouth-8bit"></div>
         </div>
       </div>
-      <div class="hud-section right">
-        <div class="hud-value songs" id="songs-val">0</div>
-        <div class="hud-label">Songs</div>
+      <div class="hud-section-8bit">
+        <div class="hud-value-8bit songs" id="songs-val">0</div>
+        <div class="hud-label-8bit">SONGS</div>
       </div>
-      <div class="hud-section right">
-        <div class="hud-value golden" id="golden-val">NO</div>
-        <div class="hud-label">Golden</div>
+      <div class="hud-section-8bit">
+        <div class="hud-value-8bit golden" id="golden-val">NO</div>
+        <div class="hud-label-8bit">GOLDEN</div>
       </div>
     </div>
 
@@ -1355,7 +1162,7 @@
     <div id="text-log"></div>
 
     <!-- Controls -->
-    <div class="controls-area">
+    <div class="controls-8bit">
       <button onclick="game.swing('left')">SWING LEFT</button>
       <button onclick="game.swing('straight')">FORWARD</button>
       <button onclick="game.swing('right')">SWING RIGHT</button>
@@ -1390,8 +1197,8 @@
 
         this.updateUI();
         this.hideAllEvents();
-        this.log("Welcome to SWINGER MONKEY!");
-        this.log("Collect 69 bananas + the Golden Banana to win!");
+        this.log("SWINGER MONKEY");
+        this.log("GET 69 BANANAS + GOLDEN BANANA TO WIN!");
       }
 
       setupKeyboard() {
@@ -1418,12 +1225,12 @@
         document.getElementById('songs-val').textContent = this.jungleSongs;
         const goldenEl = document.getElementById('golden-val');
         goldenEl.textContent = this.hasGoldenBanana ? 'YES' : 'NO';
-        goldenEl.className = 'hud-value golden' + (this.hasGoldenBanana ? ' yes' : '');
+        goldenEl.className = 'hud-value-8bit golden' + (this.hasGoldenBanana ? ' yes' : '');
         document.getElementById('climb-btn').style.display = this.canClimbUp ? 'block' : 'none';
       }
 
       hideAllEvents() {
-        document.querySelectorAll('.event-object').forEach(el => el.classList.remove('visible'));
+        document.querySelectorAll('.event-8bit').forEach(el => el.classList.remove('visible'));
       }
 
       showEvent(eventId) {
@@ -1438,64 +1245,55 @@
 
           const leftHand = document.getElementById('hand-left');
           const rightHand = document.getElementById('hand-right');
-          const floor = document.getElementById('floor');
-          const tunnel = document.getElementById('tunnel');
-          const grabbedVine = document.getElementById('grabbed-vine');
           const trees = ['tree-l1', 'tree-l2', 'tree-r1', 'tree-r2'].map(id => document.getElementById(id));
+          const vines = ['vine1', 'vine2', 'vine3', 'vine4', 'vine5'].map(id => document.getElementById(id));
 
-          // Reset animations
+          // Reset
           leftHand.classList.remove('swing-left', 'swing-right', 'swing-forward');
           rightHand.classList.remove('swing-left', 'swing-right', 'swing-forward');
-          floor.classList.remove('moving');
-          tunnel.classList.remove('zooming');
-          grabbedVine.classList.remove('visible');
           trees.forEach(t => t.classList.remove('moving'));
+          vines.forEach(v => v.classList.remove('swing'));
 
-          void leftHand.offsetWidth; // Force reflow
+          void leftHand.offsetWidth;
 
-          // Apply direction-specific animations
+          // Apply animations
           if (direction === 'left') {
             leftHand.classList.add('swing-left');
-            grabbedVine.classList.add('visible');
           } else if (direction === 'right') {
             rightHand.classList.add('swing-right');
-            grabbedVine.classList.add('visible');
           } else {
             leftHand.classList.add('swing-forward');
             rightHand.classList.add('swing-forward');
-            grabbedVine.classList.add('visible');
           }
 
-          // Environment animations
-          floor.classList.add('moving');
-          tunnel.classList.add('zooming');
           trees.forEach(t => t.classList.add('moving'));
+          vines.forEach(v => v.classList.add('swing'));
 
           setTimeout(() => {
             this.isAnimating = false;
             resolve();
-          }, 600);
+          }, 500);
         });
       }
 
       showDamage() {
-        const overlay = document.getElementById('damage-overlay');
+        const flash = document.getElementById('damage-flash');
         const viewport = document.getElementById('viewport');
         const face = document.getElementById('monkey-face');
 
-        overlay.classList.remove('active');
+        flash.classList.remove('active');
         viewport.classList.remove('shake');
         face.classList.remove('hurt');
 
-        void overlay.offsetWidth;
+        void flash.offsetWidth;
 
-        overlay.classList.add('active');
+        flash.classList.add('active');
         viewport.classList.add('shake');
         face.classList.add('hurt');
 
         setTimeout(() => {
           face.classList.remove('hurt');
-        }, 500);
+        }, 400);
       }
 
       async swing(direction) {
@@ -1507,54 +1305,54 @@
         await this.animateSwing(direction);
 
         const dirText = direction === 'straight' ? 'FORWARD' : direction.toUpperCase();
-        this.log(`Swinging ${dirText}...`);
+        this.log(`SWING ${dirText}...`);
 
         const event = this.events[Math.floor(Math.random() * this.events.length)];
 
         switch(event) {
           case 'snake':
-            this.showEvent('snake-obj');
+            this.showEvent('snake-8bit');
             if (this.jungleSongs > 0) {
               this.jungleSongs--;
-              this.log("SNAKE! Your jungle song scares it away!");
+              this.log("SNAKE! SONG SCARES IT!");
             } else {
               const damage = Math.floor(Math.random() * 16) + 10;
               this.health -= damage;
               this.showDamage();
-              this.log(`SNAKE BITE! -${damage} health!`);
+              this.log(`SNAKE BITE! -${damage} HP!`);
             }
             break;
 
           case 'banana_tree':
-            this.showEvent('banana-obj');
+            this.showEvent('banana-8bit');
             const reward = Math.floor(Math.random() * 5) + 1;
             this.bananas += reward;
-            this.log(`Banana tree! +${reward} bananas!`);
+            this.log(`BANANA TREE! +${reward} BANANAS!`);
             break;
 
           case 'banana_stash':
-            this.showEvent('banana-obj');
+            this.showEvent('banana-8bit');
             const stash = Math.floor(Math.random() * 11) + 5;
             this.bananas += stash;
-            this.log(`Hidden stash! +${stash} bananas!`);
+            this.log(`SECRET STASH! +${stash} BANANAS!`);
             break;
 
           case 'muddy_pit':
-            this.showEvent('pit-obj');
+            this.showEvent('pit-8bit');
             const pitDmg = Math.floor(Math.random() * 11) + 5;
             this.health -= pitDmg;
             this.showDamage();
-            this.log(`Fell in mud! -${pitDmg} health!`);
+            this.log(`MUD PIT! -${pitDmg} HP!`);
             break;
 
           case 'golden_banana':
             if (!this.hasGoldenBanana) {
-              this.showEvent('golden-obj');
-              this.log("THE GOLDEN BANANA! Answer the riddle!");
+              this.showEvent('golden-8bit');
+              this.log("GOLDEN BANANA! ANSWER RIDDLE!");
               document.getElementById('minigame-modal').style.display = 'block';
               return;
             } else {
-              this.log("Swinging deeper into the jungle...");
+              this.log("SWINGING DEEPER...");
             }
             break;
 
@@ -1563,23 +1361,23 @@
             const friend = friends[Math.floor(Math.random() * friends.length)];
 
             if (friend === 'kaa') {
-              this.showEvent('kaa-obj');
-              this.log("KAA! Shows you how to climb higher!");
+              this.showEvent('kaa-8bit');
+              this.log("KAA! LEARN TO CLIMB!");
               this.canClimbUp = true;
             } else if (friend === 'baloo') {
-              this.showEvent('baloo-obj');
+              this.showEvent('baloo-8bit');
               this.jungleSongs++;
-              this.log("BALOO teaches you a jungle song! +1 Song");
+              this.log("BALOO! +1 SONG!");
             } else {
-              this.showEvent('wolves-obj');
+              this.showEvent('wolves-8bit');
               this.health = Math.min(100, this.health + 15);
-              this.log("WOLF PACK protects you! +15 health!");
+              this.log("WOLVES! +15 HP!");
             }
             break;
 
           default:
             this.hideAllEvents();
-            this.log("The jungle stretches on...");
+            this.log("JUNGLE CONTINUES...");
         }
 
         this.updateUI();
@@ -1592,9 +1390,9 @@
         if (answer === 'B') {
           this.hasGoldenBanana = true;
           this.bananas += 20;
-          this.log("CORRECT! The Golden Banana is yours! +20 bananas!");
+          this.log("CORRECT! +GOLDEN +20 BANANAS!");
         } else {
-          this.log("Wrong! The Golden Banana vanishes...");
+          this.log("WRONG! GOLDEN VANISHES...");
         }
 
         this.hideAllEvents();
@@ -1609,19 +1407,19 @@
           overlay.className = 'defeat';
           overlay.style.display = 'flex';
           document.getElementById('overlay-title').textContent = 'GAME OVER';
-          this.log("The jungle claims another soul...");
+          this.log("YOU DIED!");
         } else if (this.bananas >= 69 && this.hasGoldenBanana) {
           this.gameOver = true;
           const overlay = document.getElementById('game-overlay');
           overlay.className = 'victory';
           overlay.style.display = 'flex';
-          document.getElementById('overlay-title').textContent = 'VICTORY!';
-          this.log("YOU SAVED THE JUNGLE!");
+          document.getElementById('overlay-title').textContent = 'YOU WIN!';
+          this.log("JUNGLE SAVED!");
         }
       }
 
       quit() {
-        if (confirm('Quit game?')) {
+        if (confirm('QUIT GAME?')) {
           window.location.href = 'index.html';
         }
       }
