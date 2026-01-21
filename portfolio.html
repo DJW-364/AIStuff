@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore our portfolio of innovative companies, products, and ideas at So Easy a Monkey Can Do It.">
+  <meta name="keywords" content="portfolio, projects, startups, products, innovation, technology">
+  <meta name="author" content="So Easy a Monkey Can Do It">
+  <meta property="og:title" content="Portfolio | So Easy a Monkey Can Do It">
+  <meta property="og:description" content="Discover our innovative projects and ventures.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://soeasymonkeycandoit.com/portfolio">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#9d4edd">
+
+  <title>Portfolio | So Easy a Monkey Can Do It</title>
+
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐵</text></svg>">
+</head>
+<body class="page-transition">
+  <!-- Animated Background -->
+  <div class="tie-dye-bg"></div>
+
+  <!-- Wave Decoration -->
+  <div class="wave-decoration">
+    <div class="wave"></div>
+  </div>
+
+  <!-- Jungle Decorations -->
+  <div class="jungle-decoration top-left">🌿</div>
+  <div class="jungle-decoration top-right">🍃</div>
+  <div class="jungle-decoration bottom-left">🌴</div>
+  <div class="jungle-decoration bottom-right">🌿</div>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <span class="logo-monkey">🐵</span>
+        <span>SEAM</span>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html" class="active">Portfolio</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Portfolio Section -->
+  <section class="portfolio-section">
+    <h1 class="section-title">Our Portfolio</h1>
+    <p style="text-align: center; max-width: 600px; margin: 0 auto 3rem; color: rgba(255,255,255,0.8);">
+      Swinging through innovation—here's a glimpse of the companies, products, and ideas we're cultivating in our techno-jungle.
+    </p>
+
+    <!-- Filter Buttons -->
+    <div class="filter-container">
+      <button class="filter-btn active" data-filter="all">
+        <i class="fas fa-border-all"></i> All
+      </button>
+      <button class="filter-btn" data-filter="company">
+        <i class="fas fa-building"></i> Companies
+      </button>
+      <button class="filter-btn" data-filter="product">
+        <i class="fas fa-box"></i> Products
+      </button>
+      <button class="filter-btn" data-filter="idea">
+        <i class="fas fa-lightbulb"></i> Ideas
+      </button>
+    </div>
+
+    <!-- Portfolio Grid -->
+    <div class="portfolio-grid" id="portfolioGrid">
+      <!-- Card 1 -->
+      <div class="portfolio-card" data-category="company">
+        <div class="card-gradient gradient-1">
+          <span class="card-icon">🚀</span>
+        </div>
+        <div class="card-content">
+          <span class="card-category">Company</span>
+          <h3>JungleStack</h3>
+          <p>A no-code platform that lets anyone build powerful web applications. Drag, drop, deploy—it's that simple.</p>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="portfolio-card" data-category="product">
+        <div class="card-gradient gradient-2">
+          <span class="card-icon">🎨</span>
+        </div>
+        <div class="card-content">
+          <span class="card-category">Product</span>
+          <h3>VineUI</h3>
+          <p>Beautiful, accessible component library that grows with your project. Open source and community-driven.</p>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="portfolio-card" data-category="idea">
+        <div class="card-gradient gradient-3">
+          <span class="card-icon">🧠</span>
+        </div>
+        <div class="card-content">
+          <span class="card-category">Idea</span>
+          <h3>NeuralNest</h3>
+          <p>AI-powered learning platform that adapts to your brain's unique patterns. Education, personalized.</p>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="portfolio-card" data-category="company">
+        <div class="card-gradient gradient-4">
+          <span class="card-icon">💬</span>
+        </div>
+        <div class="card-content">
+          <span class="card-category">Company</span>
+          <h3>ChatterVine</h3>
+          <p>Next-gen team collaboration tool that cuts through the noise. Less meetings, more doing.</p>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="portfolio-card" data-category="product">
+        <div class="card-gradient gradient-5">
+          <span class="card-icon">📊</span>
+        </div>
+        <div class="card-content">
+          <span class="card-category">Product</span>
+          <h3>DataCanopy</h3>
+          <p>Analytics dashboard that tells stories, not just numbers. Insights anyone can understand.</p>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="portfolio-card" data-category="idea">
+        <div class="card-gradient gradient-6">
+          <span class="card-icon">🌍</span>
+        </div>
+        <div class="card-content">
+          <span class="card-category">Idea</span>
+          <h3>EcoSwing</h3>
+          <p>Carbon footprint tracker that gamifies sustainability. Make the planet greener while having fun.</p>
+        </div>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="portfolio-card" data-category="product">
+        <div class="card-gradient gradient-1">
+          <span class="card-icon">🔐</span>
+        </div>
+        <div class="card-content">
+          <span class="card-category">Product</span>
+          <h3>KeyVault</h3>
+          <p>Password manager so intuitive, your grandma could use it. Security without the headaches.</p>
+        </div>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="portfolio-card" data-category="company">
+        <div class="card-gradient gradient-3">
+          <span class="card-icon">🎮</span>
+        </div>
+        <div class="card-content">
+          <span class="card-category">Company</span>
+          <h3>PixelPrimate</h3>
+          <p>Game studio creating accessible gaming experiences. Everyone deserves to play.</p>
+        </div>
+      </div>
+
+      <!-- Card 9 -->
+      <div class="portfolio-card" data-category="idea">
+        <div class="card-gradient gradient-2">
+          <span class="card-icon">🏥</span>
+        </div>
+        <div class="card-content">
+          <span class="card-category">Idea</span>
+          <h3>HealthVine</h3>
+          <p>Telemedicine platform connecting rural communities to healthcare. Distance shouldn't matter.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-logo">🐵 So Easy a Monkey Can Do It</div>
+
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="contact.html">Contact</a>
+      </div>
+
+      <div class="social-links">
+        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      </div>
+
+      <p class="copyright">
+        &copy; 2024 So Easy a Monkey Can Do It. All rights reserved. 🍌
+      </p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
