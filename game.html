@@ -2,1436 +2,1161 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Swinger Monkey - So Easy Monkey Can Do It</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>JUNGLE SWING - So Easy Monkey Can Do It</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐵</text></svg>">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Press+Start+2P&display=swap');
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      image-rendering: pixelated;
-      -webkit-font-smoothing: none;
-    }
-
-    :root {
-      /* Atari 2600 style limited palette */
-      --sky: #1a4a1a;
-      --ground: #4a7a2a;
-      --ground-dark: #2a5a1a;
-      --tree-trunk: #6a3a1a;
-      --tree-dark: #4a2a0a;
-      --vine: #2a8a2a;
-      --vine-dark: #1a6a1a;
-      --monkey-orange: #da6a2a;
-      --monkey-dark: #aa4a1a;
-      --monkey-light: #ea9a6a;
-      --snake-green: #4a9a2a;
-      --snake-dark: #2a7a1a;
-      --banana-yellow: #eaea2a;
-      --banana-dark: #baba1a;
-      --golden: #fada2a;
-      --mud-brown: #5a4a3a;
-      --mud-dark: #3a2a1a;
-      --hud-bg: #1a1a1a;
-      --hud-border: #4a4a4a;
-      --text-green: #2aea2a;
-      --text-red: #ea2a2a;
-      --text-yellow: #eaea2a;
-      --white: #eaeaea;
-      --black: #0a0a0a;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Press Start 2P', monospace;
-      background: var(--black);
-      height: 100vh;
+      background: #1a0a2e;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #game-container {
-      width: 100%;
-      max-width: 800px;
-      height: 100vh;
-      max-height: 650px;
-      display: flex;
-      flex-direction: column;
-      background: var(--black);
-      position: relative;
-      border: 4px solid var(--hud-border);
-    }
-
-    /* Scanline effect for CRT look */
-    #game-container::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(
-        0deg,
-        rgba(0,0,0,0.15) 0px,
-        rgba(0,0,0,0.15) 2px,
-        transparent 2px,
-        transparent 4px
-      );
-      pointer-events: none;
-      z-index: 1000;
-    }
-
-    /* 8-bit Viewport */
-    #viewport {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-      background: var(--sky);
-    }
-
-    /* Pixelated sky bands */
-    .sky-band {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      height: 20%;
-    }
-    .sky-band:nth-child(1) { top: 0; background: #0a2a0a; }
-    .sky-band:nth-child(2) { top: 20%; background: #1a3a1a; }
-    .sky-band:nth-child(3) { top: 40%; background: #2a4a2a; }
-
-    /* 8-bit Ground - flat colored strips */
-    .ground-8bit {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 45%;
-      background: repeating-linear-gradient(
-        to bottom,
-        var(--ground) 0px,
-        var(--ground) 16px,
-        var(--ground-dark) 16px,
-        var(--ground-dark) 32px
-      );
-    }
-
-    /* 8-bit Path - simple triangle perspective */
-    .path-8bit {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 120px solid transparent;
-      border-right: 120px solid transparent;
-      border-bottom: 200px solid var(--mud-brown);
-    }
-
-    /* 8-bit Tree trunks - simple rectangles */
-    .tree-8bit {
-      position: absolute;
-      bottom: 45%;
-      width: 24px;
-      background: var(--tree-trunk);
-      border: 4px solid var(--tree-dark);
-    }
-
-    .tree-8bit.l1 { left: 8%; height: 55%; }
-    .tree-8bit.l2 { left: 20%; height: 45%; width: 20px; }
-    .tree-8bit.r1 { right: 8%; height: 55%; }
-    .tree-8bit.r2 { right: 20%; height: 45%; width: 20px; }
-
-    .tree-8bit.moving {
-      animation: tree8bitMove 0.4s steps(4);
-    }
-
-    @keyframes tree8bitMove {
-      0% { transform: scale(0.7); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    /* 8-bit Vines - simple lines */
-    .vine-8bit {
-      position: absolute;
-      top: 0;
-      width: 8px;
-      background: var(--vine);
-      border: 2px solid var(--vine-dark);
-    }
-
-    .vine-8bit::after {
-      content: '';
-      position: absolute;
-      bottom: -12px;
-      left: -4px;
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 12px solid var(--vine);
-    }
-
-    .vine-8bit.v1 { left: 12%; height: 30%; }
-    .vine-8bit.v2 { left: 28%; height: 22%; }
-    .vine-8bit.v3 { left: 50%; transform: translateX(-50%); height: 35%; }
-    .vine-8bit.v4 { right: 28%; height: 25%; }
-    .vine-8bit.v5 { right: 12%; height: 28%; }
-
-    .vine-8bit.swing {
-      animation: vineSwing8bit 0.5s steps(3);
-    }
-
-    @keyframes vineSwing8bit {
-      0% { transform: translateX(0); }
-      33% { transform: translateX(-8px); }
-      66% { transform: translateX(8px); }
-      100% { transform: translateX(0); }
-    }
-
-    /* Event objects - 8-bit style */
-    .event-8bit {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%) scale(0);
-      z-index: 20;
-      opacity: 0;
-    }
-
-    .event-8bit.visible {
-      opacity: 1;
-      transform: translateX(-50%) scale(1);
-      animation: eventPop8bit 0.3s steps(3);
-    }
-
-    @keyframes eventPop8bit {
-      0% { transform: translateX(-50%) scale(0); }
-      50% { transform: translateX(-50%) scale(1.2); }
-      100% { transform: translateX(-50%) scale(1); }
-    }
-
-    /* 8-bit Snake */
-    #snake-8bit {
-      top: 25%;
-    }
-
-    .snake-body-8bit {
-      display: flex;
-      align-items: center;
-    }
-
-    .snake-segment {
-      width: 20px;
-      height: 20px;
-      background: var(--snake-green);
-      border: 3px solid var(--snake-dark);
-    }
-
-    .snake-head-8bit {
-      width: 28px;
-      height: 28px;
-      background: var(--snake-green);
-      border: 3px solid var(--snake-dark);
-      position: relative;
-    }
-
-    .snake-eye-8bit {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: var(--text-red);
-      top: 6px;
-      left: 6px;
-    }
-
-    .snake-tongue-8bit {
-      position: absolute;
-      left: -16px;
-      top: 10px;
-      width: 16px;
-      height: 4px;
-      background: var(--text-red);
-    }
-
-    .snake-tongue-8bit::before,
-    .snake-tongue-8bit::after {
-      content: '';
-      position: absolute;
-      left: -8px;
-      width: 8px;
-      height: 4px;
-      background: var(--text-red);
-    }
-    .snake-tongue-8bit::before { top: -4px; }
-    .snake-tongue-8bit::after { top: 4px; }
-
-    /* 8-bit Banana Tree */
-    #banana-8bit {
-      top: 18%;
-    }
-
-    .banana-tree-8bit {
-      position: relative;
-    }
-
-    .btree-trunk {
-      width: 20px;
-      height: 100px;
-      background: var(--tree-trunk);
-      border: 3px solid var(--tree-dark);
-      margin: 0 auto;
-    }
-
-    .btree-leaves {
-      position: absolute;
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .btree-leaf {
-      width: 48px;
-      height: 12px;
-      background: var(--vine);
-      border: 2px solid var(--vine-dark);
-      position: absolute;
-    }
-
-    .btree-leaf:nth-child(1) { transform: rotate(-45deg); left: -40px; top: 20px; }
-    .btree-leaf:nth-child(2) { transform: rotate(45deg); left: 0; top: 20px; }
-    .btree-leaf:nth-child(3) { transform: rotate(-20deg); left: -30px; top: 0; }
-    .btree-leaf:nth-child(4) { transform: rotate(20deg); left: -10px; top: 0; }
-
-    .banana-bunch-8bit {
-      position: absolute;
-      top: 30px;
-      left: 30px;
-    }
-
-    .banana-pixel {
-      width: 24px;
-      height: 10px;
-      background: var(--banana-yellow);
-      border: 2px solid var(--banana-dark);
-      margin: 4px 0;
-      transform: skewX(-15deg);
-    }
-
-    /* 8-bit Mud Pit */
-    #pit-8bit {
-      top: 35%;
-    }
-
-    .mud-pit-8bit {
-      width: 140px;
-      height: 40px;
-      background: var(--mud-brown);
-      border: 4px solid var(--mud-dark);
-      position: relative;
-    }
-
-    .mud-bubble-8bit {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: var(--mud-dark);
-      animation: mudBubble8bit 1s steps(4) infinite;
-    }
-
-    .mud-bubble-8bit:nth-child(1) { left: 20px; top: 10px; animation-delay: 0s; }
-    .mud-bubble-8bit:nth-child(2) { left: 60px; top: 14px; animation-delay: 0.3s; }
-    .mud-bubble-8bit:nth-child(3) { right: 20px; top: 8px; animation-delay: 0.6s; }
-
-    @keyframes mudBubble8bit {
-      0%, 100% { transform: translateY(0); opacity: 1; }
-      50% { transform: translateY(-16px); opacity: 0.5; }
-      75% { opacity: 0; }
-    }
-
-    /* 8-bit Golden Banana */
-    #golden-8bit {
-      top: 28%;
-    }
-
-    .golden-banana-8bit {
-      width: 64px;
-      height: 24px;
-      background: var(--golden);
-      border: 4px solid var(--banana-dark);
-      animation: goldenFlash8bit 0.5s steps(2) infinite;
-    }
-
-    @keyframes goldenFlash8bit {
-      0%, 100% { background: var(--golden); box-shadow: 0 0 0 4px var(--banana-yellow); }
-      50% { background: var(--banana-yellow); box-shadow: 0 0 0 8px var(--golden); }
-    }
-
-    /* 8-bit Friends */
-    #kaa-8bit { top: 25%; }
-    #baloo-8bit { top: 20%; }
-    #wolves-8bit { top: 30%; }
-
-    /* Kaa */
-    .kaa-body-8bit {
-      display: flex;
-      align-items: center;
-    }
-
-    .kaa-seg {
-      width: 16px;
-      height: 16px;
-      background: #baba6a;
-      border: 2px solid #8a8a4a;
-    }
-
-    .kaa-head-8bit {
-      width: 32px;
-      height: 32px;
-      background: #baba6a;
-      border: 3px solid #8a8a4a;
-      position: relative;
-    }
-
-    .kaa-eye-8bit {
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      background: var(--banana-yellow);
-      border: 2px solid #8a8a1a;
-      top: 6px;
-      left: 10px;
-      animation: kaaEye8bit 0.3s steps(2) infinite;
-    }
-
-    @keyframes kaaEye8bit {
-      0%, 100% { background: var(--banana-yellow); }
-      50% { background: var(--white); }
-    }
-
-    /* Baloo */
-    .baloo-8bit {
-      position: relative;
-      width: 80px;
-      height: 100px;
-    }
-
-    .baloo-body-8bit {
-      position: absolute;
-      bottom: 0;
-      left: 10px;
-      width: 60px;
-      height: 70px;
-      background: #5a5a6a;
-      border: 4px solid #3a3a4a;
-    }
-
-    .baloo-belly-8bit {
-      position: absolute;
-      bottom: 8px;
-      left: 20px;
-      width: 40px;
-      height: 50px;
-      background: #8a8a9a;
-      border: 3px solid #6a6a7a;
-    }
-
-    .baloo-head-8bit {
-      position: absolute;
-      top: 0;
-      left: 15px;
-      width: 50px;
-      height: 45px;
-      background: #5a5a6a;
-      border: 4px solid #3a3a4a;
-    }
-
-    .baloo-ear-8bit {
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      background: #5a5a6a;
-      border: 3px solid #3a3a4a;
-      top: 0;
-    }
-
-    .baloo-ear-8bit.left { left: 12px; }
-    .baloo-ear-8bit.right { right: 12px; }
-
-    .baloo-snout-8bit {
-      position: absolute;
-      bottom: 35px;
-      left: 25px;
-      width: 30px;
-      height: 20px;
-      background: #9a9aaa;
-      border: 3px solid #7a7a8a;
-    }
-
-    /* Wolves */
-    .wolves-8bit {
-      display: flex;
-      gap: 16px;
-    }
-
-    .wolf-8bit {
-      width: 40px;
-      height: 36px;
-      position: relative;
-    }
-
-    .wolf-body-8bit {
-      position: absolute;
-      bottom: 0;
-      width: 36px;
-      height: 24px;
-      background: #6a6a7a;
-      border: 3px solid #4a4a5a;
-    }
-
-    .wolf-head-8bit {
-      position: absolute;
-      top: 4px;
-      left: 0;
-      width: 24px;
-      height: 20px;
-      background: #6a6a7a;
-      border: 3px solid #4a4a5a;
-    }
-
-    .wolf-ear-8bit {
-      position: absolute;
-      width: 8px;
-      height: 12px;
-      background: #6a6a7a;
-      border: 2px solid #4a4a5a;
-      top: -10px;
-    }
-
-    .wolf-ear-8bit.left { left: 2px; }
-    .wolf-ear-8bit.right { left: 12px; }
-
-    .wolf-eye-8bit {
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: var(--text-green);
-      top: 6px;
-      left: 8px;
-      animation: wolfEye8bit 1s steps(2) infinite;
-    }
-
-    @keyframes wolfEye8bit {
-      0%, 100% { background: var(--text-green); }
-      50% { background: #8afa8a; }
-    }
-
-    /* 8-BIT MONKEY HANDS */
-    .monkey-hands-8bit {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 45%;
-      z-index: 30;
-      pointer-events: none;
-    }
-
-    .hand-8bit {
-      position: absolute;
-      bottom: -10px;
-    }
-
-    .hand-8bit.left { left: 8%; }
-    .hand-8bit.right { right: 8%; transform: scaleX(-1); }
-
-    /* Pixelated hand made of blocks */
-    .hand-arm-8bit {
-      width: 32px;
-      height: 100px;
-      background: var(--monkey-orange);
-      border: 4px solid var(--monkey-dark);
-    }
-
-    .hand-palm-8bit {
-      position: absolute;
-      top: -40px;
-      left: -12px;
-      width: 56px;
-      height: 48px;
-      background: var(--monkey-orange);
-      border: 4px solid var(--monkey-dark);
-    }
-
-    .hand-palm-inner-8bit {
-      position: absolute;
-      top: 12px;
-      left: 10px;
-      width: 32px;
-      height: 28px;
-      background: var(--monkey-light);
-      border: 3px solid var(--monkey-orange);
-    }
-
-    .finger-8bit {
-      position: absolute;
-      background: var(--monkey-orange);
-      border: 3px solid var(--monkey-dark);
-    }
-
-    .finger-8bit.f1 { width: 12px; height: 32px; top: -60px; left: 0; }
-    .finger-8bit.f2 { width: 12px; height: 40px; top: -68px; left: 14px; }
-    .finger-8bit.f3 { width: 12px; height: 38px; top: -66px; left: 28px; }
-    .finger-8bit.f4 { width: 10px; height: 28px; top: -54px; left: 40px; }
-    .finger-8bit.thumb { width: 14px; height: 24px; top: 0px; left: -14px; }
-
-    /* Hand animations - 8-bit stepped */
-    .hand-8bit.left.swing-left {
-      animation: handLeft8bit 0.5s steps(4);
-    }
-
-    .hand-8bit.right.swing-right {
-      animation: handRight8bit 0.5s steps(4);
-    }
-
-    .hand-8bit.swing-forward {
-      animation: handForward8bit 0.5s steps(4);
-    }
-
-    @keyframes handLeft8bit {
-      0% { transform: translateY(0); }
-      25% { transform: translateY(-60px) translateX(20px); }
-      50% { transform: translateY(-40px) translateX(10px); }
-      100% { transform: translateY(0); }
-    }
-
-    @keyframes handRight8bit {
-      0% { transform: scaleX(-1) translateY(0); }
-      25% { transform: scaleX(-1) translateY(-60px) translateX(-20px); }
-      50% { transform: scaleX(-1) translateY(-40px) translateX(-10px); }
-      100% { transform: scaleX(-1) translateY(0); }
-    }
-
-    @keyframes handForward8bit {
-      0% { transform: translateY(0) scale(1); }
-      25% { transform: translateY(-80px) scale(0.7); }
-      50% { transform: translateY(-50px) scale(0.8); }
-      100% { transform: translateY(0) scale(1); }
-    }
-
-    /* Damage flash */
-    .damage-flash {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--text-red);
-      z-index: 40;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .damage-flash.active {
-      animation: damageFlash8bit 0.3s steps(3);
-    }
-
-    @keyframes damageFlash8bit {
-      0% { opacity: 0.7; }
-      33% { opacity: 0; }
-      66% { opacity: 0.5; }
-      100% { opacity: 0; }
-    }
-
-    /* Screen shake */
-    #viewport.shake {
-      animation: shake8bit 0.3s steps(4);
-    }
-
-    @keyframes shake8bit {
-      0%, 100% { transform: translate(0, 0); }
-      25% { transform: translate(-8px, 4px); }
-      50% { transform: translate(8px, -4px); }
-      75% { transform: translate(-4px, 8px); }
-    }
-
-    /* ==================== 8-BIT HUD ==================== */
-    .hud-8bit {
-      height: 80px;
-      background: var(--hud-bg);
-      border-top: 4px solid var(--hud-border);
-      display: flex;
-      justify-content: space-between;
-      align-items: stretch;
-    }
-
-    .hud-section-8bit {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 8px 12px;
-      min-width: 80px;
-      border-right: 4px solid var(--hud-border);
-    }
-
-    .hud-section-8bit:last-child {
-      border-right: none;
-      border-left: 4px solid var(--hud-border);
-    }
-
-    .hud-value-8bit {
-      font-size: 1.4rem;
-      line-height: 1;
-    }
-
-    .hud-value-8bit.health { color: var(--text-red); }
-    .hud-value-8bit.bananas { color: var(--text-yellow); }
-    .hud-value-8bit.songs { color: var(--text-green); }
-    .hud-value-8bit.golden { color: #6a6a6a; }
-    .hud-value-8bit.golden.yes {
-      color: var(--golden);
-      animation: goldenText8bit 0.5s steps(2) infinite;
-    }
-
-    @keyframes goldenText8bit {
-      0%, 100% { color: var(--golden); }
-      50% { color: var(--text-yellow); }
-    }
-
-    .hud-label-8bit {
-      font-size: 0.4rem;
-      color: var(--white);
-      margin-top: 4px;
-    }
-
-    /* 8-bit Monkey face */
-    .hud-center-8bit {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .monkey-face-8bit {
-      width: 56px;
-      height: 56px;
-      background: var(--monkey-orange);
-      border: 4px solid var(--monkey-dark);
-      position: relative;
-    }
-
-    .mf-ear-8bit {
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      background: var(--monkey-orange);
-      border: 3px solid var(--monkey-dark);
-      top: 4px;
-    }
-
-    .mf-ear-8bit.left { left: -12px; }
-    .mf-ear-8bit.right { right: -12px; }
-
-    .mf-ear-inner-8bit {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: var(--monkey-light);
-      top: 2px;
-      left: 2px;
-    }
-
-    .mf-eye-8bit {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: var(--white);
-      top: 14px;
-    }
-
-    .mf-eye-8bit.left { left: 8px; }
-    .mf-eye-8bit.right { right: 8px; }
-
-    .mf-eye-8bit::after {
-      content: '';
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: var(--black);
-      top: 2px;
-      left: 2px;
-    }
-
-    .mf-snout-8bit {
-      position: absolute;
-      width: 28px;
-      height: 20px;
-      background: var(--monkey-light);
-      border: 3px solid var(--monkey-orange);
-      bottom: 6px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .mf-nose-8bit {
-      position: absolute;
-      width: 8px;
-      height: 6px;
-      background: var(--monkey-dark);
-      bottom: 22px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .mf-mouth-8bit {
-      position: absolute;
-      width: 16px;
-      height: 6px;
-      background: var(--monkey-dark);
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    /* Hurt face */
-    .monkey-face-8bit.hurt .mf-eye-8bit {
-      height: 4px;
-      top: 17px;
-    }
-
-    .monkey-face-8bit.hurt .mf-eye-8bit::after {
-      display: none;
-    }
-
-    .monkey-face-8bit.hurt .mf-mouth-8bit {
-      width: 20px;
-      height: 12px;
-      background: #3a1a1a;
-      bottom: 8px;
-    }
-
-    /* Controls */
-    .controls-8bit {
-      display: flex;
-      gap: 4px;
-      padding: 6px;
-      background: var(--black);
-    }
-
-    .controls-8bit button {
-      flex: 1;
-      font-family: 'Press Start 2P', monospace;
-      background: var(--hud-bg);
-      color: var(--white);
-      border: 4px solid var(--hud-border);
-      padding: 10px 6px;
+      font-family: 'Bangers', cursive;
       cursor: pointer;
-      font-size: 0.4rem;
-      transition: none;
+      touch-action: none;
     }
 
-    .controls-8bit button:hover {
-      background: var(--text-green);
-      color: var(--black);
+    #game-canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
     }
 
-    .controls-8bit button:active {
-      background: var(--vine-dark);
+    /* UI Overlay */
+    #ui {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
     }
 
-    .controls-8bit button.quit-btn:hover {
-      background: var(--text-red);
+    /* Score display */
+    #score-display {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
     }
 
-    /* Text log */
-    #text-log {
-      height: 55px;
-      background: var(--black);
-      border-top: 4px solid var(--hud-border);
-      padding: 6px 10px;
-      overflow-y: auto;
-      font-size: 0.4rem;
-      color: var(--text-green);
-      line-height: 1.5;
+    #score {
+      font-size: 3.5rem;
+      color: #ffd700;
+      text-shadow:
+        3px 3px 0 #ff6b00,
+        6px 6px 0 rgba(0,0,0,0.3);
+      letter-spacing: 4px;
     }
 
-    #text-log::-webkit-scrollbar { width: 8px; }
-    #text-log::-webkit-scrollbar-track { background: var(--black); }
-    #text-log::-webkit-scrollbar-thumb { background: var(--hud-border); }
+    #combo {
+      font-size: 1.5rem;
+      color: #00ffaa;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
 
-    /* Modal */
-    #minigame-modal {
-      display: none;
+    #combo.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Banana counter */
+    #banana-counter {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .banana-icon {
+      font-size: 2.5rem;
+      filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.4));
+      animation: bananaWiggle 0.5s ease-in-out infinite;
+    }
+
+    @keyframes bananaWiggle {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    #banana-count {
+      font-size: 2.5rem;
+      color: #ffec00;
+      text-shadow: 3px 3px 0 #cc9900, 5px 5px 0 rgba(0,0,0,0.3);
+    }
+
+    /* Start screen */
+    #start-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(180deg,
+        rgba(26,10,46,0.9) 0%,
+        rgba(10,40,30,0.85) 100%
+      );
+      pointer-events: auto;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+
+    #start-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    #game-title {
+      font-size: 5rem;
+      color: #00ff88;
+      text-shadow:
+        4px 4px 0 #008844,
+        8px 8px 0 rgba(0,0,0,0.4);
+      margin-bottom: 10px;
+      animation: titlePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes titlePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    #game-subtitle {
+      font-size: 1.8rem;
+      color: #ffcc00;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+      margin-bottom: 50px;
+    }
+
+    .start-btn {
+      font-family: 'Bangers', cursive;
+      font-size: 2.5rem;
+      padding: 20px 60px;
+      background: linear-gradient(180deg, #ff6b35 0%, #d63031 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+      box-shadow:
+        0 8px 0 #8b1a1a,
+        0 15px 30px rgba(0,0,0,0.4);
+      transition: all 0.1s;
+      letter-spacing: 3px;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 11px 0 #8b1a1a,
+        0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .start-btn:active {
+      transform: translateY(4px);
+      box-shadow:
+        0 4px 0 #8b1a1a,
+        0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    #instructions {
+      margin-top: 40px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.9rem;
+      color: #88ffcc;
+      text-align: center;
+      line-height: 2;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    }
+
+    /* Game over screen */
+    #game-over {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(180deg,
+        rgba(46,10,26,0.95) 0%,
+        rgba(20,10,30,0.95) 100%
+      );
+      pointer-events: auto;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+
+    #game-over.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #game-over-title {
+      font-size: 4rem;
+      color: #ff4444;
+      text-shadow:
+        4px 4px 0 #880000,
+        8px 8px 0 rgba(0,0,0,0.4);
+      margin-bottom: 20px;
+    }
+
+    #final-score-label {
+      font-size: 1.5rem;
+      color: #ffaa00;
+      margin-bottom: 10px;
+    }
+
+    #final-score {
+      font-size: 5rem;
+      color: #ffd700;
+      text-shadow:
+        4px 4px 0 #ff8800,
+        8px 8px 0 rgba(0,0,0,0.4);
+      margin-bottom: 15px;
+    }
+
+    #high-score {
+      font-size: 1.3rem;
+      color: #00ffaa;
+      margin-bottom: 40px;
+    }
+
+    /* Feedback text */
+    #feedback {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: var(--black);
-      border: 4px solid var(--golden);
-      padding: 20px;
-      z-index: 100;
-      text-align: center;
+      font-size: 4rem;
+      color: #00ff88;
+      text-shadow:
+        3px 3px 0 #008844,
+        6px 6px 0 rgba(0,0,0,0.4);
+      opacity: 0;
+      pointer-events: none;
     }
 
-    #minigame-modal h3 {
-      color: var(--golden);
-      font-size: 0.6rem;
-      margin-bottom: 12px;
+    #feedback.perfect {
+      color: #ffd700;
+      text-shadow:
+        3px 3px 0 #ff8800,
+        6px 6px 0 rgba(0,0,0,0.4);
+      animation: feedbackPop 0.6s ease-out forwards;
     }
 
-    #minigame-modal p {
-      font-size: 0.45rem;
-      color: var(--white);
-      margin-bottom: 16px;
+    #feedback.good {
+      color: #00ff88;
+      animation: feedbackPop 0.6s ease-out forwards;
     }
 
-    .minigame-options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
+    #feedback.miss {
+      color: #ff4444;
+      text-shadow:
+        3px 3px 0 #880000,
+        6px 6px 0 rgba(0,0,0,0.4);
+      animation: feedbackPop 0.6s ease-out forwards;
     }
 
-    .minigame-options button {
+    @keyframes feedbackPop {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+      100% { opacity: 0; transform: translate(-50%, -70%) scale(1); }
+    }
+
+    /* Mobile touch hint */
+    #touch-hint {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
       font-family: 'Press Start 2P', monospace;
-      background: var(--hud-bg);
-      color: var(--white);
-      border: 3px solid var(--text-green);
-      padding: 10px;
-      cursor: pointer;
-      font-size: 0.35rem;
+      font-size: 1rem;
+      color: rgba(255,255,255,0.6);
+      animation: hintPulse 1.5s ease-in-out infinite;
     }
 
-    .minigame-options button:hover {
-      background: var(--text-green);
-      color: var(--black);
+    @keyframes hintPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
     }
 
-    /* Game overlay */
-    #game-overlay {
-      display: none;
+    #touch-hint.hidden { display: none; }
+
+    /* Back link */
+    .back-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      pointer-events: auto;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: #00ff88;
+    }
+
+    /* Speed lines effect */
+    #speed-lines {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(10,10,10,0.95);
-      z-index: 90;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+      pointer-events: none;
+      opacity: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 50px,
+        rgba(255,255,255,0.03) 50px,
+        rgba(255,255,255,0.03) 51px
+      );
+      transition: opacity 0.3s;
     }
 
-    #game-overlay h2 {
-      font-size: 1rem;
-      margin-bottom: 20px;
+    #speed-lines.active {
+      opacity: 1;
+      animation: speedLinesMove 0.1s linear infinite;
     }
 
-    #game-overlay.victory h2 { color: var(--golden); }
-    #game-overlay.defeat h2 { color: var(--text-red); }
-
-    #game-overlay button {
-      font-family: 'Press Start 2P', monospace;
-      background: var(--text-green);
-      color: var(--black);
-      border: 4px solid var(--vine-dark);
-      padding: 12px 24px;
-      cursor: pointer;
-      font-size: 0.5rem;
+    @keyframes speedLinesMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 51px 0; }
     }
 
-    #game-overlay button:hover {
-      background: var(--vine);
-    }
-
-    .back-link {
-      display: block;
-      text-align: center;
-      padding: 6px;
-      background: var(--black);
-      color: var(--text-green);
-      text-decoration: none;
-      font-size: 0.35rem;
-    }
-
-    .back-link:hover {
-      color: var(--text-yellow);
-    }
-
-    @media (max-width: 600px) {
-      .hud-8bit { height: 65px; }
-      .hud-value-8bit { font-size: 1rem; }
-      .hud-label-8bit { font-size: 0.3rem; }
-      .monkey-face-8bit { width: 44px; height: 44px; }
-      .controls-8bit button { font-size: 0.3rem; padding: 8px 4px; }
-      #text-log { height: 45px; font-size: 0.35rem; }
-      .hand-8bit { transform: scale(0.7); }
-      .hand-8bit.right { transform: scale(0.7) scaleX(-1); }
+    @media (max-width: 768px) {
+      #game-title { font-size: 3rem; }
+      #game-subtitle { font-size: 1.2rem; }
+      .start-btn { font-size: 1.8rem; padding: 15px 40px; }
+      #instructions { font-size: 0.7rem; padding: 0 20px; }
+      #score { font-size: 2.5rem; }
+      #banana-count { font-size: 1.8rem; }
+      .banana-icon { font-size: 1.8rem; }
     }
   </style>
 </head>
 <body>
-  <div id="game-container">
-    <!-- 8-bit Viewport -->
-    <div id="viewport">
-      <!-- Sky bands -->
-      <div class="sky-band"></div>
-      <div class="sky-band"></div>
-      <div class="sky-band"></div>
+  <canvas id="game-canvas"></canvas>
 
-      <!-- Ground -->
-      <div class="ground-8bit"></div>
-      <div class="path-8bit"></div>
+  <div id="ui">
+    <a href="index.html" class="back-link">< HOME</a>
 
-      <!-- Trees -->
-      <div class="tree-8bit l1" id="tree-l1"></div>
-      <div class="tree-8bit l2" id="tree-l2"></div>
-      <div class="tree-8bit r1" id="tree-r1"></div>
-      <div class="tree-8bit r2" id="tree-r2"></div>
+    <div id="score-display">
+      <div id="score">0</div>
+      <div id="combo"></div>
+    </div>
 
-      <!-- Vines -->
-      <div class="vine-8bit v1" id="vine1"></div>
-      <div class="vine-8bit v2" id="vine2"></div>
-      <div class="vine-8bit v3" id="vine3"></div>
-      <div class="vine-8bit v4" id="vine4"></div>
-      <div class="vine-8bit v5" id="vine5"></div>
+    <div id="banana-counter">
+      <span class="banana-icon">🍌</span>
+      <span id="banana-count">0</span>
+    </div>
 
-      <!-- Events -->
-      <div id="snake-8bit" class="event-8bit">
-        <div class="snake-body-8bit">
-          <div class="snake-head-8bit">
-            <div class="snake-eye-8bit"></div>
-            <div class="snake-tongue-8bit"></div>
-          </div>
-          <div class="snake-segment"></div>
-          <div class="snake-segment"></div>
-          <div class="snake-segment"></div>
-          <div class="snake-segment"></div>
-          <div class="snake-segment"></div>
-        </div>
-      </div>
+    <div id="feedback"></div>
+    <div id="speed-lines"></div>
+    <div id="touch-hint">TAP TO SWING!</div>
 
-      <div id="banana-8bit" class="event-8bit">
-        <div class="banana-tree-8bit">
-          <div class="btree-leaves">
-            <div class="btree-leaf"></div>
-            <div class="btree-leaf"></div>
-            <div class="btree-leaf"></div>
-            <div class="btree-leaf"></div>
-          </div>
-          <div class="banana-bunch-8bit">
-            <div class="banana-pixel"></div>
-            <div class="banana-pixel"></div>
-            <div class="banana-pixel"></div>
-          </div>
-          <div class="btree-trunk"></div>
-        </div>
-      </div>
-
-      <div id="pit-8bit" class="event-8bit">
-        <div class="mud-pit-8bit">
-          <div class="mud-bubble-8bit"></div>
-          <div class="mud-bubble-8bit"></div>
-          <div class="mud-bubble-8bit"></div>
-        </div>
-      </div>
-
-      <div id="golden-8bit" class="event-8bit">
-        <div class="golden-banana-8bit"></div>
-      </div>
-
-      <div id="kaa-8bit" class="event-8bit">
-        <div class="kaa-body-8bit">
-          <div class="kaa-head-8bit">
-            <div class="kaa-eye-8bit"></div>
-          </div>
-          <div class="kaa-seg"></div>
-          <div class="kaa-seg"></div>
-          <div class="kaa-seg"></div>
-          <div class="kaa-seg"></div>
-          <div class="kaa-seg"></div>
-          <div class="kaa-seg"></div>
-        </div>
-      </div>
-
-      <div id="baloo-8bit" class="event-8bit">
-        <div class="baloo-8bit">
-          <div class="baloo-body-8bit"></div>
-          <div class="baloo-belly-8bit"></div>
-          <div class="baloo-head-8bit">
-            <div class="baloo-ear-8bit left"></div>
-            <div class="baloo-ear-8bit right"></div>
-            <div class="baloo-snout-8bit"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="wolves-8bit" class="event-8bit">
-        <div class="wolves-8bit">
-          <div class="wolf-8bit"><div class="wolf-body-8bit"></div><div class="wolf-head-8bit"><div class="wolf-ear-8bit left"></div><div class="wolf-ear-8bit right"></div><div class="wolf-eye-8bit"></div></div></div>
-          <div class="wolf-8bit"><div class="wolf-body-8bit"></div><div class="wolf-head-8bit"><div class="wolf-ear-8bit left"></div><div class="wolf-ear-8bit right"></div><div class="wolf-eye-8bit"></div></div></div>
-          <div class="wolf-8bit"><div class="wolf-body-8bit"></div><div class="wolf-head-8bit"><div class="wolf-ear-8bit left"></div><div class="wolf-ear-8bit right"></div><div class="wolf-eye-8bit"></div></div></div>
-        </div>
-      </div>
-
-      <!-- 8-bit Monkey Hands -->
-      <div class="monkey-hands-8bit">
-        <div class="hand-8bit left" id="hand-left">
-          <div class="hand-arm-8bit"></div>
-          <div class="hand-palm-8bit">
-            <div class="hand-palm-inner-8bit"></div>
-          </div>
-          <div class="finger-8bit f1"></div>
-          <div class="finger-8bit f2"></div>
-          <div class="finger-8bit f3"></div>
-          <div class="finger-8bit f4"></div>
-          <div class="finger-8bit thumb"></div>
-        </div>
-        <div class="hand-8bit right" id="hand-right">
-          <div class="hand-arm-8bit"></div>
-          <div class="hand-palm-8bit">
-            <div class="hand-palm-inner-8bit"></div>
-          </div>
-          <div class="finger-8bit f1"></div>
-          <div class="finger-8bit f2"></div>
-          <div class="finger-8bit f3"></div>
-          <div class="finger-8bit f4"></div>
-          <div class="finger-8bit thumb"></div>
-        </div>
-      </div>
-
-      <!-- Damage flash -->
-      <div class="damage-flash" id="damage-flash"></div>
-
-      <!-- Modal -->
-      <div id="minigame-modal">
-        <h3>GOLDEN BANANA!</h3>
-        <p>RIDDLE: WHAT CAN YOU CATCH BUT NOT THROW?</p>
-        <div class="minigame-options">
-          <button onclick="game.answerRiddle('A')">A: BALL</button>
-          <button onclick="game.answerRiddle('B')">B: COLD</button>
-          <button onclick="game.answerRiddle('C')">C: FISH</button>
-          <button onclick="game.answerRiddle('D')">D: SHADOW</button>
-        </div>
-      </div>
-
-      <!-- Overlay -->
-      <div id="game-overlay">
-        <h2 id="overlay-title"></h2>
-        <button onclick="game.restart()">PLAY AGAIN</button>
+    <div id="start-screen">
+      <div id="game-title">JUNGLE SWING</div>
+      <div id="game-subtitle">🐵 A Monkey Adventure 🌴</div>
+      <button class="start-btn" onclick="game.start()">PLAY!</button>
+      <div id="instructions">
+        CLICK or TAP to grab vines<br>
+        Collect bananas • Avoid falling<br>
+        Time your swings perfectly!
       </div>
     </div>
 
-    <!-- 8-bit HUD -->
-    <div class="hud-8bit">
-      <div class="hud-section-8bit">
-        <div class="hud-value-8bit health" id="health-val">100</div>
-        <div class="hud-label-8bit">HEALTH</div>
-      </div>
-      <div class="hud-section-8bit">
-        <div class="hud-value-8bit bananas" id="bananas-val">0</div>
-        <div class="hud-label-8bit">BANANAS</div>
-      </div>
-      <div class="hud-center-8bit">
-        <div class="monkey-face-8bit" id="monkey-face">
-          <div class="mf-ear-8bit left"><div class="mf-ear-inner-8bit"></div></div>
-          <div class="mf-ear-8bit right"><div class="mf-ear-inner-8bit"></div></div>
-          <div class="mf-eye-8bit left"></div>
-          <div class="mf-eye-8bit right"></div>
-          <div class="mf-snout-8bit"></div>
-          <div class="mf-nose-8bit"></div>
-          <div class="mf-mouth-8bit"></div>
-        </div>
-      </div>
-      <div class="hud-section-8bit">
-        <div class="hud-value-8bit songs" id="songs-val">0</div>
-        <div class="hud-label-8bit">SONGS</div>
-      </div>
-      <div class="hud-section-8bit">
-        <div class="hud-value-8bit golden" id="golden-val">NO</div>
-        <div class="hud-label-8bit">GOLDEN</div>
-      </div>
+    <div id="game-over">
+      <div id="game-over-title">GAME OVER</div>
+      <div id="final-score-label">SCORE</div>
+      <div id="final-score">0</div>
+      <div id="high-score">BEST: 0</div>
+      <button class="start-btn" onclick="game.restart()">RETRY!</button>
     </div>
-
-    <!-- Text Log -->
-    <div id="text-log"></div>
-
-    <!-- Controls -->
-    <div class="controls-8bit">
-      <button onclick="game.swing('left')">SWING LEFT</button>
-      <button onclick="game.swing('straight')">FORWARD</button>
-      <button onclick="game.swing('right')">SWING RIGHT</button>
-      <button id="climb-btn" onclick="game.swing('up')" style="display:none;">CLIMB UP</button>
-      <button class="quit-btn" onclick="game.quit()">QUIT</button>
-    </div>
-
-    <a href="index.html" class="back-link">< BACK TO HOME</a>
   </div>
 
   <script>
-    class Game {
+    // ==================== JUNGLE SWING 3D ====================
+    // A modern retro-style 3D monkey swinging game
+
+    class JungleSwing {
       constructor() {
-        this.init();
-        this.setupKeyboard();
-      }
-
-      init() {
-        this.health = 100;
+        this.canvas = document.getElementById('game-canvas');
+        this.score = 0;
         this.bananas = 0;
-        this.jungleSongs = 0;
-        this.hasGoldenBanana = false;
-        this.canClimbUp = false;
-        this.gameOver = false;
-        this.isAnimating = false;
+        this.combo = 0;
+        this.highScore = parseInt(localStorage.getItem('jungleSwingHighScore')) || 0;
+        this.isPlaying = false;
+        this.gameSpeed = 1;
 
-        this.events = [
-          ...Array(6).fill(['snake', 'banana_tree', 'muddy_pit', 'banana_stash', 'nothing']).flat(),
-          ...Array(3).fill('meet_friend'),
-          'golden_banana'
-        ];
-
-        this.updateUI();
-        this.hideAllEvents();
-        this.log("SWINGER MONKEY");
-        this.log("GET 69 BANANAS + GOLDEN BANANA TO WIN!");
+        this.initThree();
+        this.initLights();
+        this.createEnvironment();
+        this.createMonkey();
+        this.createVines();
+        this.setupControls();
+        this.animate();
       }
 
-      setupKeyboard() {
-        document.addEventListener('keydown', (e) => {
-          if (this.gameOver || this.isAnimating) return;
-          const key = e.key.toLowerCase();
-          if (key === 'a' || key === 'arrowleft') this.swing('left');
-          else if (key === 'w' || key === 'arrowup') this.swing('straight');
-          else if (key === 'd' || key === 'arrowright') this.swing('right');
-          else if (key === 'u' && this.canClimbUp) this.swing('up');
-          else if (key === 'q' || key === 'escape') this.quit();
+      initThree() {
+        // Scene
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x1a0a2e);
+        this.scene.fog = new THREE.Fog(0x1a0a2e, 30, 80);
+
+        // Camera
+        this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera.position.set(0, 5, 18);
+        this.camera.lookAt(0, 3, 0);
+
+        // Renderer
+        this.renderer = new THREE.WebGLRenderer({
+          canvas: this.canvas,
+          antialias: true,
+          powerPreference: "high-performance"
+        });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+          this.camera.aspect = window.innerWidth / window.innerHeight;
+          this.camera.updateProjectionMatrix();
+          this.renderer.setSize(window.innerWidth, window.innerHeight);
         });
       }
 
-      log(text) {
-        const logEl = document.getElementById('text-log');
-        logEl.innerHTML += `<div>> ${text}</div>`;
-        logEl.scrollTop = logEl.scrollHeight;
+      initLights() {
+        // Ambient light
+        const ambient = new THREE.AmbientLight(0x404060, 0.5);
+        this.scene.add(ambient);
+
+        // Main directional light (sun)
+        const sun = new THREE.DirectionalLight(0xffffaa, 1);
+        sun.position.set(10, 20, 10);
+        sun.castShadow = true;
+        sun.shadow.mapSize.width = 2048;
+        sun.shadow.mapSize.height = 2048;
+        sun.shadow.camera.near = 0.5;
+        sun.shadow.camera.far = 50;
+        sun.shadow.camera.left = -20;
+        sun.shadow.camera.right = 20;
+        sun.shadow.camera.top = 20;
+        sun.shadow.camera.bottom = -20;
+        this.scene.add(sun);
+
+        // Rim light for dramatic effect
+        const rim = new THREE.DirectionalLight(0x00ffaa, 0.3);
+        rim.position.set(-5, 5, -10);
+        this.scene.add(rim);
+
+        // Point light on monkey
+        this.monkeyLight = new THREE.PointLight(0xffaa00, 0.5, 10);
+        this.scene.add(this.monkeyLight);
       }
 
-      updateUI() {
-        document.getElementById('health-val').textContent = this.health;
-        document.getElementById('bananas-val').textContent = this.bananas;
-        document.getElementById('songs-val').textContent = this.jungleSongs;
-        const goldenEl = document.getElementById('golden-val');
-        goldenEl.textContent = this.hasGoldenBanana ? 'YES' : 'NO';
-        goldenEl.className = 'hud-value-8bit golden' + (this.hasGoldenBanana ? ' yes' : '');
-        document.getElementById('climb-btn').style.display = this.canClimbUp ? 'block' : 'none';
+      createEnvironment() {
+        // Ground
+        const groundGeo = new THREE.PlaneGeometry(200, 200);
+        const groundMat = new THREE.MeshLambertMaterial({
+          color: 0x1a3a20,
+          side: THREE.DoubleSide
+        });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -5;
+        ground.receiveShadow = true;
+        this.scene.add(ground);
+
+        // Create low-poly trees
+        this.trees = [];
+        for (let i = 0; i < 40; i++) {
+          const tree = this.createTree();
+          const side = Math.random() > 0.5 ? 1 : -1;
+          tree.position.set(
+            side * (8 + Math.random() * 15),
+            -5,
+            -40 + Math.random() * 100
+          );
+          tree.rotation.y = Math.random() * Math.PI * 2;
+          this.scene.add(tree);
+          this.trees.push(tree);
+        }
+
+        // Floating particles (fireflies/pollen)
+        this.particles = [];
+        const particleGeo = new THREE.SphereGeometry(0.08, 4, 4);
+        const particleMat = new THREE.MeshBasicMaterial({ color: 0xffff88 });
+
+        for (let i = 0; i < 50; i++) {
+          const particle = new THREE.Mesh(particleGeo, particleMat);
+          particle.position.set(
+            (Math.random() - 0.5) * 40,
+            Math.random() * 15,
+            (Math.random() - 0.5) * 60
+          );
+          particle.userData = {
+            baseY: particle.position.y,
+            speed: 0.5 + Math.random() * 1,
+            offset: Math.random() * Math.PI * 2
+          };
+          this.scene.add(particle);
+          this.particles.push(particle);
+        }
       }
 
-      hideAllEvents() {
-        document.querySelectorAll('.event-8bit').forEach(el => el.classList.remove('visible'));
+      createTree() {
+        const tree = new THREE.Group();
+
+        // Trunk (low-poly cylinder)
+        const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, 8, 6);
+        const trunkMat = new THREE.MeshLambertMaterial({ color: 0x4a3020 });
+        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+        trunk.position.y = 4;
+        trunk.castShadow = true;
+        tree.add(trunk);
+
+        // Foliage layers (low-poly cones)
+        const colors = [0x2d5a27, 0x3a7a35, 0x4a9a45];
+        for (let i = 0; i < 3; i++) {
+          const size = 3 - i * 0.7;
+          const foliageGeo = new THREE.ConeGeometry(size, size * 1.5, 6);
+          const foliageMat = new THREE.MeshLambertMaterial({ color: colors[i] });
+          const foliage = new THREE.Mesh(foliageGeo, foliageMat);
+          foliage.position.y = 6 + i * 2;
+          foliage.castShadow = true;
+          tree.add(foliage);
+        }
+
+        return tree;
       }
 
-      showEvent(eventId) {
-        this.hideAllEvents();
-        const el = document.getElementById(eventId);
-        if (el) el.classList.add('visible');
+      createMonkey() {
+        this.monkey = new THREE.Group();
+
+        // Body
+        const bodyGeo = new THREE.SphereGeometry(0.6, 8, 6);
+        const bodyMat = new THREE.MeshLambertMaterial({ color: 0xd4712a });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.scale.y = 1.2;
+        body.castShadow = true;
+        this.monkey.add(body);
+
+        // Head
+        const headGeo = new THREE.SphereGeometry(0.5, 8, 6);
+        const headMat = new THREE.MeshLambertMaterial({ color: 0xd4712a });
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.y = 0.9;
+        head.castShadow = true;
+        this.monkey.add(head);
+
+        // Face
+        const faceGeo = new THREE.SphereGeometry(0.35, 8, 6);
+        const faceMat = new THREE.MeshLambertMaterial({ color: 0xf4c99a });
+        const face = new THREE.Mesh(faceGeo, faceMat);
+        face.position.set(0, 0.85, 0.3);
+        face.scale.z = 0.7;
+        this.monkey.add(face);
+
+        // Eyes
+        const eyeGeo = new THREE.SphereGeometry(0.1, 6, 6);
+        const eyeMat = new THREE.MeshBasicMaterial({ color: 0x222222 });
+        const eyeWhiteGeo = new THREE.SphereGeometry(0.14, 6, 6);
+        const eyeWhiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+        [-0.15, 0.15].forEach(x => {
+          const eyeWhite = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
+          eyeWhite.position.set(x, 1, 0.4);
+          this.monkey.add(eyeWhite);
+
+          const eye = new THREE.Mesh(eyeGeo, eyeMat);
+          eye.position.set(x, 1, 0.5);
+          this.monkey.add(eye);
+        });
+
+        // Ears
+        const earGeo = new THREE.SphereGeometry(0.2, 6, 6);
+        const earMat = new THREE.MeshLambertMaterial({ color: 0xd4712a });
+        [-0.5, 0.5].forEach(x => {
+          const ear = new THREE.Mesh(earGeo, earMat);
+          ear.position.set(x, 1, 0);
+          this.monkey.add(ear);
+        });
+
+        // Arms
+        this.leftArm = this.createArm();
+        this.leftArm.position.set(-0.5, 0.3, 0);
+        this.monkey.add(this.leftArm);
+
+        this.rightArm = this.createArm();
+        this.rightArm.position.set(0.5, 0.3, 0);
+        this.monkey.add(this.rightArm);
+
+        // Tail
+        const tailCurve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(0, -0.3, -0.3),
+          new THREE.Vector3(0, -0.8, -0.6),
+          new THREE.Vector3(0.3, -1.2, -0.4),
+          new THREE.Vector3(0.5, -1, 0)
+        ]);
+        const tailGeo = new THREE.TubeGeometry(tailCurve, 12, 0.08, 6, false);
+        const tailMat = new THREE.MeshLambertMaterial({ color: 0xd4712a });
+        const tail = new THREE.Mesh(tailGeo, tailMat);
+        tail.castShadow = true;
+        this.monkey.add(tail);
+
+        // Position monkey
+        this.monkey.position.set(0, 5, 0);
+        this.scene.add(this.monkey);
+
+        // Physics state
+        this.monkeyState = {
+          swinging: false,
+          falling: false,
+          velocity: new THREE.Vector3(),
+          currentVine: null,
+          swingAngle: 0,
+          swingSpeed: 0
+        };
       }
 
-      animateSwing(direction) {
-        return new Promise(resolve => {
-          this.isAnimating = true;
+      createArm() {
+        const arm = new THREE.Group();
+        const armGeo = new THREE.CylinderGeometry(0.1, 0.08, 0.8, 6);
+        const armMat = new THREE.MeshLambertMaterial({ color: 0xd4712a });
+        const armMesh = new THREE.Mesh(armGeo, armMat);
+        armMesh.position.y = -0.4;
+        armMesh.castShadow = true;
+        arm.add(armMesh);
 
-          const leftHand = document.getElementById('hand-left');
-          const rightHand = document.getElementById('hand-right');
-          const trees = ['tree-l1', 'tree-l2', 'tree-r1', 'tree-r2'].map(id => document.getElementById(id));
-          const vines = ['vine1', 'vine2', 'vine3', 'vine4', 'vine5'].map(id => document.getElementById(id));
+        // Hand
+        const handGeo = new THREE.SphereGeometry(0.12, 6, 6);
+        const handMat = new THREE.MeshLambertMaterial({ color: 0xf4c99a });
+        const hand = new THREE.Mesh(handGeo, handMat);
+        hand.position.y = -0.8;
+        arm.add(hand);
 
-          // Reset
-          leftHand.classList.remove('swing-left', 'swing-right', 'swing-forward');
-          rightHand.classList.remove('swing-left', 'swing-right', 'swing-forward');
-          trees.forEach(t => t.classList.remove('moving'));
-          vines.forEach(v => v.classList.remove('swing'));
+        return arm;
+      }
 
-          void leftHand.offsetWidth;
+      createVines() {
+        this.vines = [];
+        this.bananaObjects = [];
 
-          // Apply animations
-          if (direction === 'left') {
-            leftHand.classList.add('swing-left');
-          } else if (direction === 'right') {
-            rightHand.classList.add('swing-right');
+        // Create initial vines
+        for (let i = 0; i < 8; i++) {
+          this.addVine(i * 5 - 5);
+        }
+
+        this.currentVineIndex = 1;
+        this.attachToVine(this.vines[this.currentVineIndex]);
+      }
+
+      addVine(z) {
+        const vine = new THREE.Group();
+        vine.userData = {
+          grabbed: false,
+          z: z,
+          swingOffset: Math.random() * Math.PI * 2,
+          hasBanana: Math.random() > 0.4
+        };
+
+        // Vine rope
+        const ropeGeo = new THREE.CylinderGeometry(0.05, 0.05, 8, 6);
+        const ropeMat = new THREE.MeshLambertMaterial({ color: 0x3a7a35 });
+        const rope = new THREE.Mesh(ropeGeo, ropeMat);
+        rope.position.y = 4;
+        vine.add(rope);
+
+        // Leaves on vine
+        const leafGeo = new THREE.ConeGeometry(0.3, 0.6, 4);
+        const leafMat = new THREE.MeshLambertMaterial({ color: 0x4a9a45 });
+        for (let i = 0; i < 4; i++) {
+          const leaf = new THREE.Mesh(leafGeo, leafMat);
+          leaf.position.y = 2 + i * 1.5;
+          leaf.position.x = (i % 2 === 0 ? 0.2 : -0.2);
+          leaf.rotation.z = (i % 2 === 0 ? -0.5 : 0.5);
+          vine.add(leaf);
+        }
+
+        // Grab point (invisible)
+        vine.userData.grabPoint = new THREE.Vector3(0, 0, 0);
+
+        // Position
+        const xOffset = (Math.random() - 0.5) * 4;
+        vine.position.set(xOffset, 8, z);
+
+        // Banana
+        if (vine.userData.hasBanana) {
+          const banana = this.createBanana();
+          banana.position.set(xOffset + (Math.random() - 0.5) * 2, 4 + Math.random() * 3, z);
+          banana.userData.collected = false;
+          banana.userData.vineZ = z;
+          this.scene.add(banana);
+          this.bananaObjects.push(banana);
+        }
+
+        this.scene.add(vine);
+        this.vines.push(vine);
+
+        return vine;
+      }
+
+      createBanana() {
+        const banana = new THREE.Group();
+
+        // Banana bunch
+        const bananaGeo = new THREE.TorusGeometry(0.25, 0.1, 6, 8, Math.PI);
+        const bananaMat = new THREE.MeshLambertMaterial({ color: 0xffe135 });
+
+        for (let i = 0; i < 3; i++) {
+          const b = new THREE.Mesh(bananaGeo, bananaMat);
+          b.rotation.z = Math.PI / 2 + (i - 1) * 0.3;
+          b.position.x = (i - 1) * 0.15;
+          banana.add(b);
+        }
+
+        // Glow
+        const glowGeo = new THREE.SphereGeometry(0.5, 8, 8);
+        const glowMat = new THREE.MeshBasicMaterial({
+          color: 0xffff00,
+          transparent: true,
+          opacity: 0.2
+        });
+        const glow = new THREE.Mesh(glowGeo, glowMat);
+        banana.add(glow);
+
+        banana.userData.baseY = 0;
+        banana.userData.rotSpeed = 0.02 + Math.random() * 0.02;
+
+        return banana;
+      }
+
+      setupControls() {
+        const handleInput = () => {
+          if (!this.isPlaying) return;
+          this.swing();
+        };
+
+        document.addEventListener('click', handleInput);
+        document.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          handleInput();
+        }, { passive: false });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.code === 'Space') {
+            e.preventDefault();
+            if (this.isPlaying) {
+              this.swing();
+            } else if (!document.getElementById('start-screen').classList.contains('hidden')) {
+              this.start();
+            } else {
+              this.restart();
+            }
+          }
+        });
+      }
+
+      swing() {
+        const state = this.monkeyState;
+        if (state.falling) return;
+
+        // Release from current vine
+        if (state.swinging) {
+          state.swinging = false;
+
+          // Calculate release velocity based on swing
+          const speed = Math.abs(state.swingSpeed) * 0.5 + this.gameSpeed * 3;
+          state.velocity.set(
+            state.swingSpeed * 0.5,
+            Math.abs(state.swingSpeed) * 0.3 + 2,
+            -speed
+          );
+
+          // Remove touch hint after first swing
+          document.getElementById('touch-hint').classList.add('hidden');
+        }
+
+        // Try to grab next vine
+        this.tryGrabVine();
+      }
+
+      tryGrabVine() {
+        const state = this.monkeyState;
+        const monkeyPos = this.monkey.position;
+
+        // Find closest ungrabbed vine in front
+        let closestVine = null;
+        let closestDist = Infinity;
+
+        for (const vine of this.vines) {
+          if (vine.userData.grabbed) continue;
+
+          const vinePos = vine.position;
+          const dist = Math.sqrt(
+            Math.pow(monkeyPos.x - vinePos.x, 2) +
+            Math.pow(monkeyPos.z - vinePos.z, 2)
+          );
+
+          if (vinePos.z < monkeyPos.z && dist < closestDist && dist < 6) {
+            closestDist = dist;
+            closestVine = vine;
+          }
+        }
+
+        if (closestVine) {
+          this.attachToVine(closestVine);
+
+          // Score based on timing
+          if (closestDist < 1.5) {
+            this.addScore(100);
+            this.showFeedback('PERFECT!', 'perfect');
+            this.combo++;
+          } else if (closestDist < 3) {
+            this.addScore(50);
+            this.showFeedback('GOOD!', 'good');
+            this.combo++;
           } else {
-            leftHand.classList.add('swing-forward');
-            rightHand.classList.add('swing-forward');
+            this.addScore(20);
+            this.combo = 0;
           }
 
-          trees.forEach(t => t.classList.add('moving'));
-          vines.forEach(v => v.classList.add('swing'));
+          // Update combo display
+          this.updateCombo();
+        }
+      }
 
-          setTimeout(() => {
-            this.isAnimating = false;
-            resolve();
-          }, 500);
+      attachToVine(vine) {
+        const state = this.monkeyState;
+
+        vine.userData.grabbed = true;
+        state.swinging = true;
+        state.falling = false;
+        state.currentVine = vine;
+        state.swingAngle = 0;
+        state.swingSpeed = 2;
+        state.velocity.set(0, 0, 0);
+
+        // Arms up animation
+        this.leftArm.rotation.z = Math.PI;
+        this.rightArm.rotation.z = -Math.PI;
+      }
+
+      showFeedback(text, type) {
+        const feedback = document.getElementById('feedback');
+        feedback.textContent = text;
+        feedback.className = type;
+
+        // Reset animation
+        void feedback.offsetWidth;
+        feedback.className = type;
+      }
+
+      updateCombo() {
+        const comboEl = document.getElementById('combo');
+        if (this.combo > 1) {
+          comboEl.textContent = `${this.combo}x COMBO!`;
+          comboEl.classList.add('show');
+        } else {
+          comboEl.classList.remove('show');
+        }
+      }
+
+      addScore(points) {
+        const multiplier = Math.min(this.combo + 1, 5);
+        this.score += points * multiplier;
+        document.getElementById('score').textContent = this.score;
+      }
+
+      collectBanana(banana) {
+        if (banana.userData.collected) return;
+
+        banana.userData.collected = true;
+        this.bananas++;
+        document.getElementById('banana-count').textContent = this.bananas;
+        this.addScore(25);
+
+        // Collect animation
+        const targetY = banana.position.y + 3;
+        const startY = banana.position.y;
+        const startScale = 1;
+        let t = 0;
+
+        const animateCollect = () => {
+          t += 0.1;
+          if (t >= 1) {
+            this.scene.remove(banana);
+            return;
+          }
+
+          banana.position.y = startY + (targetY - startY) * t;
+          const scale = startScale * (1 - t);
+          banana.scale.set(scale, scale, scale);
+          banana.rotation.y += 0.3;
+
+          requestAnimationFrame(animateCollect);
+        };
+
+        animateCollect();
+      }
+
+      update(deltaTime) {
+        if (!this.isPlaying) return;
+
+        const state = this.monkeyState;
+
+        // Update game speed over time
+        this.gameSpeed = Math.min(1 + this.score / 5000, 2.5);
+
+        // Speed lines effect at high speed
+        const speedLines = document.getElementById('speed-lines');
+        if (this.gameSpeed > 1.5) {
+          speedLines.classList.add('active');
+        } else {
+          speedLines.classList.remove('active');
+        }
+
+        if (state.swinging && state.currentVine) {
+          // Swing physics
+          state.swingAngle += state.swingSpeed * deltaTime;
+          state.swingSpeed = Math.sin(state.swingAngle) * 3;
+
+          const vine = state.currentVine;
+          const swingRadius = 3;
+          const swingX = Math.sin(state.swingAngle * 0.5) * swingRadius;
+          const swingY = -Math.abs(Math.cos(state.swingAngle * 0.5)) * swingRadius * 0.3;
+
+          this.monkey.position.x = vine.position.x + swingX;
+          this.monkey.position.y = 5 + swingY;
+          this.monkey.position.z = vine.position.z + 1;
+
+          // Monkey rotation while swinging
+          this.monkey.rotation.z = state.swingAngle * 0.2;
+
+          // Auto-release if swinging too long
+          if (Math.abs(state.swingAngle) > Math.PI * 3) {
+            this.swing();
+          }
+        } else {
+          // Flying/falling physics
+          state.velocity.y -= 15 * deltaTime; // Gravity
+          state.velocity.z -= this.gameSpeed * 0.5 * deltaTime; // Forward momentum
+
+          this.monkey.position.add(state.velocity.clone().multiplyScalar(deltaTime));
+
+          // Rotation while flying
+          this.monkey.rotation.z = Math.sin(Date.now() * 0.01) * 0.2;
+          this.monkey.rotation.x = state.velocity.y * 0.05;
+
+          // Arms down while flying
+          this.leftArm.rotation.z = 0.3;
+          this.rightArm.rotation.z = -0.3;
+
+          // Check if fallen
+          if (this.monkey.position.y < -3) {
+            this.gameOver();
+            return;
+          }
+
+          // Auto-grab if close to vine
+          if (!state.swinging && state.velocity.y < 0) {
+            this.tryGrabVine();
+          }
+        }
+
+        // Update monkey light
+        this.monkeyLight.position.copy(this.monkey.position);
+        this.monkeyLight.position.y += 2;
+
+        // Camera follow
+        const targetCamZ = this.monkey.position.z + 18;
+        const targetCamX = this.monkey.position.x * 0.3;
+        this.camera.position.z += (targetCamZ - this.camera.position.z) * 0.05;
+        this.camera.position.x += (targetCamX - this.camera.position.x) * 0.1;
+        this.camera.lookAt(
+          this.monkey.position.x * 0.5,
+          4,
+          this.monkey.position.z - 5
+        );
+
+        // Update vines (swing animation)
+        this.vines.forEach(vine => {
+          if (!vine.userData.grabbed) {
+            vine.rotation.z = Math.sin(Date.now() * 0.002 + vine.userData.swingOffset) * 0.1;
+          }
+
+          // Remove vines that are too far behind
+          if (vine.position.z > this.monkey.position.z + 20) {
+            this.scene.remove(vine);
+            this.vines = this.vines.filter(v => v !== vine);
+          }
+        });
+
+        // Add new vines ahead
+        const furthestZ = Math.min(...this.vines.map(v => v.position.z));
+        if (this.monkey.position.z - furthestZ < 30) {
+          this.addVine(furthestZ - 5);
+        }
+
+        // Update bananas
+        this.bananaObjects.forEach((banana, index) => {
+          if (banana.userData.collected) return;
+
+          // Rotate and bob
+          banana.rotation.y += banana.userData.rotSpeed;
+          banana.position.y = banana.userData.baseY || banana.position.y;
+          banana.position.y += Math.sin(Date.now() * 0.003 + index) * 0.02;
+
+          // Check collection
+          const dist = this.monkey.position.distanceTo(banana.position);
+          if (dist < 1.5) {
+            this.collectBanana(banana);
+          }
+
+          // Remove if too far behind
+          if (banana.position.z > this.monkey.position.z + 15) {
+            this.scene.remove(banana);
+            this.bananaObjects = this.bananaObjects.filter(b => b !== banana);
+          }
+        });
+
+        // Update particles
+        this.particles.forEach(particle => {
+          particle.position.y = particle.userData.baseY +
+            Math.sin(Date.now() * 0.001 * particle.userData.speed + particle.userData.offset) * 0.5;
+          particle.position.x += Math.sin(Date.now() * 0.0005 + particle.userData.offset) * 0.01;
+        });
+
+        // Move trees that are too far behind to front
+        this.trees.forEach(tree => {
+          if (tree.position.z > this.monkey.position.z + 30) {
+            tree.position.z -= 100;
+            tree.position.x = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 15);
+          }
         });
       }
 
-      showDamage() {
-        const flash = document.getElementById('damage-flash');
-        const viewport = document.getElementById('viewport');
-        const face = document.getElementById('monkey-face');
+      gameOver() {
+        this.isPlaying = false;
+        this.monkeyState.falling = true;
 
-        flash.classList.remove('active');
-        viewport.classList.remove('shake');
-        face.classList.remove('hurt');
-
-        void flash.offsetWidth;
-
-        flash.classList.add('active');
-        viewport.classList.add('shake');
-        face.classList.add('hurt');
-
-        setTimeout(() => {
-          face.classList.remove('hurt');
-        }, 400);
-      }
-
-      async swing(direction) {
-        if (this.gameOver || this.isAnimating) return;
-
-        this.canClimbUp = false;
-        this.updateUI();
-
-        await this.animateSwing(direction);
-
-        const dirText = direction === 'straight' ? 'FORWARD' : direction.toUpperCase();
-        this.log(`SWING ${dirText}...`);
-
-        const event = this.events[Math.floor(Math.random() * this.events.length)];
-
-        switch(event) {
-          case 'snake':
-            this.showEvent('snake-8bit');
-            if (this.jungleSongs > 0) {
-              this.jungleSongs--;
-              this.log("SNAKE! SONG SCARES IT!");
-            } else {
-              const damage = Math.floor(Math.random() * 16) + 10;
-              this.health -= damage;
-              this.showDamage();
-              this.log(`SNAKE BITE! -${damage} HP!`);
-            }
-            break;
-
-          case 'banana_tree':
-            this.showEvent('banana-8bit');
-            const reward = Math.floor(Math.random() * 5) + 1;
-            this.bananas += reward;
-            this.log(`BANANA TREE! +${reward} BANANAS!`);
-            break;
-
-          case 'banana_stash':
-            this.showEvent('banana-8bit');
-            const stash = Math.floor(Math.random() * 11) + 5;
-            this.bananas += stash;
-            this.log(`SECRET STASH! +${stash} BANANAS!`);
-            break;
-
-          case 'muddy_pit':
-            this.showEvent('pit-8bit');
-            const pitDmg = Math.floor(Math.random() * 11) + 5;
-            this.health -= pitDmg;
-            this.showDamage();
-            this.log(`MUD PIT! -${pitDmg} HP!`);
-            break;
-
-          case 'golden_banana':
-            if (!this.hasGoldenBanana) {
-              this.showEvent('golden-8bit');
-              this.log("GOLDEN BANANA! ANSWER RIDDLE!");
-              document.getElementById('minigame-modal').style.display = 'block';
-              return;
-            } else {
-              this.log("SWINGING DEEPER...");
-            }
-            break;
-
-          case 'meet_friend':
-            const friends = ['kaa', 'baloo', 'wolves'];
-            const friend = friends[Math.floor(Math.random() * friends.length)];
-
-            if (friend === 'kaa') {
-              this.showEvent('kaa-8bit');
-              this.log("KAA! LEARN TO CLIMB!");
-              this.canClimbUp = true;
-            } else if (friend === 'baloo') {
-              this.showEvent('baloo-8bit');
-              this.jungleSongs++;
-              this.log("BALOO! +1 SONG!");
-            } else {
-              this.showEvent('wolves-8bit');
-              this.health = Math.min(100, this.health + 15);
-              this.log("WOLVES! +15 HP!");
-            }
-            break;
-
-          default:
-            this.hideAllEvents();
-            this.log("JUNGLE CONTINUES...");
+        // Update high score
+        if (this.score > this.highScore) {
+          this.highScore = this.score;
+          localStorage.setItem('jungleSwingHighScore', this.highScore);
         }
 
-        this.updateUI();
-        this.checkGameState();
+        // Show game over screen
+        document.getElementById('final-score').textContent = this.score;
+        document.getElementById('high-score').textContent = `BEST: ${this.highScore}`;
+        document.getElementById('game-over').classList.add('show');
+        document.getElementById('speed-lines').classList.remove('active');
+
+        this.showFeedback('OOPS!', 'miss');
       }
 
-      answerRiddle(answer) {
-        document.getElementById('minigame-modal').style.display = 'none';
+      start() {
+        document.getElementById('start-screen').classList.add('hidden');
+        this.isPlaying = true;
+        this.score = 0;
+        this.bananas = 0;
+        this.combo = 0;
+        this.gameSpeed = 1;
 
-        if (answer === 'B') {
-          this.hasGoldenBanana = true;
-          this.bananas += 20;
-          this.log("CORRECT! +GOLDEN +20 BANANAS!");
-        } else {
-          this.log("WRONG! GOLDEN VANISHES...");
-        }
-
-        this.hideAllEvents();
-        this.updateUI();
-        this.checkGameState();
-      }
-
-      checkGameState() {
-        if (this.health <= 0) {
-          this.gameOver = true;
-          const overlay = document.getElementById('game-overlay');
-          overlay.className = 'defeat';
-          overlay.style.display = 'flex';
-          document.getElementById('overlay-title').textContent = 'GAME OVER';
-          this.log("YOU DIED!");
-        } else if (this.bananas >= 69 && this.hasGoldenBanana) {
-          this.gameOver = true;
-          const overlay = document.getElementById('game-overlay');
-          overlay.className = 'victory';
-          overlay.style.display = 'flex';
-          document.getElementById('overlay-title').textContent = 'YOU WIN!';
-          this.log("JUNGLE SAVED!");
-        }
-      }
-
-      quit() {
-        if (confirm('QUIT GAME?')) {
-          window.location.href = 'index.html';
-        }
+        document.getElementById('score').textContent = '0';
+        document.getElementById('banana-count').textContent = '0';
+        document.getElementById('combo').classList.remove('show');
       }
 
       restart() {
-        document.getElementById('game-overlay').style.display = 'none';
-        document.getElementById('text-log').innerHTML = '';
-        this.init();
+        document.getElementById('game-over').classList.remove('show');
+
+        // Reset monkey position
+        this.monkey.position.set(0, 5, 0);
+        this.monkey.rotation.set(0, 0, 0);
+        this.monkeyState = {
+          swinging: false,
+          falling: false,
+          velocity: new THREE.Vector3(),
+          currentVine: null,
+          swingAngle: 0,
+          swingSpeed: 0
+        };
+
+        // Clear and recreate vines
+        this.vines.forEach(vine => this.scene.remove(vine));
+        this.vines = [];
+        this.bananaObjects.forEach(banana => this.scene.remove(banana));
+        this.bananaObjects = [];
+
+        for (let i = 0; i < 8; i++) {
+          this.addVine(i * 5 - 5);
+        }
+
+        this.currentVineIndex = 1;
+        this.attachToVine(this.vines[this.currentVineIndex]);
+
+        // Reset camera
+        this.camera.position.set(0, 5, 18);
+
+        // Start game
+        this.score = 0;
+        this.bananas = 0;
+        this.combo = 0;
+        this.gameSpeed = 1;
+
+        document.getElementById('score').textContent = '0';
+        document.getElementById('banana-count').textContent = '0';
+        document.getElementById('combo').classList.remove('show');
+        document.getElementById('touch-hint').classList.remove('hidden');
+
+        this.isPlaying = true;
+      }
+
+      animate() {
+        let lastTime = performance.now();
+
+        const loop = (currentTime) => {
+          requestAnimationFrame(loop);
+
+          const deltaTime = Math.min((currentTime - lastTime) / 1000, 0.1);
+          lastTime = currentTime;
+
+          this.update(deltaTime);
+          this.renderer.render(this.scene, this.camera);
+        };
+
+        requestAnimationFrame(loop);
       }
     }
 
-    const game = new Game();
+    // Initialize game
+    const game = new JungleSwing();
   </script>
 </body>
 </html>
