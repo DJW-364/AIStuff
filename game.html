@@ -23,229 +23,886 @@
       --stone-mid: #4A3C2A;
       --stone-light: #8B7355;
       --cream: #F5E6C8;
+      --sky-top: #1a3a1a;
+      --sky-bottom: #2d5a2d;
+      --tree-dark: #1a4a1a;
+      --tree-light: #2d6a2d;
     }
 
     body {
       font-family: 'Press Start 2P', cursive;
-      background: linear-gradient(to bottom, #1a1408 0%, #2C2416 30%, #3d3020 60%, #2C2416 100%);
+      background: var(--stone-dark);
       min-height: 100vh;
       color: var(--cream);
-      padding: 20px;
+      overflow: hidden;
     }
 
-    #game-container {
-      max-width: 800px;
+    #game-wrapper {
+      max-width: 900px;
       margin: 0 auto;
-      background: var(--stone-mid);
-      border: 4px solid var(--gold);
-      border-radius: 0;
-      padding: 20px;
-      clip-path: polygon(
-        0 3%, 3% 0, 97% 0, 100% 3%,
-        100% 97%, 97% 100%, 3% 100%, 0 97%
-      );
-      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
     }
 
-    #game-container::before {
-      content: '';
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
-      bottom: 10px;
-      border: 2px solid var(--jade);
-      pointer-events: none;
-    }
-
-    h1 {
-      text-align: center;
-      color: var(--gold);
-      font-size: clamp(0.8rem, 3vw, 1.2rem);
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 0 var(--stone-dark);
-    }
-
+    /* Status Bar */
     .status-bar {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      background: var(--stone-mid);
+      border: 3px solid var(--gold);
+      padding: 8px 15px;
+      margin-bottom: 10px;
+      flex-shrink: 0;
     }
 
     .status-item {
-      text-align: center;
-      padding: 12px 8px;
-      background: var(--stone-dark);
-      border: 2px solid var(--gold);
-      font-size: 0.6rem;
-      clip-path: polygon(
-        0 15%, 15% 0, 85% 0, 100% 15%,
-        100% 85%, 85% 100%, 15% 100%, 0 85%
-      );
+      font-size: 0.5rem;
+      color: var(--cream);
     }
 
     .status-item span {
       color: var(--turquoise);
-      display: block;
-      margin-top: 5px;
-      font-size: 0.8rem;
+      margin-left: 5px;
     }
 
-    #output {
-      background: var(--stone-dark);
-      padding: 15px;
+    /* Game Scene */
+    #game-scene {
+      flex: 1;
+      background: linear-gradient(to bottom, var(--sky-top) 0%, var(--sky-bottom) 40%, #3d2a1a 100%);
+      border: 3px solid var(--gold);
+      position: relative;
+      overflow: hidden;
       min-height: 300px;
-      max-height: 400px;
-      overflow-y: auto;
-      margin-bottom: 20px;
-      border: 3px solid var(--jade);
-      font-size: 0.55rem;
-      line-height: 1.8;
     }
 
-    #output::-webkit-scrollbar {
+    /* Jungle Background Layers */
+    .bg-layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    /* Ground */
+    .ground {
+      height: 60px;
+      background: linear-gradient(to bottom, #5a4a2a, #3d2a1a);
+      z-index: 10;
+    }
+
+    .ground::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      background: repeating-linear-gradient(90deg, #6a5a3a 0px, #6a5a3a 20px, #5a4a2a 20px, #5a4a2a 40px);
+    }
+
+    /* Background Trees */
+    .bg-trees {
+      height: 200px;
+      z-index: 1;
+    }
+
+    .bg-tree {
+      position: absolute;
+      bottom: 60px;
+    }
+
+    .tree-trunk {
+      position: absolute;
+      bottom: 0;
+      background: linear-gradient(90deg, #3d2a1a, #5a4030, #3d2a1a);
+      border-radius: 5px;
+    }
+
+    .tree-canopy {
+      position: absolute;
+      background: var(--tree-dark);
+      border-radius: 50%;
+    }
+
+    /* Vines */
+    .vine {
+      position: absolute;
+      top: 0;
+      width: 4px;
+      background: linear-gradient(to bottom, var(--jade), #1a4a1a);
+      transform-origin: top center;
+      z-index: 5;
+    }
+
+    .vine-1 { left: 15%; height: 150px; animation: vineSwing 3s ease-in-out infinite; }
+    .vine-2 { left: 35%; height: 180px; animation: vineSwing 4s ease-in-out infinite -1s; }
+    .vine-3 { left: 55%; height: 140px; animation: vineSwing 3.5s ease-in-out infinite -0.5s; }
+    .vine-4 { left: 75%; height: 170px; animation: vineSwing 4.5s ease-in-out infinite -2s; }
+    .vine-5 { left: 90%; height: 130px; animation: vineSwing 3s ease-in-out infinite -1.5s; }
+
+    @keyframes vineSwing {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+
+    /* Monkey Character */
+    #monkey {
+      position: absolute;
+      width: 60px;
+      height: 70px;
+      left: 50%;
+      top: 120px;
+      transform: translateX(-50%);
+      z-index: 20;
+      transition: all 0.5s ease;
+    }
+
+    #monkey.swinging {
+      animation: monkeySwing 0.6s ease-in-out;
+    }
+
+    @keyframes monkeySwing {
+      0% { transform: translateX(-50%) rotate(0deg); }
+      25% { transform: translateX(-30%) rotate(-20deg) translateY(-20px); }
+      50% { transform: translateX(0%) rotate(0deg) translateY(-40px); }
+      75% { transform: translateX(30%) rotate(20deg) translateY(-20px); }
+      100% { transform: translateX(-50%) rotate(0deg); }
+    }
+
+    .monkey-body {
+      position: absolute;
+      width: 35px;
+      height: 40px;
+      background: var(--terracotta);
+      border-radius: 50% 50% 40% 40%;
+      left: 50%;
+      top: 25px;
+      transform: translateX(-50%);
+    }
+
+    .monkey-head {
+      position: absolute;
+      width: 40px;
+      height: 35px;
+      background: var(--terracotta);
+      border-radius: 50%;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+    }
+
+    .monkey-face {
+      position: absolute;
+      width: 25px;
+      height: 20px;
+      background: var(--cream);
+      border-radius: 50%;
+      left: 50%;
+      top: 12px;
+      transform: translateX(-50%);
+    }
+
+    .monkey-eye {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--stone-dark);
+      border-radius: 50%;
+      top: 8px;
+    }
+
+    .monkey-eye.left { left: 8px; }
+    .monkey-eye.right { right: 8px; }
+
+    .monkey-nose {
+      position: absolute;
+      width: 8px;
+      height: 5px;
+      background: var(--terracotta);
+      border-radius: 50%;
+      left: 50%;
+      top: 18px;
+      transform: translateX(-50%);
+    }
+
+    .monkey-ear {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: var(--terracotta);
+      border-radius: 50%;
+      top: 10px;
+    }
+
+    .monkey-ear.left { left: -5px; }
+    .monkey-ear.right { right: -5px; }
+
+    .monkey-arm {
+      position: absolute;
+      width: 8px;
+      height: 30px;
+      background: var(--terracotta);
+      border-radius: 4px;
+      top: 30px;
+    }
+
+    .monkey-arm.left { left: 5px; transform: rotate(30deg); }
+    .monkey-arm.right { right: 5px; transform: rotate(-30deg); }
+
+    .monkey-tail {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 5px solid var(--terracotta);
+      border-radius: 50%;
+      border-top-color: transparent;
+      border-left-color: transparent;
+      bottom: -10px;
+      right: -15px;
+      transform: rotate(45deg);
+    }
+
+    /* Event Objects */
+    .event-object {
+      position: absolute;
+      z-index: 15;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .event-object.visible {
+      opacity: 1;
+    }
+
+    /* Snake */
+    #snake {
+      bottom: 60px;
+      right: 20%;
+    }
+
+    .snake-body {
+      width: 80px;
+      height: 20px;
+      background: linear-gradient(90deg, #4a7a2a, #6a9a3a, #4a7a2a);
+      border-radius: 10px;
+      position: relative;
+    }
+
+    .snake-head {
+      position: absolute;
+      right: -15px;
+      top: -5px;
+      width: 25px;
+      height: 25px;
+      background: #4a7a2a;
+      border-radius: 50% 50% 50% 20%;
+    }
+
+    .snake-eye {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      background: red;
+      border-radius: 50%;
+      top: 5px;
+      right: 5px;
+    }
+
+    .snake-tongue {
+      position: absolute;
+      right: -10px;
+      top: 10px;
+      width: 15px;
+      height: 3px;
+      background: red;
+      animation: flickTongue 0.3s infinite;
+    }
+
+    @keyframes flickTongue {
+      0%, 100% { width: 15px; }
+      50% { width: 20px; }
+    }
+
+    /* Banana Tree */
+    #banana-tree {
+      bottom: 60px;
+      right: 15%;
+    }
+
+    .banana-trunk {
+      width: 20px;
+      height: 100px;
+      background: linear-gradient(90deg, #6a5030, #8a7050, #6a5030);
+      border-radius: 5px;
+    }
+
+    .banana-leaves {
+      position: absolute;
+      top: -30px;
+      left: -30px;
+      width: 80px;
+      height: 60px;
+    }
+
+    .banana-leaf {
+      position: absolute;
+      width: 40px;
+      height: 15px;
+      background: var(--jade);
+      border-radius: 50%;
+    }
+
+    .banana-leaf:nth-child(1) { transform: rotate(-30deg); left: 0; top: 20px; }
+    .banana-leaf:nth-child(2) { transform: rotate(30deg); right: 0; top: 20px; }
+    .banana-leaf:nth-child(3) { transform: rotate(-60deg); left: 10px; top: 0; }
+    .banana-leaf:nth-child(4) { transform: rotate(60deg); right: 10px; top: 0; }
+
+    .banana-bunch {
+      position: absolute;
+      top: 10px;
+      left: 25px;
+    }
+
+    .banana {
+      width: 20px;
+      height: 8px;
+      background: #FFE135;
+      border-radius: 10px;
+      margin: 2px;
+      transform: rotate(-20deg);
+      box-shadow: 0 0 5px rgba(255, 225, 53, 0.5);
+    }
+
+    /* Muddy Pit */
+    #muddy-pit {
+      bottom: 50px;
+      left: 30%;
+    }
+
+    .pit {
+      width: 100px;
+      height: 30px;
+      background: linear-gradient(to bottom, #4a3a2a, #3a2a1a);
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .pit::before {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 20px;
+      background: #5a4a3a;
+      border-radius: 50%;
+      top: 5px;
+      left: 10px;
+      animation: mudBubble 2s infinite;
+    }
+
+    @keyframes mudBubble {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* Golden Banana */
+    #golden-banana {
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .golden-banana-icon {
+      width: 50px;
+      height: 20px;
+      background: linear-gradient(to bottom, #FFD700, #FFA500);
+      border-radius: 25px;
+      transform: rotate(-30deg);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 200, 0, 0.5);
+      animation: goldenGlow 1s ease-in-out infinite;
+    }
+
+    @keyframes goldenGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 200, 0, 0.5); }
+      50% { box-shadow: 0 0 30px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 200, 0, 0.8); }
+    }
+
+    /* Friends */
+    #friend-kaa {
+      bottom: 100px;
+      left: 20%;
+    }
+
+    .kaa-body {
+      width: 100px;
+      height: 15px;
+      background: linear-gradient(90deg, #7a6a3a, #9a8a4a, #7a6a3a);
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .kaa-head {
+      position: absolute;
+      left: -20px;
+      top: -8px;
+      width: 30px;
+      height: 30px;
+      background: #9a8a4a;
+      border-radius: 50%;
+    }
+
+    .kaa-eye {
+      position: absolute;
       width: 10px;
+      height: 10px;
+      background: yellow;
+      border-radius: 50%;
+      top: 8px;
+      left: 15px;
+      animation: hypnotize 1s infinite;
     }
 
-    #output::-webkit-scrollbar-track {
+    @keyframes hypnotize {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    #friend-baloo {
+      bottom: 60px;
+      right: 25%;
+    }
+
+    .baloo-body {
+      width: 70px;
+      height: 80px;
+      background: #5a5a6a;
+      border-radius: 35px 35px 25px 25px;
+      position: relative;
+    }
+
+    .baloo-belly {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: #7a7a8a;
+      border-radius: 50%;
+      bottom: 10px;
+      left: 10px;
+    }
+
+    .baloo-head {
+      position: absolute;
+      width: 50px;
+      height: 45px;
+      background: #5a5a6a;
+      border-radius: 50%;
+      top: -30px;
+      left: 10px;
+    }
+
+    .baloo-snout {
+      position: absolute;
+      width: 25px;
+      height: 15px;
+      background: #7a7a8a;
+      border-radius: 50%;
+      bottom: 5px;
+      left: 12px;
+    }
+
+    .baloo-ear {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #5a5a6a;
+      border-radius: 50%;
+      top: 0;
+    }
+
+    .baloo-ear.left { left: 0; }
+    .baloo-ear.right { right: 0; }
+
+    #friend-wolves {
+      bottom: 60px;
+      left: 15%;
+    }
+
+    .wolf {
+      width: 50px;
+      height: 35px;
+      background: #6a6a7a;
+      border-radius: 25px 25px 10px 10px;
+      position: relative;
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+    .wolf-head {
+      position: absolute;
+      width: 25px;
+      height: 20px;
+      background: #6a6a7a;
+      border-radius: 50% 50% 30% 30%;
+      top: -10px;
+      left: 0;
+    }
+
+    .wolf-ear {
+      position: absolute;
+      width: 8px;
+      height: 12px;
+      background: #6a6a7a;
+      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+      top: -10px;
+    }
+
+    .wolf-ear.left { left: 3px; }
+    .wolf-ear.right { left: 12px; }
+
+    /* Text Log */
+    #text-log {
+      height: 120px;
+      background: var(--stone-dark);
+      border: 3px solid var(--gold);
+      border-top: none;
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 0.5rem;
+      line-height: 1.6;
+      flex-shrink: 0;
+    }
+
+    #text-log::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #text-log::-webkit-scrollbar-track {
       background: var(--stone-dark);
     }
 
-    #output::-webkit-scrollbar-thumb {
+    #text-log::-webkit-scrollbar-thumb {
       background: var(--gold);
-      border: 2px solid var(--stone-dark);
     }
 
+    /* Controls */
     .controls {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      display: flex;
       gap: 10px;
+      margin-top: 10px;
+      flex-shrink: 0;
     }
 
     .controls button {
+      flex: 1;
       font-family: 'Press Start 2P', cursive;
       background: linear-gradient(to bottom, var(--stone-light) 0%, var(--stone-mid) 100%);
       color: var(--cream);
       border: 3px solid var(--gold);
-      padding: 15px 10px;
+      padding: 12px 8px;
       cursor: pointer;
       transition: all 0.2s;
-      font-size: 0.5rem;
-      clip-path: polygon(
-        0 15%, 15% 0, 85% 0, 100% 15%,
-        100% 85%, 85% 100%, 15% 100%, 0 85%
-      );
+      font-size: 0.45rem;
     }
 
     .controls button:hover {
-      background: linear-gradient(to bottom, var(--stone-mid) 0%, var(--stone-dark) 100%);
-      border-color: var(--turquoise);
-      transform: scale(1.05);
+      background: linear-gradient(to bottom, var(--jade) 0%, #007a50 100%);
+      transform: scale(1.02);
     }
 
     .controls button:active {
-      transform: scale(0.95);
+      transform: scale(0.98);
     }
 
-    .controls button.climb-btn {
-      background: linear-gradient(to bottom, var(--jade) 0%, #007a50 100%);
-      border-color: var(--turquoise);
+    .controls button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
-    .controls button.quit-btn {
-      background: linear-gradient(to bottom, var(--terracotta) 0%, #a33d28 100%);
-      border-color: var(--terracotta);
+    .controls button.quit-btn:hover {
+      background: linear-gradient(to bottom, var(--terracotta) 0%, #8a3020 100%);
     }
 
-    .back-link {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      color: var(--gold);
-      text-decoration: none;
-      font-size: 0.6rem;
-      transition: color 0.2s;
-    }
-
-    .back-link:hover {
-      color: var(--turquoise);
-    }
-
-    /* Mini-game styling */
-    .minigame {
+    /* Mini-game Modal */
+    #minigame-modal {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       background: var(--stone-mid);
-      border: 2px solid var(--gold);
-      padding: 15px;
-      margin: 10px 0;
+      border: 4px solid var(--gold);
+      padding: 20px;
+      z-index: 100;
+      text-align: center;
+      max-width: 90%;
     }
 
-    .minigame strong {
+    #minigame-modal h3 {
       color: var(--gold);
+      font-size: 0.7rem;
+      margin-bottom: 15px;
     }
 
-    .options {
+    #minigame-modal p {
+      font-size: 0.5rem;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .minigame-options {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin-top: 10px;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
-    .options button {
+    .minigame-options button {
       font-family: 'Press Start 2P', cursive;
       background: var(--stone-dark);
       color: var(--cream);
       border: 2px solid var(--jade);
       padding: 10px;
       cursor: pointer;
-      font-size: 0.45rem;
+      font-size: 0.4rem;
       transition: all 0.2s;
     }
 
-    .options button:hover {
+    .minigame-options button:hover {
       background: var(--jade);
       color: var(--stone-dark);
     }
 
+    /* Game Over / Victory Overlay */
+    #game-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 90;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    #game-overlay h2 {
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    #game-overlay.victory h2 {
+      color: var(--gold);
+    }
+
+    #game-overlay.defeat h2 {
+      color: var(--terracotta);
+    }
+
+    #game-overlay button {
+      font-family: 'Press Start 2P', cursive;
+      background: var(--jade);
+      color: var(--cream);
+      border: 3px solid var(--gold);
+      padding: 15px 30px;
+      cursor: pointer;
+      font-size: 0.6rem;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .back-link:hover {
+      color: var(--turquoise);
+    }
+
     @media (max-width: 600px) {
       .status-bar {
-        grid-template-columns: 1fr;
-      }
-
-      .controls {
-        grid-template-columns: repeat(2, 1fr);
+        flex-wrap: wrap;
+        gap: 5px;
       }
 
       .status-item {
-        font-size: 0.5rem;
+        font-size: 0.4rem;
       }
 
-      #output {
-        min-height: 250px;
-        font-size: 0.5rem;
+      .controls button {
+        font-size: 0.35rem;
+        padding: 10px 5px;
+      }
+
+      #text-log {
+        height: 100px;
+        font-size: 0.4rem;
       }
     }
   </style>
 </head>
 <body>
-  <div id="game-container">
-    <h1>SWINGER MONKEY</h1>
-
+  <div id="game-wrapper">
+    <!-- Status Bar -->
     <div class="status-bar">
-      <div class="status-item">HEALTH<span id="health">100</span></div>
-      <div class="status-item">BANANAS<span id="bananas">0</span></div>
-      <div class="status-item">SONGS<span id="songs">0</span></div>
+      <div class="status-item">HEALTH:<span id="health">100</span></div>
+      <div class="status-item">BANANAS:<span id="bananas">0</span>/69</div>
+      <div class="status-item">SONGS:<span id="songs">0</span></div>
+      <div class="status-item">GOLDEN:<span id="golden">NO</span></div>
     </div>
 
-    <div id="output"></div>
+    <!-- Game Scene -->
+    <div id="game-scene">
+      <!-- Vines -->
+      <div class="vine vine-1"></div>
+      <div class="vine vine-2"></div>
+      <div class="vine vine-3"></div>
+      <div class="vine vine-4"></div>
+      <div class="vine vine-5"></div>
 
+      <!-- Background Trees -->
+      <div class="bg-trees">
+        <div class="bg-tree" style="left: 5%;">
+          <div class="tree-trunk" style="width: 25px; height: 120px;"></div>
+          <div class="tree-canopy" style="width: 80px; height: 60px; top: -50px; left: -28px;"></div>
+        </div>
+        <div class="bg-tree" style="left: 25%;">
+          <div class="tree-trunk" style="width: 20px; height: 100px;"></div>
+          <div class="tree-canopy" style="width: 70px; height: 50px; top: -40px; left: -25px;"></div>
+        </div>
+        <div class="bg-tree" style="right: 25%;">
+          <div class="tree-trunk" style="width: 22px; height: 110px;"></div>
+          <div class="tree-canopy" style="width: 75px; height: 55px; top: -45px; left: -27px;"></div>
+        </div>
+        <div class="bg-tree" style="right: 5%;">
+          <div class="tree-trunk" style="width: 28px; height: 130px;"></div>
+          <div class="tree-canopy" style="width: 90px; height: 65px; top: -55px; left: -31px;"></div>
+        </div>
+      </div>
+
+      <!-- Ground -->
+      <div class="bg-layer ground"></div>
+
+      <!-- Monkey -->
+      <div id="monkey">
+        <div class="monkey-head">
+          <div class="monkey-ear left"></div>
+          <div class="monkey-ear right"></div>
+          <div class="monkey-face">
+            <div class="monkey-eye left"></div>
+            <div class="monkey-eye right"></div>
+            <div class="monkey-nose"></div>
+          </div>
+        </div>
+        <div class="monkey-body"></div>
+        <div class="monkey-arm left"></div>
+        <div class="monkey-arm right"></div>
+        <div class="monkey-tail"></div>
+      </div>
+
+      <!-- Event Objects (hidden by default) -->
+      <div id="snake" class="event-object">
+        <div class="snake-body">
+          <div class="snake-head">
+            <div class="snake-eye"></div>
+            <div class="snake-tongue"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="banana-tree" class="event-object">
+        <div class="banana-trunk">
+          <div class="banana-leaves">
+            <div class="banana-leaf"></div>
+            <div class="banana-leaf"></div>
+            <div class="banana-leaf"></div>
+            <div class="banana-leaf"></div>
+          </div>
+          <div class="banana-bunch">
+            <div class="banana"></div>
+            <div class="banana"></div>
+            <div class="banana"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="muddy-pit" class="event-object">
+        <div class="pit"></div>
+      </div>
+
+      <div id="golden-banana" class="event-object">
+        <div class="golden-banana-icon"></div>
+      </div>
+
+      <div id="friend-kaa" class="event-object">
+        <div class="kaa-body">
+          <div class="kaa-head">
+            <div class="kaa-eye"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="friend-baloo" class="event-object">
+        <div class="baloo-body">
+          <div class="baloo-belly"></div>
+          <div class="baloo-head">
+            <div class="baloo-ear left"></div>
+            <div class="baloo-ear right"></div>
+            <div class="baloo-snout"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="friend-wolves" class="event-object">
+        <div class="wolf">
+          <div class="wolf-head">
+            <div class="wolf-ear left"></div>
+            <div class="wolf-ear right"></div>
+          </div>
+        </div>
+        <div class="wolf">
+          <div class="wolf-head">
+            <div class="wolf-ear left"></div>
+            <div class="wolf-ear right"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini-game Modal -->
+      <div id="minigame-modal">
+        <h3>GOLDEN BANANA CHALLENGE!</h3>
+        <p>Riddle: What can you catch but not throw?</p>
+        <div class="minigame-options">
+          <button onclick="game.answerRiddle('A')">A: A ball</button>
+          <button onclick="game.answerRiddle('B')">B: A cold</button>
+          <button onclick="game.answerRiddle('C')">C: A fish</button>
+          <button onclick="game.answerRiddle('D')">D: A shadow</button>
+        </div>
+      </div>
+
+      <!-- Game Over / Victory Overlay -->
+      <div id="game-overlay">
+        <h2 id="overlay-title"></h2>
+        <button onclick="game.restart()">PLAY AGAIN</button>
+      </div>
+    </div>
+
+    <!-- Text Log -->
+    <div id="text-log"></div>
+
+    <!-- Controls -->
     <div class="controls">
-      <button onclick="game.handleChoice('l')">LEFT (L)</button>
-      <button onclick="game.handleChoice('s')">STRAIGHT (S)</button>
-      <button onclick="game.handleChoice('r')">RIGHT (R)</button>
-      <button id="climbBtn" class="climb-btn" style="display:none;" onclick="game.handleChoice('u')">CLIMB UP (U)</button>
-      <button onclick="game.restart()">RESTART</button>
-      <button class="quit-btn" onclick="game.handleChoice('q')">QUIT (Q)</button>
+      <button onclick="game.swing('left')">SWING LEFT</button>
+      <button onclick="game.swing('straight')">SWING STRAIGHT</button>
+      <button onclick="game.swing('right')">SWING RIGHT</button>
+      <button id="climb-btn" onclick="game.swing('up')" style="display: none;">CLIMB UP</button>
+      <button class="quit-btn" onclick="game.quit()">QUIT</button>
     </div>
 
     <a href="index.html" class="back-link">&lt; BACK TO HOME</a>
@@ -255,17 +912,7 @@
     class Game {
       constructor() {
         this.init();
-        this.healthElement = document.getElementById('health');
-        this.bananasElement = document.getElementById('bananas');
-        this.songsElement = document.getElementById('songs');
-        this.climbBtn = document.getElementById('climbBtn');
-
-        document.addEventListener('keydown', (e) => {
-          const key = e.key.toLowerCase();
-          if (['l', 'r', 's', 'u', 'q'].includes(key)) {
-            this.handleChoice(key);
-          }
-        });
+        this.setupKeyboard();
       }
 
       init() {
@@ -275,174 +922,205 @@
         this.hasGoldenBanana = false;
         this.canClimbUp = false;
         this.gameOver = false;
+        this.isAnimating = false;
+
         this.events = [
           ...Array(6).fill(['snake', 'banana_tree', 'muddy_pit', 'banana_stash', 'nothing']).flat(),
           ...Array(3).fill('meet_friend'),
           'golden_banana'
         ];
+
+        this.updateUI();
+        this.hideAllEvents();
+        this.log("Welcome to SWINGER MONKEY!");
+        this.log("Swing through the jungle and collect 69 bananas + the Golden Banana to win!");
+        this.log("Use the buttons or keyboard (L/S/R/U) to swing.");
       }
 
-      print(text) {
-        const output = document.getElementById('output');
-        output.innerHTML += text + '<br>';
-        output.scrollTop = output.scrollHeight;
-      }
-
-      clearOutput() {
-        document.getElementById('output').innerHTML = '';
-      }
-
-      updateUI() {
-        this.healthElement.textContent = this.health;
-        this.bananasElement.textContent = this.bananas;
-        this.songsElement.textContent = this.jungleSongs;
-        this.climbBtn.style.display = this.canClimbUp ? 'block' : 'none';
-      }
-
-      async goldenBananaMiniGame() {
-        return new Promise((resolve) => {
-          this.print("<div class='minigame'>");
-          this.print("<strong>GOLDEN BANANA CHALLENGE!</strong><br><br>");
-          this.print("Riddle: What can you catch but not throw?");
-
-          const options = {
-            "A": "A ball", "B": "A cold", "C": "A fish", "D": "A shadow"
-          };
-
-          this.print("<div class='options'>");
-          Object.entries(options).forEach(([key, value]) => {
-            this.print(`<button onclick="game.resolveMiniGame('${key}')">${key}: ${value}</button>`);
-          });
-          this.print("</div></div>");
-
-          this.resolveMiniGame = (choice) => {
-            const minigame = document.querySelector('.minigame');
-            if (minigame) minigame.remove();
-            if (choice === 'B') {
-              this.print("<span style='color: #D4AF37'>CORRECT! You win the golden banana!</span>");
-              resolve(true);
-            } else {
-              this.print("<span style='color: #C84C32'>Wrong answer! Try again later.</span>");
-              resolve(false);
-            }
-          };
+      setupKeyboard() {
+        document.addEventListener('keydown', (e) => {
+          if (this.gameOver || this.isAnimating) return;
+          const key = e.key.toLowerCase();
+          if (key === 'l') this.swing('left');
+          else if (key === 's') this.swing('straight');
+          else if (key === 'r') this.swing('right');
+          else if (key === 'u' && this.canClimbUp) this.swing('up');
+          else if (key === 'q') this.quit();
         });
       }
 
-      start() {
-        this.print("Welcome to SWINGER MONKEY!");
-        this.print("Swing through the jungle and collect bananas!");
-        this.print("<span style='color: #D4AF37'>GOAL: Find the Golden Banana + collect 69 bananas to save the forest!</span>");
-        this.print("---");
-        this.print("Use the buttons or keyboard (L/R/S/U/Q) to navigate.");
-        this.print("---");
-        this.updateUI();
+      log(text) {
+        const logEl = document.getElementById('text-log');
+        logEl.innerHTML += `<div>${text}</div>`;
+        logEl.scrollTop = logEl.scrollHeight;
       }
 
-      restart() {
-        this.init();
-        this.clearOutput();
-        this.start();
-        this.updateUI();
+      updateUI() {
+        document.getElementById('health').textContent = this.health;
+        document.getElementById('bananas').textContent = this.bananas;
+        document.getElementById('songs').textContent = this.jungleSongs;
+        document.getElementById('golden').textContent = this.hasGoldenBanana ? 'YES' : 'NO';
+        document.getElementById('golden').style.color = this.hasGoldenBanana ? '#FFD700' : '';
+        document.getElementById('climb-btn').style.display = this.canClimbUp ? 'block' : 'none';
       }
 
-      async handleChoice(choice) {
-        if (this.gameOver) return;
+      hideAllEvents() {
+        document.querySelectorAll('.event-object').forEach(el => el.classList.remove('visible'));
+      }
 
-        if (choice === 'q') {
-          this.health = 0;
-          this.gameOver = true;
-          this.print("<span style='color: #C84C32'>You quit the game. Thanks for playing!</span>");
-          this.updateUI();
-          return;
-        }
+      showEvent(eventId) {
+        this.hideAllEvents();
+        const el = document.getElementById(eventId);
+        if (el) el.classList.add('visible');
+      }
 
-        if (choice === 'u' && !this.canClimbUp) return;
+      animateMonkey() {
+        return new Promise(resolve => {
+          this.isAnimating = true;
+          const monkey = document.getElementById('monkey');
+          monkey.classList.add('swinging');
+          setTimeout(() => {
+            monkey.classList.remove('swinging');
+            this.isAnimating = false;
+            resolve();
+          }, 600);
+        });
+      }
+
+      async swing(direction) {
+        if (this.gameOver || this.isAnimating) return;
 
         this.canClimbUp = false;
-        const event = this.events[Math.floor(Math.random() * this.events.length)];
+        this.updateUI();
 
-        const directions = { 'l': 'left', 'r': 'right', 's': 'straight', 'u': 'up' };
-        this.print(`<span style='color: #8B7355'>You swing ${directions[choice]}...</span>`);
+        await this.animateMonkey();
+
+        const dirText = direction.toUpperCase();
+        this.log(`You swing ${dirText}...`);
+
+        const event = this.events[Math.floor(Math.random() * this.events.length)];
 
         switch(event) {
           case 'snake':
+            this.showEvent('snake');
             if (this.jungleSongs > 0) {
               this.jungleSongs--;
-              this.print("You encountered a sneaky snake! But you used a jungle song to scare it away. No damage taken!");
+              this.log("A snake appears! You sing a jungle song and scare it away!");
             } else {
               const damage = Math.floor(Math.random() * 16) + 10;
               this.health -= damage;
-              this.print(`<span style='color: #C84C32'>You encountered a sneaky snake! You lost ${damage} health.</span>`);
+              this.log(`A snake bites you! You lost ${damage} health.`);
             }
             break;
+
           case 'banana_tree':
+            this.showEvent('banana-tree');
             const reward = Math.floor(Math.random() * 5) + 1;
             this.bananas += reward;
-            this.print(`<span style='color: #00A86B'>You found a banana tree! You picked ${reward} bananas.</span>`);
+            this.log(`You found a banana tree! +${reward} bananas!`);
             break;
+
           case 'banana_stash':
-            const stashReward = Math.floor(Math.random() * 11) + 5;
-            this.bananas += stashReward;
-            this.print(`<span style='color: #00A86B'>You found another monkey's stash! You borrowed ${stashReward} bananas.</span>`);
+            this.showEvent('banana-tree');
+            const stash = Math.floor(Math.random() * 11) + 5;
+            this.bananas += stash;
+            this.log(`You found a hidden banana stash! +${stash} bananas!`);
             break;
+
           case 'muddy_pit':
-            const pitDamage = Math.floor(Math.random() * 11) + 5;
-            this.health -= pitDamage;
-            this.print(`<span style='color: #C84C32'>You fell into a muddy pit! You lost ${pitDamage} health.</span>`);
+            this.showEvent('muddy-pit');
+            const pitDmg = Math.floor(Math.random() * 11) + 5;
+            this.health -= pitDmg;
+            this.log(`You fell into a muddy pit! -${pitDmg} health.`);
             break;
+
           case 'golden_banana':
             if (!this.hasGoldenBanana) {
-              this.print("<span style='color: #D4AF37'>You found a GOLDEN BANANA! Complete the challenge to earn it!</span>");
-              if (await this.goldenBananaMiniGame()) {
-                this.bananas += 20;
-                this.hasGoldenBanana = true;
-                this.print("<span style='color: #D4AF37'>You earned the golden banana! +20 bananas!</span>");
-              }
+              this.showEvent('golden-banana');
+              this.log("You found the GOLDEN BANANA! Answer the riddle to claim it!");
+              document.getElementById('minigame-modal').style.display = 'block';
+              return;
             } else {
-              this.print("You found another golden banana spot, but you already have one!");
+              this.log("You swing through familiar territory...");
             }
             break;
+
           case 'meet_friend':
-            const friends = ['kaa', 'baloo', 'wolf pack'];
+            const friends = ['kaa', 'baloo', 'wolves'];
             const friend = friends[Math.floor(Math.random() * friends.length)];
+
             if (friend === 'kaa') {
-              this.print("<span style='color: #40E0D0'>You met Kaa! He showed you how to climb higher into the trees.</span>");
+              this.showEvent('friend-kaa');
+              this.log("You meet Kaa the snake! He shows you how to climb higher.");
               this.canClimbUp = true;
             } else if (friend === 'baloo') {
+              this.showEvent('friend-baloo');
               this.jungleSongs++;
-              this.print("<span style='color: #40E0D0'>You met Baloo! He taught you a jungle song to scare away snakes.</span>");
+              this.log("You meet Baloo! He teaches you a jungle song. (+1 Song)");
             } else {
+              this.showEvent('friend-wolves');
               this.health = Math.min(100, this.health + 15);
-              this.print("<span style='color: #40E0D0'>You met the Wolf Pack! They helped restore your health. +15 health!</span>");
+              this.log("The Wolf Pack protects you! +15 health!");
             }
             break;
+
           default:
-            this.print("You swing for a while but nothing exciting happens.");
+            this.hideAllEvents();
+            this.log("You swing through the jungle... nothing happens.");
         }
 
         this.updateUI();
+        this.checkGameState();
+      }
 
-        // Check win/lose conditions
+      answerRiddle(answer) {
+        document.getElementById('minigame-modal').style.display = 'none';
+
+        if (answer === 'B') {
+          this.hasGoldenBanana = true;
+          this.bananas += 20;
+          this.log("CORRECT! You earned the Golden Banana! +20 bananas!");
+        } else {
+          this.log("Wrong answer! The Golden Banana slips away...");
+        }
+
+        this.hideAllEvents();
+        this.updateUI();
+        this.checkGameState();
+      }
+
+      checkGameState() {
         if (this.health <= 0) {
           this.gameOver = true;
-          this.print("---");
-          this.print("<span style='color: #C84C32; font-size: 0.7rem'>GAME OVER! You ran out of health.</span>");
-          this.print("Click RESTART to try again!");
+          const overlay = document.getElementById('game-overlay');
+          overlay.className = 'defeat';
+          overlay.style.display = 'flex';
+          document.getElementById('overlay-title').textContent = 'GAME OVER';
+          this.log("You ran out of health! The jungle claims another...");
         } else if (this.bananas >= 69 && this.hasGoldenBanana) {
           this.gameOver = true;
-          this.print("---");
-          this.print("<span style='color: #D4AF37; font-size: 0.7rem'>VICTORY! You saved the jungle!</span>");
-          this.print("Congratulations, mighty monkey!");
+          const overlay = document.getElementById('game-overlay');
+          overlay.className = 'victory';
+          overlay.style.display = 'flex';
+          document.getElementById('overlay-title').textContent = 'VICTORY!';
+          this.log("YOU SAVED THE JUNGLE! Congratulations, mighty monkey!");
         }
+      }
+
+      quit() {
+        if (confirm('Are you sure you want to quit?')) {
+          window.location.href = 'index.html';
+        }
+      }
+
+      restart() {
+        document.getElementById('game-overlay').style.display = 'none';
+        document.getElementById('text-log').innerHTML = '';
+        this.init();
       }
     }
 
-    let game;
-    document.addEventListener('DOMContentLoaded', function() {
-      game = new Game();
-      game.start();
-    });
+    const game = new Game();
   </script>
 </body>
 </html>
