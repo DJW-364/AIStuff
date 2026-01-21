@@ -387,8 +387,7 @@
       height: 100%;
       display: flex;
       align-items: center;
-      gap: 40px;
-      animation: bananaScroll 10s linear infinite;
+      animation: monkeyScroll 15s linear infinite;
     }
 
     .border-top .border-pattern {
@@ -400,41 +399,83 @@
       top: 0;
     }
 
-    .border-banana {
-      width: 28px;
-      height: 10px;
-      background: #FFE135;
-      border-radius: 30px 30px 30px 30px / 15px 15px 8px 8px;
-      transform: rotate(-35deg);
+    /* Chain monkey - barrel of monkeys style */
+    .chain-monkey {
       position: relative;
+      width: 50px;
+      height: 36px;
       flex-shrink: 0;
-      box-shadow: 0 0 8px rgba(255, 225, 53, 0.6);
     }
 
-    .border-banana::before {
+    /* Monkey body */
+    .chain-monkey::before {
       content: '';
       position: absolute;
-      top: -2px;
-      right: -3px;
-      width: 5px;
-      height: 4px;
-      background: #5D4037;
-      border-radius: 1px;
-      transform: rotate(15deg);
+      top: 12px;
+      left: 18px;
+      width: 14px;
+      height: 16px;
+      background: var(--terracotta);
+      border-radius: 50% 50% 45% 45%;
     }
 
-    .border-banana::after {
+    /* Monkey head */
+    .chain-monkey::after {
       content: '';
       position: absolute;
-      top: 2px;
-      left: -2px;
-      width: 4px;
-      height: 3px;
-      background: #5D4037;
+      top: 4px;
+      left: 20px;
+      width: 10px;
+      height: 10px;
+      background: var(--terracotta);
       border-radius: 50%;
+      box-shadow:
+        -2px 2px 0 1px var(--cream),
+        2px 0 0 0 var(--terracotta),
+        -2px 0 0 0 var(--terracotta);
     }
 
-    @keyframes bananaScroll {
+    /* Left arm (hook shape reaching up) */
+    .monkey-arm-left {
+      position: absolute;
+      top: 6px;
+      left: 4px;
+      width: 14px;
+      height: 8px;
+      border: 3px solid var(--terracotta);
+      border-bottom: none;
+      border-radius: 10px 10px 0 0;
+      background: transparent;
+    }
+
+    /* Right arm (hook shape reaching down) */
+    .monkey-arm-right {
+      position: absolute;
+      top: 20px;
+      right: 4px;
+      width: 14px;
+      height: 8px;
+      border: 3px solid var(--terracotta);
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      background: transparent;
+    }
+
+    /* Tail */
+    .monkey-tail {
+      position: absolute;
+      bottom: 2px;
+      left: 16px;
+      width: 10px;
+      height: 10px;
+      border: 3px solid var(--terracotta);
+      border-top: none;
+      border-right: none;
+      border-radius: 0 0 0 10px;
+      background: transparent;
+    }
+
+    @keyframes monkeyScroll {
       0% { transform: translateX(0); }
       100% { transform: translateX(-50%); }
     }
@@ -1240,15 +1281,15 @@
     </div>
   </div>
 
-  <!-- Mayan border patterns with bananas -->
+  <!-- Mayan border patterns with chain monkeys -->
   <div class="border-top">
     <div class="border-pattern">
-      <div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div>
+      <div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div>
     </div>
   </div>
   <div class="border-bottom">
     <div class="border-pattern">
-      <div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div><div class="border-banana"></div>
+      <div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div><div class="chain-monkey"><div class="monkey-arm-left"></div><div class="monkey-arm-right"></div><div class="monkey-tail"></div></div>
     </div>
   </div>
 
