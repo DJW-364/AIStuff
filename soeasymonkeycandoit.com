@@ -1,0 +1,5 @@
+soeasymonkeycandoit.com
+    echo "soeasymonkeycandoit.com" > CNAME                                                             
+  git add CNAME                                                                                      
+  git commit -m "Add custom domain"                                                                  
+  git push origin main     
