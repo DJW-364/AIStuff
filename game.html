@@ -20,1018 +20,1042 @@
       --turquoise: #40E0D0;
       --terracotta: #C84C32;
       --stone-dark: #2C2416;
-      --stone-mid: #4A3C2A;
-      --cream: #F5E6C8;
+      --hud-red: #b91c1c;
+      --hud-bg: #3a2a1a;
     }
 
     body {
       font-family: 'Press Start 2P', cursive;
       background: #000;
-      min-height: 100vh;
-      color: var(--cream);
+      height: 100vh;
       overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    #game-wrapper {
-      max-width: 1000px;
-      margin: 0 auto;
+    #game-container {
+      width: 100%;
+      max-width: 900px;
       height: 100vh;
+      max-height: 700px;
       display: flex;
       flex-direction: column;
-      padding: 8px;
-    }
-
-    /* HUD */
-    .hud {
-      display: flex;
-      justify-content: space-between;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.7));
-      border: 2px solid var(--gold);
-      padding: 10px 20px;
-      margin-bottom: 5px;
-      flex-shrink: 0;
+      background: #000;
       position: relative;
-      z-index: 100;
     }
 
-    .hud-item {
-      font-size: 0.55rem;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-    }
-
-    .hud-item span {
-      color: var(--turquoise);
-      margin-left: 5px;
-    }
-
-    .hud-item.health span { color: #ff6b6b; }
-    .hud-item.bananas span { color: #ffd93d; }
-    .hud-item.golden span.yes { color: #ffd700; text-shadow: 0 0 10px #ffd700; }
-
-    /* Game Viewport */
-    #game-viewport {
+    /* 3D Viewport */
+    #viewport {
       flex: 1;
       position: relative;
       overflow: hidden;
-      border: 2px solid var(--gold);
-      min-height: 350px;
+      background: linear-gradient(to bottom,
+        #0a1a0a 0%,
+        #1a3a1a 30%,
+        #2a5a2a 60%,
+        #3a7a3a 100%
+      );
+      perspective: 400px;
+      perspective-origin: 50% 60%;
     }
 
-    /* Camera container - this moves to create camera effects */
-    #camera {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.3s ease-out;
-    }
-
-    #camera.shake {
-      animation: cameraShake 0.4s ease-out;
-    }
-
-    #camera.swing-left {
-      animation: cameraSwingLeft 0.6s ease-out;
-    }
-
-    #camera.swing-right {
-      animation: cameraSwingRight 0.6s ease-out;
-    }
-
-    #camera.swing-forward {
-      animation: cameraSwingForward 0.7s ease-out;
-    }
-
-    @keyframes cameraShake {
-      0%, 100% { transform: translate(0, 0); }
-      20% { transform: translate(-5px, 3px); }
-      40% { transform: translate(5px, -3px); }
-      60% { transform: translate(-3px, 5px); }
-      80% { transform: translate(3px, -5px); }
-    }
-
-    @keyframes cameraSwingLeft {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      30% { transform: translate(30px, -10px) rotate(2deg); }
-      60% { transform: translate(20px, -5px) rotate(1deg); }
-      100% { transform: translate(0, 0) rotate(0deg); }
-    }
-
-    @keyframes cameraSwingRight {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      30% { transform: translate(-30px, -10px) rotate(-2deg); }
-      60% { transform: translate(-20px, -5px) rotate(-1deg); }
-      100% { transform: translate(0, 0) rotate(0deg); }
-    }
-
-    @keyframes cameraSwingForward {
-      0% { transform: scale(1) translateY(0); }
-      40% { transform: scale(1.08) translateY(-15px); }
-      70% { transform: scale(1.05) translateY(-10px); }
-      100% { transform: scale(1) translateY(0); }
-    }
-
-    /* Sky with gradient and sun rays */
-    .sky {
+    /* Sky/Canopy */
+    .canopy {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 55%;
-      background: linear-gradient(to bottom,
-        #0d1f0d 0%,
-        #1a3a1a 25%,
-        #2a5a2a 50%,
-        #3a7a3a 75%,
-        #4a8a4a 100%
-      );
-      z-index: 1;
+      height: 45%;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(50,100,50,0.8) 0%, transparent 40%),
+        radial-gradient(ellipse at 70% 30%, rgba(40,90,40,0.7) 0%, transparent 35%),
+        radial-gradient(ellipse at 50% 10%, rgba(60,110,60,0.9) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 40%, rgba(45,95,45,0.6) 0%, transparent 30%),
+        radial-gradient(ellipse at 80% 15%, rgba(55,105,55,0.7) 0%, transparent 35%),
+        linear-gradient(to bottom, #0a1a0a, transparent);
+      z-index: 10;
     }
 
-    /* Sun rays */
+    /* Sun rays through canopy */
     .sun-rays {
       position: absolute;
       top: 0;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 0;
       width: 100%;
       height: 60%;
-      background: radial-gradient(ellipse at 50% 0%,
-        rgba(255, 255, 200, 0.15) 0%,
-        rgba(255, 255, 150, 0.08) 30%,
-        transparent 70%
-      );
-      z-index: 2;
+      background:
+        linear-gradient(170deg, rgba(255,255,200,0.15) 0%, transparent 30%),
+        linear-gradient(190deg, rgba(255,255,180,0.1) 0%, transparent 25%),
+        linear-gradient(160deg, rgba(255,255,150,0.08) 0%, transparent 35%);
+      z-index: 11;
       pointer-events: none;
     }
 
-    /* Fog/mist layer */
-    .fog {
+    /* 3D Floor (jungle ground rushing towards you) */
+    .floor-3d {
       position: absolute;
-      bottom: 40%;
-      left: 0;
+      bottom: 0;
+      left: -50%;
       width: 200%;
-      height: 30%;
-      background: linear-gradient(to top,
-        rgba(100, 150, 100, 0.3) 0%,
-        rgba(100, 150, 100, 0.1) 50%,
-        transparent 100%
-      );
-      z-index: 3;
-      animation: fogMove 20s linear infinite;
-    }
-
-    @keyframes fogMove {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
-    /* Parallax layers */
-    .parallax-layer {
-      position: absolute;
-      width: 200%;
-      height: 100%;
-      left: 0;
-      top: 0;
-    }
-
-    /* Far background trees (slowest) */
-    .bg-far {
-      z-index: 4;
-    }
-
-    .bg-far.scrolling {
-      animation: scrollFar 2s linear;
-    }
-
-    @keyframes scrollFar {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-3%); }
-    }
-
-    .tree-far {
-      position: absolute;
-      bottom: 45%;
-    }
-
-    .tree-far .trunk {
-      width: 8px;
-      height: 40px;
-      background: #1a2a1a;
-      margin: 0 auto;
-    }
-
-    .tree-far .canopy {
-      width: 35px;
-      height: 28px;
-      background: radial-gradient(ellipse, #1a4a2a 0%, #0a2a1a 100%);
-      border-radius: 50%;
-      margin-bottom: -5px;
-    }
-
-    /* Mid background trees */
-    .bg-mid {
+      height: 55%;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          #2a4a1a 0px,
+          #3a5a2a 20px,
+          #2a4a1a 40px
+        );
+      transform: rotateX(60deg);
+      transform-origin: center top;
       z-index: 5;
     }
 
-    .bg-mid.scrolling {
-      animation: scrollMid 2s linear;
+    .floor-3d.moving {
+      animation: floorMove 0.5s linear;
     }
 
-    @keyframes scrollMid {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-5%); }
+    @keyframes floorMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 100px; }
     }
 
-    .tree-mid {
+    /* 3D Walls/Trees on sides */
+    .wall-left, .wall-right {
       position: absolute;
-      bottom: 40%;
-    }
-
-    .tree-mid .trunk {
-      width: 15px;
-      height: 70px;
-      background: linear-gradient(90deg, #2a1a0a, #4a3020, #2a1a0a);
-      margin: 0 auto;
-      border-radius: 3px;
-    }
-
-    .tree-mid .canopy {
-      width: 60px;
-      height: 45px;
-      background: radial-gradient(ellipse, #2a6a3a 0%, #1a4a2a 70%, #0a3a1a 100%);
-      border-radius: 50%;
-      margin-bottom: -10px;
-    }
-
-    /* Near foreground trees (fastest) */
-    .bg-near {
-      z-index: 6;
-    }
-
-    .bg-near.scrolling {
-      animation: scrollNear 2s linear;
-    }
-
-    @keyframes scrollNear {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-8%); }
-    }
-
-    .tree-near {
-      position: absolute;
-      bottom: 25%;
-    }
-
-    .tree-near .trunk {
-      width: 30px;
-      height: 150px;
-      background: linear-gradient(90deg, #3a2010, #6a4030, #3a2010);
-      margin: 0 auto;
-      border-radius: 5px;
-      box-shadow: -5px 0 15px rgba(0,0,0,0.3);
-    }
-
-    .tree-near .canopy {
-      width: 120px;
-      height: 90px;
-      background: radial-gradient(ellipse at 50% 60%, #3a8a4a 0%, #2a6a3a 50%, #1a4a2a 100%);
-      border-radius: 50%;
-      margin-bottom: -20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    /* Ground */
-    .ground {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 35%;
-      background: linear-gradient(to bottom,
-        #4a6a3a 0%,
-        #3a5a2a 20%,
-        #2a4a1a 50%,
-        #1a3a0a 100%
-      );
-      z-index: 7;
-    }
-
-    /* Path */
-    .path {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 0;
       width: 35%;
-      height: 35%;
-      background: linear-gradient(to top,
-        #5a4a3a 0%,
-        #4a3a2a 30%,
-        #3a2a1a 60%,
-        transparent 100%
-      );
-      clip-path: polygon(25% 100%, 75% 100%, 58% 0%, 42% 0%);
+      height: 100%;
       z-index: 8;
     }
 
-    .path.scrolling {
-      animation: pathScroll 0.7s ease-out;
-    }
-
-    @keyframes pathScroll {
-      0% { transform: translateX(-50%) scaleY(1); }
-      50% { transform: translateX(-50%) scaleY(1.3); }
-      100% { transform: translateX(-50%) scaleY(1); }
-    }
-
-    /* Vines */
-    .vines-container {
-      position: absolute;
-      top: 0;
+    .wall-left {
       left: 0;
-      width: 100%;
-      height: 60%;
-      z-index: 15;
-      pointer-events: none;
+      background: linear-gradient(to right,
+        #1a2a0a 0%,
+        #2a4a1a 40%,
+        transparent 100%
+      );
+      transform: perspective(300px) rotateY(20deg);
+      transform-origin: left center;
     }
 
-    .vine {
+    .wall-right {
+      right: 0;
+      background: linear-gradient(to left,
+        #1a2a0a 0%,
+        #2a4a1a 40%,
+        transparent 100%
+      );
+      transform: perspective(300px) rotateY(-20deg);
+      transform-origin: right center;
+    }
+
+    /* Tree trunks rushing past */
+    .tree-trunk {
+      position: absolute;
+      bottom: 10%;
+      width: 30px;
+      background: linear-gradient(90deg, #2a1a0a, #5a3a1a, #2a1a0a);
+      z-index: 15;
+      border-radius: 5px;
+    }
+
+    .tree-trunk.left-1 { left: 5%; height: 70%; }
+    .tree-trunk.left-2 { left: 15%; height: 55%; }
+    .tree-trunk.right-1 { right: 5%; height: 70%; }
+    .tree-trunk.right-2 { right: 15%; height: 55%; }
+
+    .tree-trunk.moving {
+      animation: treePast 0.5s ease-out;
+    }
+
+    @keyframes treePast {
+      0% { transform: scale(0.5) translateY(-50px); opacity: 0.5; }
+      50% { transform: scale(1.2) translateY(0); opacity: 1; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    /* Vines hanging down */
+    .hanging-vine {
       position: absolute;
       top: 0;
-      width: 5px;
+      width: 8px;
       background: linear-gradient(to bottom,
-        #2a7a3a 0%,
-        #3a9a4a 30%,
-        #2a7a3a 60%,
-        rgba(42, 122, 58, 0.3) 100%
+        #2a7a3a,
+        #3a9a4a,
+        #2a7a3a
       );
-      border-radius: 0 0 3px 3px;
+      border-radius: 4px;
+      z-index: 12;
       transform-origin: top center;
     }
 
-    .vine::after {
+    .hanging-vine::after {
       content: '';
       position: absolute;
-      bottom: -10px;
-      left: -5px;
-      width: 15px;
-      height: 15px;
+      bottom: -15px;
+      left: -8px;
+      width: 24px;
+      height: 20px;
       background: #3a9a4a;
-      clip-path: polygon(50% 100%, 0 40%, 25% 0, 75% 0, 100% 40%);
+      clip-path: polygon(50% 100%, 0 30%, 30% 0, 70% 0, 100% 30%);
     }
 
-    .vine-1 { left: 8%; height: 45%; animation: vineSwing 4s ease-in-out infinite; }
-    .vine-2 { left: 18%; height: 35%; animation: vineSwing 5s ease-in-out infinite -1s; }
-    .vine-3 { left: 30%; height: 50%; animation: vineSwing 4.5s ease-in-out infinite -2s; }
-    .vine-4 { right: 30%; height: 40%; animation: vineSwing 5.5s ease-in-out infinite -0.5s; }
-    .vine-5 { right: 18%; height: 55%; animation: vineSwing 4s ease-in-out infinite -1.5s; }
-    .vine-6 { right: 8%; height: 38%; animation: vineSwing 5s ease-in-out infinite -2.5s; }
+    .vine-l1 { left: 10%; height: 35%; animation: vineSwing 3s ease-in-out infinite; }
+    .vine-l2 { left: 25%; height: 25%; animation: vineSwing 4s ease-in-out infinite -1s; }
+    .vine-r1 { right: 10%; height: 30%; animation: vineSwing 3.5s ease-in-out infinite -0.5s; }
+    .vine-r2 { right: 25%; height: 28%; animation: vineSwing 4s ease-in-out infinite -2s; }
+    .vine-center { left: 48%; height: 40%; animation: vineSwing 3s ease-in-out infinite; }
 
     @keyframes vineSwing {
-      0%, 100% { transform: rotate(-6deg); }
-      50% { transform: rotate(6deg); }
+      0%, 100% { transform: rotate(-8deg); }
+      50% { transform: rotate(8deg); }
     }
 
-    /* Monkey */
-    #monkey {
+    /* Grabbed vine (when swinging) */
+    .grabbed-vine {
       position: absolute;
-      bottom: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
-    }
-
-    #monkey.swing-left {
-      animation: monkeySwingLeft 0.6s ease-out;
-    }
-
-    #monkey.swing-right {
-      animation: monkeySwingRight 0.6s ease-out;
-    }
-
-    #monkey.swing-forward {
-      animation: monkeySwingForward 0.7s ease-out;
-    }
-
-    @keyframes monkeySwingLeft {
-      0% { transform: translateX(-50%) rotate(0) scale(1); }
-      20% { transform: translateX(-100%) rotate(-25deg) scale(0.9) translateY(-40px); }
-      50% { transform: translateX(-80%) rotate(-15deg) scale(0.85) translateY(-60px); }
-      80% { transform: translateX(-60%) rotate(-5deg) scale(0.9) translateY(-30px); }
-      100% { transform: translateX(-50%) rotate(0) scale(1); }
-    }
-
-    @keyframes monkeySwingRight {
-      0% { transform: translateX(-50%) rotate(0) scale(1); }
-      20% { transform: translateX(0%) rotate(25deg) scale(0.9) translateY(-40px); }
-      50% { transform: translateX(-20%) rotate(15deg) scale(0.85) translateY(-60px); }
-      80% { transform: translateX(-40%) rotate(5deg) scale(0.9) translateY(-30px); }
-      100% { transform: translateX(-50%) rotate(0) scale(1); }
-    }
-
-    @keyframes monkeySwingForward {
-      0% { transform: translateX(-50%) scale(1) translateY(0); }
-      30% { transform: translateX(-50%) scale(0.7) translateY(-80px); }
-      50% { transform: translateX(-50%) scale(0.5) translateY(-120px); }
-      70% { transform: translateX(-50%) scale(0.6) translateY(-80px); }
-      100% { transform: translateX(-50%) scale(1) translateY(0); }
-    }
-
-    .monkey-body-container {
-      position: relative;
-      width: 90px;
-      height: 110px;
-    }
-
-    .monkey-body {
-      position: absolute;
-      width: 55px;
-      height: 60px;
-      background: linear-gradient(to bottom, #c84c32, #a83c22);
-      border-radius: 28px 28px 22px 22px;
-      left: 50%;
-      bottom: 10px;
-      transform: translateX(-50%);
-      box-shadow: inset -8px 0 15px rgba(0,0,0,0.2);
-    }
-
-    .monkey-head {
-      position: absolute;
-      width: 52px;
-      height: 45px;
-      background: linear-gradient(to bottom, #c84c32, #b84c32);
-      border-radius: 50%;
-      left: 50%;
       top: 0;
+      left: 50%;
       transform: translateX(-50%);
-      box-shadow: inset -5px 0 10px rgba(0,0,0,0.2);
-    }
-
-    .monkey-ear {
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      background: linear-gradient(135deg, #c84c32, #a83c22);
-      border-radius: 50%;
-      top: 8px;
-    }
-
-    .monkey-ear.left { left: 2px; }
-    .monkey-ear.right { right: 2px; }
-
-    .monkey-ear-inner {
-      position: absolute;
       width: 12px;
-      height: 12px;
-      background: #e8a090;
-      border-radius: 50%;
-      top: 5px;
-      left: 5px;
-    }
-
-    .monkey-arm {
-      position: absolute;
-      width: 14px;
-      height: 50px;
-      background: linear-gradient(to bottom, #c84c32, #a83c22);
-      border-radius: 7px;
-      top: 35px;
-      transform-origin: top center;
-    }
-
-    .monkey-arm.left {
-      left: 5px;
-      transform: rotate(25deg);
-    }
-
-    .monkey-arm.right {
-      right: 5px;
-      transform: rotate(-25deg);
-    }
-
-    .monkey-arm.reaching-left {
-      animation: armReachLeft 0.6s ease-out;
-    }
-
-    .monkey-arm.reaching-right {
-      animation: armReachRight 0.6s ease-out;
-    }
-
-    .monkey-arm.reaching-up {
-      animation: armReachUp 0.7s ease-out;
-    }
-
-    @keyframes armReachLeft {
-      0%, 100% { transform: rotate(25deg); }
-      50% { transform: rotate(-60deg) translateY(-15px); }
-    }
-
-    @keyframes armReachRight {
-      0%, 100% { transform: rotate(-25deg); }
-      50% { transform: rotate(60deg) translateY(-15px); }
-    }
-
-    @keyframes armReachUp {
-      0%, 100% { transform: rotate(25deg); }
-      50% { transform: rotate(-80deg) translateY(-25px); }
-    }
-
-    .monkey-hand {
-      position: absolute;
-      bottom: -5px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 16px;
-      height: 14px;
-      background: #c84c32;
-      border-radius: 50%;
-    }
-
-    .monkey-tail {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      border: 7px solid #c84c32;
-      border-radius: 50%;
-      border-top-color: transparent;
-      border-left-color: transparent;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%) rotate(135deg);
-    }
-
-    /* Events */
-    .event-3d {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 12;
+      height: 50%;
+      background: linear-gradient(to bottom, #2a7a3a, #4aaa5a, #2a7a3a);
+      border-radius: 6px;
+      z-index: 25;
       opacity: 0;
-      transition: opacity 0.3s, transform 0.5s;
+      transition: opacity 0.2s;
     }
 
-    .event-3d.visible {
+    .grabbed-vine.visible {
       opacity: 1;
-      animation: eventZoomIn 0.5s ease-out;
+      animation: grabbedVineSwing 0.6s ease-out;
     }
 
-    @keyframes eventZoomIn {
-      0% { transform: translateX(-50%) scale(0.2) translateY(-50px); opacity: 0; }
+    @keyframes grabbedVineSwing {
+      0% { transform: translateX(-50%) rotate(0); }
+      30% { transform: translateX(-50%) rotate(-15deg); }
+      60% { transform: translateX(-50%) rotate(10deg); }
+      100% { transform: translateX(-50%) rotate(0); }
+    }
+
+    /* Center tunnel effect */
+    .tunnel {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40%;
+      height: 50%;
+      background: radial-gradient(ellipse,
+        rgba(50,100,50,0.3) 0%,
+        rgba(30,70,30,0.5) 40%,
+        transparent 70%
+      );
+      z-index: 6;
+    }
+
+    .tunnel.zooming {
+      animation: tunnelZoom 0.5s ease-out;
+    }
+
+    @keyframes tunnelZoom {
+      0% { transform: translateX(-50%) scale(0.5); opacity: 0.3; }
+      50% { transform: translateX(-50%) scale(1.3); opacity: 0.8; }
+      100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    }
+
+    /* Event objects (appearing in 3D space) */
+    .event-object {
+      position: absolute;
+      left: 50%;
+      top: 30%;
+      transform: translateX(-50%) scale(0);
+      z-index: 20;
+      opacity: 0;
+      transition: all 0.3s ease-out;
+    }
+
+    .event-object.visible {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+      animation: eventAppear 0.5s ease-out;
+    }
+
+    @keyframes eventAppear {
+      0% { transform: translateX(-50%) scale(0.2) translateY(-100px); opacity: 0; }
       60% { transform: translateX(-50%) scale(1.1) translateY(0); opacity: 1; }
       100% { transform: translateX(-50%) scale(1) translateY(0); opacity: 1; }
     }
 
     /* Snake */
-    #snake-event {
-      bottom: 38%;
+    #snake-obj {
+      top: 25%;
     }
 
-    .snake-body {
-      width: 120px;
-      height: 30px;
-      background: linear-gradient(90deg, #3a7a2a, #5a9a3a, #4a8a2a, #3a7a2a);
-      border-radius: 15px;
+    .snake-3d {
       position: relative;
-      animation: snakeMove 0.4s ease-in-out infinite;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
 
-    @keyframes snakeMove {
-      0%, 100% { transform: scaleX(1) translateX(0); }
-      50% { transform: scaleX(1.05) translateX(5px); }
+    .snake-3d .body {
+      width: 150px;
+      height: 40px;
+      background: linear-gradient(90deg, #3a7a2a, #5a9a3a, #4a8a2a, #3a7a2a);
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      animation: snakeSlither 0.3s ease-in-out infinite;
     }
 
-    .snake-head {
+    @keyframes snakeSlither {
+      0%, 100% { transform: scaleX(1); }
+      50% { transform: scaleX(1.05); }
+    }
+
+    .snake-3d .head {
       position: absolute;
-      left: -25px;
-      top: -8px;
-      width: 45px;
-      height: 45px;
+      left: -35px;
+      top: -12px;
+      width: 60px;
+      height: 60px;
       background: radial-gradient(circle at 30% 30%, #5a9a3a, #3a7a2a);
       border-radius: 50%;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     }
 
-    .snake-eye {
+    .snake-3d .eye {
       position: absolute;
-      width: 16px;
-      height: 16px;
-      background: radial-gradient(circle, #ff0000 0%, #aa0000 100%);
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle, #ff0000, #990000);
       border-radius: 50%;
-      top: 10px;
-      left: 12px;
-      box-shadow: 0 0 15px rgba(255,0,0,0.6);
+      top: 15px;
+      left: 18px;
+      box-shadow: 0 0 20px rgba(255,0,0,0.8);
+      animation: snakeEyePulse 0.5s infinite;
     }
 
-    .snake-eye::after {
+    @keyframes snakeEyePulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,0,0,0.8); }
+      50% { box-shadow: 0 0 35px rgba(255,0,0,1); }
+    }
+
+    .snake-3d .eye::after {
       content: '';
       position: absolute;
-      width: 5px;
-      height: 14px;
+      width: 6px;
+      height: 16px;
       background: #000;
-      border-radius: 2px;
-      top: 1px;
-      left: 5px;
+      border-radius: 3px;
+      top: 2px;
+      left: 7px;
     }
 
-    .snake-tongue {
+    .snake-3d .tongue {
       position: absolute;
-      left: -20px;
-      top: 18px;
-      width: 25px;
-      height: 5px;
+      left: -25px;
+      top: 25px;
+      width: 30px;
+      height: 6px;
       background: #ff3333;
       animation: tongueFlick 0.15s infinite;
     }
 
-    .snake-tongue::before,
-    .snake-tongue::after {
+    .snake-3d .tongue::before,
+    .snake-3d .tongue::after {
       content: '';
       position: absolute;
-      left: -10px;
-      width: 12px;
-      height: 3px;
+      left: -12px;
+      width: 14px;
+      height: 4px;
       background: #ff3333;
     }
 
-    .snake-tongue::before { top: -4px; transform: rotate(-25deg); }
-    .snake-tongue::after { top: 6px; transform: rotate(25deg); }
+    .snake-3d .tongue::before { top: -5px; transform: rotate(-25deg); }
+    .snake-3d .tongue::after { top: 7px; transform: rotate(25deg); }
 
     @keyframes tongueFlick {
-      0%, 100% { width: 25px; }
-      50% { width: 35px; }
+      0%, 100% { width: 30px; }
+      50% { width: 45px; }
     }
 
-    /* Banana tree */
-    #banana-event {
-      bottom: 35%;
+    /* Banana Tree */
+    #banana-obj {
+      top: 20%;
     }
 
-    .banana-tree {
+    .banana-tree-3d {
       position: relative;
     }
 
-    .banana-trunk {
-      width: 35px;
-      height: 120px;
+    .banana-tree-3d .trunk {
+      width: 45px;
+      height: 140px;
       background: linear-gradient(90deg, #5a4020, #8a6840, #5a4020);
-      border-radius: 5px;
+      border-radius: 8px;
       margin: 0 auto;
-      box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+      box-shadow: -8px 0 20px rgba(0,0,0,0.4);
     }
 
-    .banana-leaves {
+    .banana-tree-3d .leaves {
       position: absolute;
-      top: -50px;
+      top: -60px;
       left: 50%;
       transform: translateX(-50%);
-      width: 140px;
-      height: 80px;
+      width: 180px;
+      height: 100px;
     }
 
-    .banana-leaf {
+    .banana-tree-3d .leaf {
       position: absolute;
-      width: 60px;
-      height: 22px;
+      width: 70px;
+      height: 25px;
       background: linear-gradient(to right, #2a8a3a, #4aaa5a, #2a8a3a);
       border-radius: 50%;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-    }
-
-    .banana-leaf:nth-child(1) { transform: rotate(-50deg); left: 0; top: 35px; }
-    .banana-leaf:nth-child(2) { transform: rotate(50deg); right: 0; top: 35px; }
-    .banana-leaf:nth-child(3) { transform: rotate(-75deg); left: 20px; top: 10px; }
-    .banana-leaf:nth-child(4) { transform: rotate(75deg); right: 20px; top: 10px; }
-    .banana-leaf:nth-child(5) { left: 50%; transform: translateX(-50%) rotate(-5deg); top: 0; }
-
-    .banana-bunch {
-      position: absolute;
-      top: 30px;
-      left: 55%;
-    }
-
-    .banana-fruit {
-      width: 30px;
-      height: 12px;
-      background: linear-gradient(to bottom, #ffe135, #ffc800);
-      border-radius: 15px;
-      margin: 4px 0;
-      transform: rotate(-30deg);
-      box-shadow: 0 0 15px rgba(255,225,53,0.5);
-      animation: bananaGlow 1.5s ease-in-out infinite;
-    }
-
-    @keyframes bananaGlow {
-      0%, 100% { box-shadow: 0 0 15px rgba(255,225,53,0.5); }
-      50% { box-shadow: 0 0 25px rgba(255,225,53,0.8); }
-    }
-
-    /* Muddy pit */
-    #pit-event {
-      bottom: 30%;
-    }
-
-    .mud-pit {
-      width: 180px;
-      height: 50px;
-      background: radial-gradient(ellipse, #6a5a4a 0%, #4a3a2a 50%, #3a2a1a 100%);
-      border-radius: 50%;
-      position: relative;
-      box-shadow: inset 0 -10px 20px rgba(0,0,0,0.4), 0 5px 15px rgba(0,0,0,0.3);
-    }
-
-    .mud-bubble {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: rgba(90,70,50,0.8);
-      border-radius: 50%;
-      animation: bubblePop 2s infinite;
-    }
-
-    .mud-bubble:nth-child(1) { left: 30px; top: 15px; animation-delay: 0s; }
-    .mud-bubble:nth-child(2) { left: 80px; top: 20px; animation-delay: 0.7s; }
-    .mud-bubble:nth-child(3) { right: 30px; top: 12px; animation-delay: 1.3s; }
-
-    @keyframes bubblePop {
-      0%, 100% { transform: scale(0); opacity: 0; }
-      30% { transform: scale(1); opacity: 0.8; }
-      50% { transform: scale(1.3) translateY(-15px); opacity: 0.4; }
-      70% { transform: scale(1.5) translateY(-25px); opacity: 0; }
-    }
-
-    /* Golden banana */
-    #golden-event {
-      bottom: 42%;
-    }
-
-    .golden-banana {
-      width: 100px;
-      height: 40px;
-      background: linear-gradient(to bottom, #ffd700, #ffaa00, #ffd700);
-      border-radius: 50px;
-      transform: rotate(-25deg);
-      box-shadow:
-        0 0 40px rgba(255,215,0,0.9),
-        0 0 80px rgba(255,180,0,0.6),
-        0 0 120px rgba(255,150,0,0.3),
-        inset 0 -5px 15px rgba(200,150,0,0.5);
-      animation: goldenPulse 1s ease-in-out infinite, goldenFloat 2s ease-in-out infinite;
-    }
-
-    @keyframes goldenPulse {
-      0%, 100% { box-shadow: 0 0 40px rgba(255,215,0,0.9), 0 0 80px rgba(255,180,0,0.6); }
-      50% { box-shadow: 0 0 60px rgba(255,215,0,1), 0 0 120px rgba(255,180,0,0.8); }
-    }
-
-    @keyframes goldenFloat {
-      0%, 100% { transform: rotate(-25deg) translateY(0); }
-      50% { transform: rotate(-25deg) translateY(-15px); }
-    }
-
-    /* Friends */
-    #kaa-event { bottom: 35%; }
-    #baloo-event { bottom: 28%; }
-    #wolves-event { bottom: 32%; }
-
-    .kaa-snake {
-      position: relative;
-    }
-
-    .kaa-body {
-      width: 140px;
-      height: 22px;
-      background: linear-gradient(90deg, #9a8a5a, #baa86a, #9a8a5a);
-      border-radius: 11px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
 
-    .kaa-head {
+    .banana-tree-3d .leaf:nth-child(1) { transform: rotate(-55deg); left: 0; top: 45px; }
+    .banana-tree-3d .leaf:nth-child(2) { transform: rotate(55deg); right: 0; top: 45px; }
+    .banana-tree-3d .leaf:nth-child(3) { transform: rotate(-75deg); left: 25px; top: 15px; }
+    .banana-tree-3d .leaf:nth-child(4) { transform: rotate(75deg); right: 25px; top: 15px; }
+    .banana-tree-3d .leaf:nth-child(5) { left: 50%; transform: translateX(-50%); top: 0; }
+
+    .banana-tree-3d .bunch {
       position: absolute;
-      left: -30px;
-      top: -15px;
-      width: 55px;
-      height: 55px;
+      top: 50px;
+      left: 60%;
+    }
+
+    .banana-tree-3d .banana {
+      width: 40px;
+      height: 15px;
+      background: linear-gradient(to bottom, #ffe135, #ffc800);
+      border-radius: 20px;
+      margin: 5px 0;
+      transform: rotate(-30deg);
+      box-shadow: 0 0 20px rgba(255,225,53,0.6);
+      animation: bananaGlow 1s ease-in-out infinite;
+    }
+
+    @keyframes bananaGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,225,53,0.6); }
+      50% { box-shadow: 0 0 35px rgba(255,225,53,0.9); }
+    }
+
+    /* Mud Pit */
+    #pit-obj {
+      top: 40%;
+    }
+
+    .mud-pit-3d {
+      width: 200px;
+      height: 60px;
+      background: radial-gradient(ellipse, #6a5a4a 0%, #4a3a2a 50%, #3a2a1a 100%);
+      border-radius: 50%;
+      box-shadow: inset 0 -15px 30px rgba(0,0,0,0.5), 0 10px 25px rgba(0,0,0,0.4);
+      position: relative;
+    }
+
+    .mud-pit-3d .bubble {
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      background: rgba(90,70,50,0.8);
+      border-radius: 50%;
+      animation: mudBubble 2s infinite;
+    }
+
+    .mud-pit-3d .bubble:nth-child(1) { left: 35px; top: 18px; animation-delay: 0s; }
+    .mud-pit-3d .bubble:nth-child(2) { left: 90px; top: 22px; animation-delay: 0.7s; }
+    .mud-pit-3d .bubble:nth-child(3) { right: 35px; top: 15px; animation-delay: 1.3s; }
+
+    @keyframes mudBubble {
+      0%, 100% { transform: scale(0); opacity: 0; }
+      30% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.4) translateY(-20px); opacity: 0.4; }
+      70% { transform: scale(1.6) translateY(-30px); opacity: 0; }
+    }
+
+    /* Golden Banana */
+    #golden-obj {
+      top: 28%;
+    }
+
+    .golden-banana-3d {
+      width: 120px;
+      height: 50px;
+      background: linear-gradient(to bottom, #ffd700, #ffaa00, #ffd700);
+      border-radius: 60px;
+      transform: rotate(-20deg);
+      box-shadow:
+        0 0 50px rgba(255,215,0,1),
+        0 0 100px rgba(255,180,0,0.7),
+        0 0 150px rgba(255,150,0,0.4),
+        inset 0 -8px 20px rgba(200,150,0,0.5);
+      animation: goldenFloat 1.5s ease-in-out infinite, goldenPulse 0.8s ease-in-out infinite;
+    }
+
+    @keyframes goldenFloat {
+      0%, 100% { transform: rotate(-20deg) translateY(0); }
+      50% { transform: rotate(-20deg) translateY(-20px); }
+    }
+
+    @keyframes goldenPulse {
+      0%, 100% { box-shadow: 0 0 50px rgba(255,215,0,1), 0 0 100px rgba(255,180,0,0.7); }
+      50% { box-shadow: 0 0 80px rgba(255,215,0,1), 0 0 150px rgba(255,180,0,0.9); }
+    }
+
+    /* Friends */
+    #kaa-obj { top: 25%; }
+    #baloo-obj { top: 20%; }
+    #wolves-obj { top: 30%; }
+
+    /* Kaa */
+    .kaa-3d .body {
+      width: 160px;
+      height: 28px;
+      background: linear-gradient(90deg, #9a8a5a, #baa86a, #9a8a5a);
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    .kaa-3d .head {
+      position: absolute;
+      left: -40px;
+      top: -20px;
+      width: 70px;
+      height: 70px;
       background: radial-gradient(circle at 40% 40%, #baa86a, #9a8a5a);
       border-radius: 50%;
     }
 
-    .kaa-eye {
+    .kaa-3d .eye {
       position: absolute;
-      width: 28px;
-      height: 28px;
+      width: 35px;
+      height: 35px;
       background: radial-gradient(circle, #ffff00 0%, #cccc00 50%, #999900 100%);
       border-radius: 50%;
-      top: 12px;
-      left: 20px;
-      animation: hypnoEye 0.6s infinite;
-      box-shadow: 0 0 20px rgba(255,255,0,0.8);
+      top: 15px;
+      left: 25px;
+      box-shadow: 0 0 30px rgba(255,255,0,0.9);
+      animation: hypnoEye 0.5s infinite;
     }
 
     @keyframes hypnoEye {
-      0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255,255,0,0.8); }
-      50% { transform: scale(1.3); box-shadow: 0 0 40px rgba(255,255,0,1); }
+      0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(255,255,0,0.9); }
+      50% { transform: scale(1.2); box-shadow: 0 0 50px rgba(255,255,0,1); }
     }
 
-    .kaa-eye::after {
+    .kaa-3d .eye::after {
       content: '';
       position: absolute;
-      width: 8px;
-      height: 20px;
+      width: 10px;
+      height: 25px;
       background: #000;
-      border-radius: 4px;
-      top: 4px;
-      left: 10px;
+      border-radius: 5px;
+      top: 5px;
+      left: 12px;
     }
 
     /* Baloo */
-    .baloo {
+    .baloo-3d {
       position: relative;
-      width: 110px;
-      height: 150px;
+      width: 130px;
+      height: 180px;
     }
 
-    .baloo-body {
+    .baloo-3d .body {
       position: absolute;
-      width: 90px;
-      height: 110px;
+      width: 110px;
+      height: 130px;
       background: linear-gradient(to bottom, #5a5a6a, #4a4a5a);
-      border-radius: 45px 45px 35px 35px;
+      border-radius: 55px 55px 45px 45px;
       bottom: 0;
       left: 10px;
-      box-shadow: -8px 0 20px rgba(0,0,0,0.3);
+      box-shadow: -10px 0 25px rgba(0,0,0,0.4);
     }
 
-    .baloo-belly {
+    .baloo-3d .belly {
       position: absolute;
-      width: 60px;
-      height: 70px;
+      width: 70px;
+      height: 85px;
       background: linear-gradient(to bottom, #8a8a9a, #7a7a8a);
       border-radius: 50%;
-      bottom: 15px;
-      left: 25px;
+      bottom: 20px;
+      left: 30px;
     }
 
-    .baloo-head {
+    .baloo-3d .head {
       position: absolute;
-      width: 75px;
-      height: 65px;
+      width: 90px;
+      height: 80px;
       background: radial-gradient(circle at 50% 40%, #6a6a7a, #4a4a5a);
       border-radius: 50%;
       top: 0;
-      left: 17px;
+      left: 20px;
     }
 
-    .baloo-ear {
+    .baloo-3d .ear {
       position: absolute;
-      width: 25px;
-      height: 25px;
+      width: 30px;
+      height: 30px;
       background: #5a5a6a;
       border-radius: 50%;
-      top: 5px;
+      top: 8px;
     }
 
-    .baloo-ear.left { left: 18px; }
-    .baloo-ear.right { right: 18px; }
+    .baloo-3d .ear.left { left: 22px; }
+    .baloo-3d .ear.right { right: 22px; }
 
-    .baloo-snout {
+    .baloo-3d .snout {
       position: absolute;
-      width: 40px;
-      height: 30px;
+      width: 50px;
+      height: 38px;
       background: #9a9aaa;
       border-radius: 50%;
-      bottom: 28px;
-      left: 35px;
+      bottom: 32px;
+      left: 40px;
     }
 
-    .baloo-nose {
+    .baloo-3d .nose {
       position: absolute;
-      width: 18px;
-      height: 12px;
+      width: 22px;
+      height: 15px;
       background: #2a2a3a;
       border-radius: 50%;
-      bottom: 48px;
-      left: 46px;
+      bottom: 58px;
+      left: 54px;
     }
 
     /* Wolves */
-    .wolf-pack {
+    .wolves-3d {
       display: flex;
-      gap: 20px;
+      gap: 25px;
     }
 
-    .wolf {
+    .wolf-3d {
       position: relative;
-      width: 70px;
-      height: 60px;
+      width: 80px;
+      height: 70px;
     }
 
-    .wolf-body {
+    .wolf-3d .body {
       position: absolute;
-      width: 55px;
-      height: 40px;
+      width: 65px;
+      height: 48px;
       background: linear-gradient(to bottom, #6a6a7a, #5a5a6a);
-      border-radius: 28px 28px 18px 18px;
+      border-radius: 32px 32px 22px 22px;
       bottom: 0;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     }
 
-    .wolf-head {
+    .wolf-3d .head {
       position: absolute;
-      width: 35px;
-      height: 30px;
+      width: 42px;
+      height: 38px;
       background: #6a6a7a;
-      border-radius: 18px 18px 12px 12px;
-      top: 8px;
+      border-radius: 22px 22px 15px 15px;
+      top: 10px;
       left: 0;
     }
 
-    .wolf-ear {
+    .wolf-3d .ear {
       position: absolute;
-      width: 12px;
-      height: 18px;
+      width: 15px;
+      height: 22px;
       background: #6a6a7a;
       clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-      top: -12px;
+      top: -15px;
     }
 
-    .wolf-ear.left { left: 6px; }
-    .wolf-ear.right { left: 18px; }
+    .wolf-3d .ear.left { left: 8px; }
+    .wolf-3d .ear.right { left: 22px; }
 
-    .wolf-eye {
+    .wolf-3d .eye {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #aaffaa;
+      border-radius: 50%;
+      top: 12px;
+      left: 14px;
+      box-shadow: 0 0 15px #aaffaa;
+      animation: wolfGlow 1.5s infinite;
+    }
+
+    @keyframes wolfGlow {
+      0%, 100% { box-shadow: 0 0 15px #aaffaa; }
+      50% { box-shadow: 0 0 30px #aaffaa, 0 0 45px #88ff88; }
+    }
+
+    /* MONKEY HANDS (First Person) */
+    .monkey-hands {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 45%;
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    .monkey-hand {
+      position: absolute;
+      bottom: -20px;
+      width: 120px;
+      height: 180px;
+      z-index: 31;
+    }
+
+    .monkey-hand.left {
+      left: 5%;
+      transform: rotate(15deg);
+    }
+
+    .monkey-hand.right {
+      right: 5%;
+      transform: rotate(-15deg) scaleX(-1);
+    }
+
+    /* Hand/Arm */
+    .hand-arm {
+      position: absolute;
+      bottom: 0;
+      width: 55px;
+      height: 140px;
+      background: linear-gradient(90deg, #a83c22, #c84c32, #a83c22);
+      border-radius: 28px 28px 25px 25px;
+      box-shadow: inset -8px 0 20px rgba(0,0,0,0.3);
+    }
+
+    .hand-palm {
+      position: absolute;
+      top: -30px;
+      left: -15px;
+      width: 85px;
+      height: 75px;
+      background: radial-gradient(ellipse at 50% 60%, #c84c32, #a83c22);
+      border-radius: 50% 50% 45% 45%;
+      box-shadow: inset -5px 0 15px rgba(0,0,0,0.2);
+    }
+
+    .hand-palm-inner {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      width: 55px;
+      height: 50px;
+      background: #e8a090;
+      border-radius: 50%;
+    }
+
+    .finger {
+      position: absolute;
+      background: linear-gradient(90deg, #a83c22, #c84c32, #a83c22);
+      border-radius: 12px;
+    }
+
+    .finger-1 { width: 22px; height: 50px; top: -65px; left: 5px; transform: rotate(15deg); }
+    .finger-2 { width: 22px; height: 60px; top: -75px; left: 25px; transform: rotate(5deg); }
+    .finger-3 { width: 22px; height: 58px; top: -72px; left: 45px; transform: rotate(-5deg); }
+    .finger-4 { width: 20px; height: 45px; top: -58px; left: 63px; transform: rotate(-15deg); }
+    .thumb { width: 24px; height: 40px; top: 5px; left: -18px; transform: rotate(40deg); }
+
+    /* Hand animations */
+    .monkey-hand.left.swing-left {
+      animation: leftHandGrab 0.6s ease-out;
+    }
+
+    .monkey-hand.right.swing-right {
+      animation: rightHandGrab 0.6s ease-out;
+    }
+
+    .monkey-hand.left.swing-forward,
+    .monkey-hand.right.swing-forward {
+      animation: handsReachUp 0.6s ease-out;
+    }
+
+    @keyframes leftHandGrab {
+      0% { transform: rotate(15deg) translateY(0); }
+      30% { transform: rotate(-10deg) translateY(-80px) translateX(30px); }
+      60% { transform: rotate(5deg) translateY(-50px) translateX(15px); }
+      100% { transform: rotate(15deg) translateY(0); }
+    }
+
+    @keyframes rightHandGrab {
+      0% { transform: rotate(-15deg) scaleX(-1) translateY(0); }
+      30% { transform: rotate(10deg) scaleX(-1) translateY(-80px) translateX(-30px); }
+      60% { transform: rotate(-5deg) scaleX(-1) translateY(-50px) translateX(-15px); }
+      100% { transform: rotate(-15deg) scaleX(-1) translateY(0); }
+    }
+
+    @keyframes handsReachUp {
+      0% { transform: rotate(15deg) translateY(0); }
+      40% { transform: rotate(-5deg) translateY(-100px) scale(0.8); }
+      70% { transform: rotate(5deg) translateY(-60px) scale(0.9); }
+      100% { transform: rotate(15deg) translateY(0); }
+    }
+
+    /* Screen shake */
+    #viewport.shake {
+      animation: viewportShake 0.4s ease-out;
+    }
+
+    @keyframes viewportShake {
+      0%, 100% { transform: translate(0, 0); }
+      20% { transform: translate(-8px, 5px); }
+      40% { transform: translate(8px, -5px); }
+      60% { transform: translate(-5px, 8px); }
+      80% { transform: translate(5px, -8px); }
+    }
+
+    /* Damage overlay */
+    .damage-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse, transparent 40%, rgba(180,0,0,0.6) 100%);
+      z-index: 35;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.1s;
+    }
+
+    .damage-overlay.active {
+      opacity: 1;
+      animation: damageFlash 0.4s ease-out;
+    }
+
+    @keyframes damageFlash {
+      0% { opacity: 0.8; }
+      100% { opacity: 0; }
+    }
+
+    /* ==================== DOOM-STYLE HUD ==================== */
+    .hud {
+      height: 90px;
+      background: linear-gradient(to bottom, #4a3a2a, #2a1a0a);
+      border-top: 4px solid #6a5a4a;
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      position: relative;
+      box-shadow: inset 0 5px 20px rgba(0,0,0,0.5);
+    }
+
+    .hud-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 15px;
+      min-width: 100px;
+    }
+
+    .hud-section.left {
+      background: linear-gradient(to bottom, #3a2a1a, #1a0a00);
+      border-right: 3px solid #5a4a3a;
+    }
+
+    .hud-section.right {
+      background: linear-gradient(to bottom, #3a2a1a, #1a0a00);
+      border-left: 3px solid #5a4a3a;
+    }
+
+    .hud-value {
+      font-size: 1.8rem;
+      color: var(--hud-red);
+      text-shadow: 0 0 10px rgba(185,28,28,0.8);
+      line-height: 1;
+    }
+
+    .hud-value.health { color: #ff4444; }
+    .hud-value.bananas { color: #ffd700; text-shadow: 0 0 10px rgba(255,215,0,0.8); }
+    .hud-value.songs { color: #44ff44; text-shadow: 0 0 10px rgba(68,255,68,0.8); }
+    .hud-value.golden { color: #888; }
+    .hud-value.golden.yes { color: #ffd700; text-shadow: 0 0 15px rgba(255,215,0,1); animation: goldenHudPulse 1s infinite; }
+
+    @keyframes goldenHudPulse {
+      0%, 100% { text-shadow: 0 0 15px rgba(255,215,0,1); }
+      50% { text-shadow: 0 0 30px rgba(255,215,0,1), 0 0 45px rgba(255,180,0,0.8); }
+    }
+
+    .hud-label {
+      font-size: 0.5rem;
+      color: #aa9977;
+      margin-top: 5px;
+      text-transform: uppercase;
+    }
+
+    /* Monkey face in center */
+    .hud-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .monkey-face-hud {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(to bottom, #c84c32, #a83c22);
+      border-radius: 50%;
+      border: 4px solid #5a4a3a;
+      position: relative;
+      box-shadow: inset -5px -5px 15px rgba(0,0,0,0.4), 0 0 15px rgba(0,0,0,0.5);
+    }
+
+    .monkey-face-hud .ear {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background: #c84c32;
+      border-radius: 50%;
+      top: 5px;
+      border: 3px solid #5a4a3a;
+    }
+
+    .monkey-face-hud .ear.left { left: -12px; }
+    .monkey-face-hud .ear.right { right: -12px; }
+
+    .monkey-face-hud .ear-inner {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #e8a090;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+    }
+
+    .monkey-face-hud .eye {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      top: 18px;
+    }
+
+    .monkey-face-hud .eye.left { left: 12px; }
+    .monkey-face-hud .eye.right { right: 12px; }
+
+    .monkey-face-hud .eye::after {
+      content: '';
       position: absolute;
       width: 8px;
       height: 8px;
-      background: #aaffaa;
+      background: #222;
       border-radius: 50%;
-      top: 10px;
-      left: 10px;
-      box-shadow: 0 0 10px #aaffaa;
-      animation: wolfEyeGlow 2s infinite;
+      top: 3px;
+      left: 3px;
     }
 
-    @keyframes wolfEyeGlow {
-      0%, 100% { box-shadow: 0 0 10px #aaffaa; }
-      50% { box-shadow: 0 0 20px #aaffaa, 0 0 30px #88ff88; }
+    .monkey-face-hud .snout {
+      position: absolute;
+      width: 35px;
+      height: 25px;
+      background: #e8a090;
+      border-radius: 50%;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
-    /* Text Log */
-    #text-log {
-      height: 90px;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.8));
-      border: 2px solid var(--gold);
+    .monkey-face-hud .nose {
+      position: absolute;
+      width: 8px;
+      height: 6px;
+      background: #5a3020;
+      border-radius: 50%;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .monkey-face-hud .mouth {
+      position: absolute;
+      width: 20px;
+      height: 8px;
+      border: 3px solid #5a3020;
       border-top: none;
-      padding: 10px 15px;
-      overflow-y: auto;
-      font-size: 0.5rem;
-      line-height: 1.7;
-      flex-shrink: 0;
+      border-radius: 0 0 15px 15px;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
-    #text-log div {
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    /* Face states */
+    .monkey-face-hud.hurt .eye::after {
+      width: 10px;
+      height: 3px;
+      border-radius: 0;
+      top: 6px;
+      left: 2px;
     }
 
-    #text-log::-webkit-scrollbar { width: 6px; }
-    #text-log::-webkit-scrollbar-track { background: transparent; }
-    #text-log::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+    .monkey-face-hud.hurt .mouth {
+      width: 25px;
+      height: 15px;
+      background: #3a2020;
+      border: none;
+      border-radius: 50%;
+    }
 
-    /* Controls */
-    .controls {
+    /* Controls area */
+    .controls-area {
       display: flex;
       gap: 8px;
-      margin-top: 8px;
-      flex-shrink: 0;
+      padding: 8px;
+      background: #000;
     }
 
-    .controls button {
+    .controls-area button {
       flex: 1;
       font-family: 'Press Start 2P', cursive;
       background: linear-gradient(to bottom, #5a4a3a 0%, #3a2a1a 100%);
-      color: var(--cream);
-      border: 2px solid var(--gold);
-      padding: 14px 8px;
+      color: #ddd;
+      border: 3px solid #6a5a4a;
+      padding: 12px 8px;
       cursor: pointer;
       transition: all 0.15s;
-      font-size: 0.4rem;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      font-size: 0.45rem;
+      text-shadow: 1px 1px 2px #000;
     }
 
-    .controls button:hover {
+    .controls-area button:hover {
       background: linear-gradient(to bottom, var(--jade) 0%, #007a50 100%);
       transform: translateY(-2px);
       box-shadow: 0 4px 15px rgba(0,168,107,0.4);
     }
 
-    .controls button:active {
+    .controls-area button:active {
       transform: translateY(0);
     }
 
-    .controls button.quit-btn:hover {
+    .controls-area button.quit-btn:hover {
       background: linear-gradient(to bottom, var(--terracotta) 0%, #8a3020 100%);
-      box-shadow: 0 4px 15px rgba(200,76,50,0.4);
     }
+
+    /* Text log */
+    #text-log {
+      height: 60px;
+      background: rgba(0,0,0,0.9);
+      border-top: 2px solid #4a3a2a;
+      padding: 8px 12px;
+      overflow-y: auto;
+      font-size: 0.45rem;
+      color: #aa9;
+      line-height: 1.6;
+    }
+
+    #text-log::-webkit-scrollbar { width: 5px; }
+    #text-log::-webkit-scrollbar-track { background: transparent; }
+    #text-log::-webkit-scrollbar-thumb { background: #5a4a3a; border-radius: 3px; }
 
     /* Modal */
     #minigame-modal {
@@ -1041,23 +1065,24 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background: linear-gradient(to bottom, rgba(44,36,22,0.98), rgba(30,24,14,0.98));
-      border: 3px solid var(--gold);
+      border: 4px solid var(--gold);
       padding: 25px;
       z-index: 100;
       text-align: center;
       max-width: 85%;
-      box-shadow: 0 0 50px rgba(0,0,0,0.8);
+      box-shadow: 0 0 60px rgba(0,0,0,0.9);
     }
 
     #minigame-modal h3 {
       color: var(--gold);
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       margin-bottom: 15px;
-      text-shadow: 0 0 10px rgba(212,175,55,0.5);
+      text-shadow: 0 0 15px rgba(212,175,55,0.6);
     }
 
     #minigame-modal p {
       font-size: 0.5rem;
+      color: #ddd;
       margin-bottom: 18px;
       line-height: 1.8;
     }
@@ -1071,11 +1096,11 @@
     .minigame-options button {
       font-family: 'Press Start 2P', cursive;
       background: linear-gradient(to bottom, #3a3a4a, #2a2a3a);
-      color: var(--cream);
+      color: #ddd;
       border: 2px solid var(--jade);
       padding: 12px;
       cursor: pointer;
-      font-size: 0.38rem;
+      font-size: 0.4rem;
       transition: all 0.15s;
     }
 
@@ -1093,7 +1118,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.9);
+      background: rgba(0,0,0,0.92);
       z-index: 90;
       justify-content: center;
       align-items: center;
@@ -1101,9 +1126,9 @@
     }
 
     #game-overlay h2 {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       margin-bottom: 25px;
-      text-shadow: 0 0 30px currentColor;
+      text-shadow: 0 0 40px currentColor;
     }
 
     #game-overlay.victory h2 { color: var(--gold); }
@@ -1112,26 +1137,27 @@
     #game-overlay button {
       font-family: 'Press Start 2P', cursive;
       background: var(--jade);
-      color: var(--cream);
-      border: 3px solid var(--gold);
+      color: #fff;
+      border: 4px solid var(--gold);
       padding: 15px 35px;
       cursor: pointer;
-      font-size: 0.55rem;
+      font-size: 0.6rem;
       transition: all 0.15s;
     }
 
     #game-overlay button:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 30px rgba(0,168,107,0.6);
+      box-shadow: 0 0 35px rgba(0,168,107,0.7);
     }
 
     .back-link {
       display: block;
       text-align: center;
-      margin-top: 8px;
+      padding: 8px;
+      background: #000;
       color: var(--gold);
       text-decoration: none;
-      font-size: 0.45rem;
+      font-size: 0.4rem;
       opacity: 0.8;
       transition: opacity 0.2s;
     }
@@ -1139,175 +1165,197 @@
     .back-link:hover { opacity: 1; color: var(--turquoise); }
 
     @media (max-width: 600px) {
-      .hud { padding: 8px 12px; }
-      .hud-item { font-size: 0.4rem; }
-      .controls button { font-size: 0.32rem; padding: 12px 5px; }
-      #text-log { height: 70px; font-size: 0.4rem; }
-      .monkey-body-container { transform: scale(0.8); }
+      .hud { height: 75px; }
+      .hud-value { font-size: 1.3rem; }
+      .hud-label { font-size: 0.4rem; }
+      .monkey-face-hud { width: 55px; height: 55px; }
+      .controls-area button { font-size: 0.35rem; padding: 10px 5px; }
+      #text-log { height: 50px; font-size: 0.38rem; }
+      .monkey-hand { width: 90px; height: 140px; }
     }
   </style>
 </head>
 <body>
-  <div id="game-wrapper">
-    <div class="hud">
-      <div class="hud-item health">HEALTH:<span id="health">100</span></div>
-      <div class="hud-item bananas">BANANAS:<span id="bananas">0</span>/69</div>
-      <div class="hud-item">SONGS:<span id="songs">0</span></div>
-      <div class="hud-item golden">GOLDEN:<span id="golden">NO</span></div>
-    </div>
+  <div id="game-container">
+    <!-- 3D Viewport -->
+    <div id="viewport">
+      <!-- Environment -->
+      <div class="canopy"></div>
+      <div class="sun-rays"></div>
+      <div class="floor-3d" id="floor"></div>
+      <div class="wall-left"></div>
+      <div class="wall-right"></div>
+      <div class="tunnel" id="tunnel"></div>
 
-    <div id="game-viewport">
-      <div id="camera">
-        <!-- Sky -->
-        <div class="sky"></div>
-        <div class="sun-rays"></div>
-        <div class="fog"></div>
+      <!-- Trees -->
+      <div class="tree-trunk left-1" id="tree-l1"></div>
+      <div class="tree-trunk left-2" id="tree-l2"></div>
+      <div class="tree-trunk right-1" id="tree-r1"></div>
+      <div class="tree-trunk right-2" id="tree-r2"></div>
 
-        <!-- Parallax backgrounds -->
-        <div class="parallax-layer bg-far" id="bg-far">
-          <div class="tree-far" style="left: 5%;"><div class="canopy"></div><div class="trunk"></div></div>
-          <div class="tree-far" style="left: 15%;"><div class="canopy"></div><div class="trunk"></div></div>
-          <div class="tree-far" style="left: 28%;"><div class="canopy"></div><div class="trunk"></div></div>
-          <div class="tree-far" style="right: 28%;"><div class="canopy"></div><div class="trunk"></div></div>
-          <div class="tree-far" style="right: 15%;"><div class="canopy"></div><div class="trunk"></div></div>
-          <div class="tree-far" style="right: 5%;"><div class="canopy"></div><div class="trunk"></div></div>
-        </div>
+      <!-- Vines -->
+      <div class="hanging-vine vine-l1"></div>
+      <div class="hanging-vine vine-l2"></div>
+      <div class="hanging-vine vine-r1"></div>
+      <div class="hanging-vine vine-r2"></div>
+      <div class="hanging-vine vine-center"></div>
+      <div class="grabbed-vine" id="grabbed-vine"></div>
 
-        <div class="parallax-layer bg-mid" id="bg-mid">
-          <div class="tree-mid" style="left: 3%;"><div class="canopy"></div><div class="trunk"></div></div>
-          <div class="tree-mid" style="left: 18%;"><div class="canopy"></div><div class="trunk"></div></div>
-          <div class="tree-mid" style="right: 18%;"><div class="canopy"></div><div class="trunk"></div></div>
-          <div class="tree-mid" style="right: 3%;"><div class="canopy"></div><div class="trunk"></div></div>
-        </div>
-
-        <div class="parallax-layer bg-near" id="bg-near">
-          <div class="tree-near" style="left: -2%;"><div class="canopy"></div><div class="trunk"></div></div>
-          <div class="tree-near" style="left: 12%;"><div class="canopy"></div><div class="trunk"></div></div>
-          <div class="tree-near" style="right: 12%;"><div class="canopy"></div><div class="trunk"></div></div>
-          <div class="tree-near" style="right: -2%;"><div class="canopy"></div><div class="trunk"></div></div>
-        </div>
-
-        <!-- Ground and path -->
-        <div class="ground"></div>
-        <div class="path" id="path"></div>
-
-        <!-- Vines -->
-        <div class="vines-container">
-          <div class="vine vine-1"></div>
-          <div class="vine vine-2"></div>
-          <div class="vine vine-3"></div>
-          <div class="vine vine-4"></div>
-          <div class="vine vine-5"></div>
-          <div class="vine vine-6"></div>
-        </div>
-
-        <!-- Events -->
-        <div id="snake-event" class="event-3d">
-          <div class="snake-body">
-            <div class="snake-head">
-              <div class="snake-eye"></div>
-              <div class="snake-tongue"></div>
-            </div>
+      <!-- Event Objects -->
+      <div id="snake-obj" class="event-object">
+        <div class="snake-3d">
+          <div class="body"></div>
+          <div class="head">
+            <div class="eye"></div>
+            <div class="tongue"></div>
           </div>
         </div>
+      </div>
 
-        <div id="banana-event" class="event-3d">
-          <div class="banana-tree">
-            <div class="banana-leaves">
-              <div class="banana-leaf"></div>
-              <div class="banana-leaf"></div>
-              <div class="banana-leaf"></div>
-              <div class="banana-leaf"></div>
-              <div class="banana-leaf"></div>
-            </div>
-            <div class="banana-bunch">
-              <div class="banana-fruit"></div>
-              <div class="banana-fruit"></div>
-              <div class="banana-fruit"></div>
-            </div>
-            <div class="banana-trunk"></div>
+      <div id="banana-obj" class="event-object">
+        <div class="banana-tree-3d">
+          <div class="leaves">
+            <div class="leaf"></div>
+            <div class="leaf"></div>
+            <div class="leaf"></div>
+            <div class="leaf"></div>
+            <div class="leaf"></div>
+          </div>
+          <div class="bunch">
+            <div class="banana"></div>
+            <div class="banana"></div>
+            <div class="banana"></div>
+          </div>
+          <div class="trunk"></div>
+        </div>
+      </div>
+
+      <div id="pit-obj" class="event-object">
+        <div class="mud-pit-3d">
+          <div class="bubble"></div>
+          <div class="bubble"></div>
+          <div class="bubble"></div>
+        </div>
+      </div>
+
+      <div id="golden-obj" class="event-object">
+        <div class="golden-banana-3d"></div>
+      </div>
+
+      <div id="kaa-obj" class="event-object">
+        <div class="kaa-3d">
+          <div class="body"></div>
+          <div class="head">
+            <div class="eye"></div>
           </div>
         </div>
+      </div>
 
-        <div id="pit-event" class="event-3d">
-          <div class="mud-pit">
-            <div class="mud-bubble"></div>
-            <div class="mud-bubble"></div>
-            <div class="mud-bubble"></div>
+      <div id="baloo-obj" class="event-object">
+        <div class="baloo-3d">
+          <div class="body"></div>
+          <div class="belly"></div>
+          <div class="head">
+            <div class="ear left"></div>
+            <div class="ear right"></div>
+            <div class="snout"></div>
+            <div class="nose"></div>
           </div>
         </div>
+      </div>
 
-        <div id="golden-event" class="event-3d">
-          <div class="golden-banana"></div>
+      <div id="wolves-obj" class="event-object">
+        <div class="wolves-3d">
+          <div class="wolf-3d"><div class="body"></div><div class="head"><div class="ear left"></div><div class="ear right"></div><div class="eye"></div></div></div>
+          <div class="wolf-3d"><div class="body"></div><div class="head"><div class="ear left"></div><div class="ear right"></div><div class="eye"></div></div></div>
+          <div class="wolf-3d"><div class="body"></div><div class="head"><div class="ear left"></div><div class="ear right"></div><div class="eye"></div></div></div>
         </div>
+      </div>
 
-        <div id="kaa-event" class="event-3d">
-          <div class="kaa-snake">
-            <div class="kaa-body"></div>
-            <div class="kaa-head">
-              <div class="kaa-eye"></div>
-            </div>
+      <!-- Monkey Hands -->
+      <div class="monkey-hands">
+        <div class="monkey-hand left" id="hand-left">
+          <div class="hand-arm"></div>
+          <div class="hand-palm">
+            <div class="hand-palm-inner"></div>
           </div>
+          <div class="finger finger-1"></div>
+          <div class="finger finger-2"></div>
+          <div class="finger finger-3"></div>
+          <div class="finger finger-4"></div>
+          <div class="finger thumb"></div>
         </div>
-
-        <div id="baloo-event" class="event-3d">
-          <div class="baloo">
-            <div class="baloo-body"></div>
-            <div class="baloo-belly"></div>
-            <div class="baloo-head">
-              <div class="baloo-ear left"></div>
-              <div class="baloo-ear right"></div>
-              <div class="baloo-snout"></div>
-              <div class="baloo-nose"></div>
-            </div>
+        <div class="monkey-hand right" id="hand-right">
+          <div class="hand-arm"></div>
+          <div class="hand-palm">
+            <div class="hand-palm-inner"></div>
           </div>
+          <div class="finger finger-1"></div>
+          <div class="finger finger-2"></div>
+          <div class="finger finger-3"></div>
+          <div class="finger finger-4"></div>
+          <div class="finger thumb"></div>
         </div>
+      </div>
 
-        <div id="wolves-event" class="event-3d">
-          <div class="wolf-pack">
-            <div class="wolf"><div class="wolf-body"></div><div class="wolf-head"><div class="wolf-ear left"></div><div class="wolf-ear right"></div><div class="wolf-eye"></div></div></div>
-            <div class="wolf"><div class="wolf-body"></div><div class="wolf-head"><div class="wolf-ear left"></div><div class="wolf-ear right"></div><div class="wolf-eye"></div></div></div>
-            <div class="wolf"><div class="wolf-body"></div><div class="wolf-head"><div class="wolf-ear left"></div><div class="wolf-ear right"></div><div class="wolf-eye"></div></div></div>
-          </div>
-        </div>
+      <!-- Damage overlay -->
+      <div class="damage-overlay" id="damage-overlay"></div>
 
-        <!-- Monkey -->
-        <div id="monkey">
-          <div class="monkey-body-container">
-            <div class="monkey-head">
-              <div class="monkey-ear left"><div class="monkey-ear-inner"></div></div>
-              <div class="monkey-ear right"><div class="monkey-ear-inner"></div></div>
-            </div>
-            <div class="monkey-arm left"><div class="monkey-hand"></div></div>
-            <div class="monkey-arm right"><div class="monkey-hand"></div></div>
-            <div class="monkey-body"></div>
-            <div class="monkey-tail"></div>
-          </div>
+      <!-- Modal -->
+      <div id="minigame-modal">
+        <h3>GOLDEN BANANA CHALLENGE!</h3>
+        <p>Riddle: What can you catch but not throw?</p>
+        <div class="minigame-options">
+          <button onclick="game.answerRiddle('A')">A: A ball</button>
+          <button onclick="game.answerRiddle('B')">B: A cold</button>
+          <button onclick="game.answerRiddle('C')">C: A fish</button>
+          <button onclick="game.answerRiddle('D')">D: A shadow</button>
         </div>
+      </div>
 
-        <!-- Modal -->
-        <div id="minigame-modal">
-          <h3>GOLDEN BANANA CHALLENGE!</h3>
-          <p>Riddle: What can you catch but not throw?</p>
-          <div class="minigame-options">
-            <button onclick="game.answerRiddle('A')">A: A ball</button>
-            <button onclick="game.answerRiddle('B')">B: A cold</button>
-            <button onclick="game.answerRiddle('C')">C: A fish</button>
-            <button onclick="game.answerRiddle('D')">D: A shadow</button>
-          </div>
-        </div>
-
-        <!-- Overlay -->
-        <div id="game-overlay">
-          <h2 id="overlay-title"></h2>
-          <button onclick="game.restart()">PLAY AGAIN</button>
-        </div>
+      <!-- Overlay -->
+      <div id="game-overlay">
+        <h2 id="overlay-title"></h2>
+        <button onclick="game.restart()">PLAY AGAIN</button>
       </div>
     </div>
 
+    <!-- DOOM-style HUD -->
+    <div class="hud">
+      <div class="hud-section left">
+        <div class="hud-value health" id="health-val">100</div>
+        <div class="hud-label">Health</div>
+      </div>
+      <div class="hud-section left">
+        <div class="hud-value bananas" id="bananas-val">0</div>
+        <div class="hud-label">Bananas</div>
+      </div>
+      <div class="hud-center">
+        <div class="monkey-face-hud" id="monkey-face">
+          <div class="ear left"><div class="ear-inner"></div></div>
+          <div class="ear right"><div class="ear-inner"></div></div>
+          <div class="eye left"></div>
+          <div class="eye right"></div>
+          <div class="snout"></div>
+          <div class="nose"></div>
+          <div class="mouth"></div>
+        </div>
+      </div>
+      <div class="hud-section right">
+        <div class="hud-value songs" id="songs-val">0</div>
+        <div class="hud-label">Songs</div>
+      </div>
+      <div class="hud-section right">
+        <div class="hud-value golden" id="golden-val">NO</div>
+        <div class="hud-label">Golden</div>
+      </div>
+    </div>
+
+    <!-- Text Log -->
     <div id="text-log"></div>
 
-    <div class="controls">
+    <!-- Controls -->
+    <div class="controls-area">
       <button onclick="game.swing('left')">SWING LEFT</button>
       <button onclick="game.swing('straight')">FORWARD</button>
       <button onclick="game.swing('right')">SWING RIGHT</button>
@@ -1343,16 +1391,16 @@
         this.updateUI();
         this.hideAllEvents();
         this.log("Welcome to SWINGER MONKEY!");
-        this.log("Collect 69 bananas + the Golden Banana to save the jungle!");
+        this.log("Collect 69 bananas + the Golden Banana to win!");
       }
 
       setupKeyboard() {
         document.addEventListener('keydown', (e) => {
           if (this.gameOver || this.isAnimating) return;
           const key = e.key.toLowerCase();
-          if (key === 'l' || key === 'arrowleft') this.swing('left');
-          else if (key === 's' || key === 'arrowup') this.swing('straight');
-          else if (key === 'r' || key === 'arrowright') this.swing('right');
+          if (key === 'a' || key === 'arrowleft') this.swing('left');
+          else if (key === 'w' || key === 'arrowup') this.swing('straight');
+          else if (key === 'd' || key === 'arrowright') this.swing('right');
           else if (key === 'u' && this.canClimbUp) this.swing('up');
           else if (key === 'q' || key === 'escape') this.quit();
         });
@@ -1365,17 +1413,17 @@
       }
 
       updateUI() {
-        document.getElementById('health').textContent = this.health;
-        document.getElementById('bananas').textContent = this.bananas;
-        document.getElementById('songs').textContent = this.jungleSongs;
-        const goldenEl = document.getElementById('golden');
+        document.getElementById('health-val').textContent = this.health;
+        document.getElementById('bananas-val').textContent = this.bananas;
+        document.getElementById('songs-val').textContent = this.jungleSongs;
+        const goldenEl = document.getElementById('golden-val');
         goldenEl.textContent = this.hasGoldenBanana ? 'YES' : 'NO';
-        goldenEl.className = this.hasGoldenBanana ? 'yes' : '';
+        goldenEl.className = 'hud-value golden' + (this.hasGoldenBanana ? ' yes' : '');
         document.getElementById('climb-btn').style.display = this.canClimbUp ? 'block' : 'none';
       }
 
       hideAllEvents() {
-        document.querySelectorAll('.event-3d').forEach(el => el.classList.remove('visible'));
+        document.querySelectorAll('.event-object').forEach(el => el.classList.remove('visible'));
       }
 
       showEvent(eventId) {
@@ -1384,68 +1432,70 @@
         if (el) el.classList.add('visible');
       }
 
-      animateScene(direction) {
+      animateSwing(direction) {
         return new Promise(resolve => {
           this.isAnimating = true;
 
-          const camera = document.getElementById('camera');
-          const monkey = document.getElementById('monkey');
-          const leftArm = document.querySelector('.monkey-arm.left');
-          const rightArm = document.querySelector('.monkey-arm.right');
-          const bgFar = document.getElementById('bg-far');
-          const bgMid = document.getElementById('bg-mid');
-          const bgNear = document.getElementById('bg-near');
-          const path = document.getElementById('path');
+          const leftHand = document.getElementById('hand-left');
+          const rightHand = document.getElementById('hand-right');
+          const floor = document.getElementById('floor');
+          const tunnel = document.getElementById('tunnel');
+          const grabbedVine = document.getElementById('grabbed-vine');
+          const trees = ['tree-l1', 'tree-l2', 'tree-r1', 'tree-r2'].map(id => document.getElementById(id));
 
-          // Reset classes
-          camera.classList.remove('swing-left', 'swing-right', 'swing-forward', 'shake');
-          monkey.classList.remove('swing-left', 'swing-right', 'swing-forward');
-          leftArm.classList.remove('reaching-left', 'reaching-right', 'reaching-up');
-          rightArm.classList.remove('reaching-left', 'reaching-right', 'reaching-up');
-          bgFar.classList.remove('scrolling');
-          bgMid.classList.remove('scrolling');
-          bgNear.classList.remove('scrolling');
-          path.classList.remove('scrolling');
+          // Reset animations
+          leftHand.classList.remove('swing-left', 'swing-right', 'swing-forward');
+          rightHand.classList.remove('swing-left', 'swing-right', 'swing-forward');
+          floor.classList.remove('moving');
+          tunnel.classList.remove('zooming');
+          grabbedVine.classList.remove('visible');
+          trees.forEach(t => t.classList.remove('moving'));
 
-          // Force reflow
-          void camera.offsetWidth;
+          void leftHand.offsetWidth; // Force reflow
 
-          // Apply animations based on direction
+          // Apply direction-specific animations
           if (direction === 'left') {
-            camera.classList.add('swing-left');
-            monkey.classList.add('swing-left');
-            leftArm.classList.add('reaching-left');
-            rightArm.classList.add('reaching-left');
+            leftHand.classList.add('swing-left');
+            grabbedVine.classList.add('visible');
           } else if (direction === 'right') {
-            camera.classList.add('swing-right');
-            monkey.classList.add('swing-right');
-            leftArm.classList.add('reaching-right');
-            rightArm.classList.add('reaching-right');
+            rightHand.classList.add('swing-right');
+            grabbedVine.classList.add('visible');
           } else {
-            camera.classList.add('swing-forward');
-            monkey.classList.add('swing-forward');
-            leftArm.classList.add('reaching-up');
-            rightArm.classList.add('reaching-up');
+            leftHand.classList.add('swing-forward');
+            rightHand.classList.add('swing-forward');
+            grabbedVine.classList.add('visible');
           }
 
-          // Parallax scrolling
-          bgFar.classList.add('scrolling');
-          bgMid.classList.add('scrolling');
-          bgNear.classList.add('scrolling');
-          path.classList.add('scrolling');
+          // Environment animations
+          floor.classList.add('moving');
+          tunnel.classList.add('zooming');
+          trees.forEach(t => t.classList.add('moving'));
 
           setTimeout(() => {
             this.isAnimating = false;
             resolve();
-          }, 700);
+          }, 600);
         });
       }
 
-      shakeCamera() {
-        const camera = document.getElementById('camera');
-        camera.classList.remove('shake');
-        void camera.offsetWidth;
-        camera.classList.add('shake');
+      showDamage() {
+        const overlay = document.getElementById('damage-overlay');
+        const viewport = document.getElementById('viewport');
+        const face = document.getElementById('monkey-face');
+
+        overlay.classList.remove('active');
+        viewport.classList.remove('shake');
+        face.classList.remove('hurt');
+
+        void overlay.offsetWidth;
+
+        overlay.classList.add('active');
+        viewport.classList.add('shake');
+        face.classList.add('hurt');
+
+        setTimeout(() => {
+          face.classList.remove('hurt');
+        }, 500);
       }
 
       async swing(direction) {
@@ -1454,7 +1504,7 @@
         this.canClimbUp = false;
         this.updateUI();
 
-        await this.animateScene(direction);
+        await this.animateSwing(direction);
 
         const dirText = direction === 'straight' ? 'FORWARD' : direction.toUpperCase();
         this.log(`Swinging ${dirText}...`);
@@ -1463,43 +1513,43 @@
 
         switch(event) {
           case 'snake':
-            this.showEvent('snake-event');
+            this.showEvent('snake-obj');
             if (this.jungleSongs > 0) {
               this.jungleSongs--;
               this.log("SNAKE! Your jungle song scares it away!");
             } else {
               const damage = Math.floor(Math.random() * 16) + 10;
               this.health -= damage;
-              this.shakeCamera();
+              this.showDamage();
               this.log(`SNAKE BITE! -${damage} health!`);
             }
             break;
 
           case 'banana_tree':
-            this.showEvent('banana-event');
+            this.showEvent('banana-obj');
             const reward = Math.floor(Math.random() * 5) + 1;
             this.bananas += reward;
             this.log(`Banana tree! +${reward} bananas!`);
             break;
 
           case 'banana_stash':
-            this.showEvent('banana-event');
+            this.showEvent('banana-obj');
             const stash = Math.floor(Math.random() * 11) + 5;
             this.bananas += stash;
             this.log(`Hidden stash! +${stash} bananas!`);
             break;
 
           case 'muddy_pit':
-            this.showEvent('pit-event');
+            this.showEvent('pit-obj');
             const pitDmg = Math.floor(Math.random() * 11) + 5;
             this.health -= pitDmg;
-            this.shakeCamera();
+            this.showDamage();
             this.log(`Fell in mud! -${pitDmg} health!`);
             break;
 
           case 'golden_banana':
             if (!this.hasGoldenBanana) {
-              this.showEvent('golden-event');
+              this.showEvent('golden-obj');
               this.log("THE GOLDEN BANANA! Answer the riddle!");
               document.getElementById('minigame-modal').style.display = 'block';
               return;
@@ -1513,17 +1563,17 @@
             const friend = friends[Math.floor(Math.random() * friends.length)];
 
             if (friend === 'kaa') {
-              this.showEvent('kaa-event');
+              this.showEvent('kaa-obj');
               this.log("KAA! Shows you how to climb higher!");
               this.canClimbUp = true;
             } else if (friend === 'baloo') {
-              this.showEvent('baloo-event');
+              this.showEvent('baloo-obj');
               this.jungleSongs++;
-              this.log("BALOO! Teaches you a jungle song! +1 Song");
+              this.log("BALOO teaches you a jungle song! +1 Song");
             } else {
-              this.showEvent('wolves-event');
+              this.showEvent('wolves-obj');
               this.health = Math.min(100, this.health + 15);
-              this.log("WOLF PACK! They protect you! +15 health!");
+              this.log("WOLF PACK protects you! +15 health!");
             }
             break;
 
@@ -1544,7 +1594,7 @@
           this.bananas += 20;
           this.log("CORRECT! The Golden Banana is yours! +20 bananas!");
         } else {
-          this.log("Wrong! The Golden Banana vanishes into the mist...");
+          this.log("Wrong! The Golden Banana vanishes...");
         }
 
         this.hideAllEvents();
