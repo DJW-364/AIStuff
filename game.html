@@ -660,9 +660,9 @@
         this.scene.add(vine);
         this.vines.push(vine);
 
-        // Maybe add banana near this vine
+        // Maybe add banana near this vine - at monkey's swinging level
         if (Math.random() > 0.3) {
-          this.createBanana(xOffset + (Math.random() - 0.5) * 4, 8 + Math.random() * 6, z);
+          this.createBanana(xOffset + (Math.random() - 0.5) * 6, 5 + Math.random() * 3, z);
         }
 
         return vine;
@@ -867,8 +867,8 @@
           state.swingVelocity *= damping;
           state.swingAngle += state.swingVelocity * dt;
 
-          // Clamp swing angle
-          const maxAngle = Math.PI * 0.6;
+          // Clamp swing angle - allow wider swings
+          const maxAngle = Math.PI * 0.85;
           if (Math.abs(state.swingAngle) > maxAngle) {
             state.swingAngle = Math.sign(state.swingAngle) * maxAngle;
             state.swingVelocity *= -0.5;
@@ -879,8 +879,8 @@
           const vineX = vine.position.x;
           const vineZ = vine.position.z;
 
-          // Monkey swings side to side while holding the vine
-          const swingOffset = Math.sin(state.swingAngle) * 1.5;
+          // Monkey swings side to side while holding the vine - wider swing
+          const swingOffset = Math.sin(state.swingAngle) * 4;
 
           this.monkey.position.set(
             vineX + swingOffset,
@@ -888,8 +888,8 @@
             vineZ + 0.8 // Slightly in front of vine
           );
 
-          // Rotate monkey to match swing
-          this.monkey.rotation.z = state.swingAngle * 0.5;
+          // Rotate monkey to match swing - more dramatic rotation
+          this.monkey.rotation.z = state.swingAngle * 0.7;
           this.monkey.rotation.x = 0;
 
         } else if (state.phase === 'flying' || state.phase === 'falling') {
