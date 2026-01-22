@@ -933,19 +933,26 @@
             state.swingVelocity *= -0.5;
           }
 
-          // Position monkey ON the vine - body hugging the vine
+          // Position monkey ON the vine - follows vine swing
           const vine = state.currentVine;
           const vineX = vine.position.x;
           const vineZ = vine.position.z;
+          const vineTopY = vine.position.y; // Anchor point at top
+          const distToGrab = vineTopY - state.vineGrabPoint.y; // Distance from top to grab point
 
-          // Monkey hangs from vine and swings - positioned AT the vine
+          // Calculate where grab point is based on vine rotation
+          const vineAngle = state.swingAngle * 0.6; // Vine rotation
+          const grabOffsetX = Math.sin(vineAngle) * distToGrab;
+          const grabOffsetY = Math.cos(vineAngle) * distToGrab;
+
+          // Monkey position follows the swinging vine
           this.monkey.position.set(
-            vineX, // Directly on vine X
-            state.vineGrabPoint.y - 1.2, // Hands at grab point, body below
-            vineZ + 0.5 // Slightly in front of vine
+            vineX + grabOffsetX,
+            vineTopY - grabOffsetY - 1.2, // Hang below grab point
+            vineZ + 0.5
           );
 
-          // Swing body side to side
+          // Swing body to match vine angle
           this.monkey.rotation.z = state.swingAngle * 0.8;
           this.monkey.rotation.x = 0;
 
@@ -1013,15 +1020,19 @@
           this.monkey.position.z - 10
         );
 
-        // Update vines - sway ungrabbed ones
+        // Update vines - sway all vines
         this.vines.forEach(vine => {
           if (!vine.userData.grabbed) {
+            // Idle sway for ungrabbed vines
             vine.rotation.z = Math.sin(Date.now() * 0.001 + vine.userData.swingPhase) * 0.08;
             vine.userData.grabIndicator.visible = true;
 
             // Pulse grab indicator
             const scale = 1 + Math.sin(Date.now() * 0.005) * 0.2;
             vine.userData.grabIndicator.scale.setScalar(scale);
+          } else if (vine === state.currentVine) {
+            // Grabbed vine swings with the monkey!
+            vine.rotation.z = state.swingAngle * 0.6;
           }
 
           // Remove vines far behind
@@ -1164,6 +1175,51 @@
           this.createVine(z);
           z -= 5 + Math.random() * 6;
         }
+
+        // Reset environment positions (trees, bushes, canopy, etc.)
+        this.trees.forEach((tree, i) => {
+          const side = Math.random() > 0.5 ? 1 : -1;
+          tree.position.set(
+            side * (12 + Math.random() * 15),
+            -10,
+            -50 + Math.random() * 150
+          );
+        });
+
+        if (this.groundDetails) {
+          this.groundDetails.forEach(detail => {
+            const side = Math.random() > 0.5 ? 1 : -1;
+            detail.position.z = -50 + Math.random() * 150;
+          });
+        }
+
+        if (this.canopy) {
+          this.canopy.forEach(leaf => {
+            leaf.position.z = -60 + Math.random() * 100;
+            leaf.position.x = (Math.random() - 0.5) * 60;
+          });
+        }
+
+        if (this.butterflies) {
+          this.butterflies.forEach(b => {
+            b.userData.basePos.set(
+              (Math.random() - 0.5) * 25,
+              4 + Math.random() * 10,
+              (Math.random() - 0.5) * 40
+            );
+            b.position.copy(b.userData.basePos);
+          });
+        }
+
+        this.particles.forEach(p => {
+          p.position.set(
+            (Math.random() - 0.5) * 40,
+            5 + Math.random() * 12,
+            (Math.random() - 0.5) * 60
+          );
+          p.userData.baseY = p.position.y;
+          p.userData.baseX = p.position.x;
+        });
 
         // Reset state
         this.state = {

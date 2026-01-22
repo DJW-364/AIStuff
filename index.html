@@ -399,79 +399,107 @@
       top: 0;
     }
 
-    /* Chain monkey - barrel of monkeys style */
+    /* Chain monkey - barrel of monkeys style - cohesive design */
     .chain-monkey {
       position: relative;
-      width: 50px;
-      height: 40px;
+      width: 44px;
+      height: 38px;
       flex-shrink: 0;
     }
 
-    /* Monkey body - rounder, cleaner */
+    /* Monkey body - oval torso */
     .chain-monkey::before {
       content: '';
       position: absolute;
-      top: 14px;
-      left: 17px;
-      width: 16px;
-      height: 18px;
+      top: 12px;
+      left: 15px;
+      width: 14px;
+      height: 16px;
       background: var(--terracotta);
-      border-radius: 50% 50% 40% 40%;
-      box-shadow: inset -2px -2px 0 rgba(0,0,0,0.15);
+      border-radius: 50%;
     }
 
-    /* Monkey head - with face detail */
+    /* Monkey head - connected to body */
     .chain-monkey::after {
       content: '';
       position: absolute;
-      top: 4px;
-      left: 18px;
-      width: 14px;
-      height: 12px;
+      top: 3px;
+      left: 14px;
+      width: 16px;
+      height: 14px;
       background: var(--terracotta);
       border-radius: 50%;
-      box-shadow:
-        inset 3px 0 0 2px var(--cream),
-        inset -1px -1px 0 rgba(0,0,0,0.1);
+      /* Face - cream colored muzzle area */
+      box-shadow: inset 0 2px 0 3px var(--cream);
     }
 
-    /* Left arm (hook shape reaching up) */
+    /* Left arm - connected at shoulder, curves up to hook */
     .monkey-arm-left {
       position: absolute;
-      top: 4px;
-      left: 2px;
-      width: 16px;
-      height: 12px;
+      top: 0px;
+      left: 0px;
+      width: 12px;
+      height: 16px;
       border: 4px solid var(--terracotta);
       border-bottom: none;
-      border-radius: 12px 12px 0 0;
+      border-left: none;
+      border-radius: 0 14px 0 0;
       background: transparent;
     }
 
-    /* Right arm (hook shape reaching down) */
+    /* Left hand/hook */
+    .monkey-arm-left::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -6px;
+      width: 8px;
+      height: 8px;
+      border: 4px solid var(--terracotta);
+      border-bottom: none;
+      border-right: none;
+      border-radius: 8px 0 0 0;
+    }
+
+    /* Right arm - goes down to hook onto next monkey */
     .monkey-arm-right {
       position: absolute;
-      top: 22px;
-      right: 2px;
-      width: 16px;
-      height: 12px;
-      border: 4px solid var(--terracotta);
-      border-top: none;
-      border-radius: 0 0 12px 12px;
-      background: transparent;
-    }
-
-    /* Tail - curly */
-    .monkey-tail {
-      position: absolute;
-      bottom: 0px;
-      left: 14px;
+      top: 18px;
+      right: 0px;
       width: 12px;
-      height: 12px;
+      height: 16px;
       border: 4px solid var(--terracotta);
       border-top: none;
       border-right: none;
-      border-radius: 0 0 0 12px;
+      border-radius: 0 0 0 14px;
+      background: transparent;
+    }
+
+    /* Right hand/hook */
+    .monkey-arm-right::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      right: -6px;
+      width: 8px;
+      height: 8px;
+      border: 4px solid var(--terracotta);
+      border-top: none;
+      border-left: none;
+      border-radius: 0 0 8px 0;
+    }
+
+    /* Tail - curls from bottom of body */
+    .monkey-tail {
+      position: absolute;
+      bottom: 2px;
+      left: 10px;
+      width: 10px;
+      height: 10px;
+      border: 4px solid var(--terracotta);
+      border-top: none;
+      border-right: none;
+      border-radius: 0 0 0 10px;
       background: transparent;
     }
 
