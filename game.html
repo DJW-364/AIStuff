@@ -638,9 +638,9 @@
 
         // Create initial vines with varied spacing
         let z = -5;
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 12; i++) {
           this.createVine(z);
-          z -= 6 + Math.random() * 4; // 6-10 units apart
+          z -= 5 + Math.random() * 6; // 5-11 units apart (more variety)
         }
 
         // Attach to first vine
@@ -694,12 +694,8 @@
         vine.userData.grabIndicator = grabPoint;
         vine.userData.grabY = grabY;
 
-        // Position vine with significant X variation for staggered layout
-        // Alternate left/right with randomness for more interesting patterns
-        const vineIndex = this.vines.length;
-        const side = (vineIndex % 2 === 0) ? -1 : 1; // Alternate sides
-        const baseOffset = side * (4 + Math.random() * 4); // 4-8 units left or right
-        const xOffset = baseOffset + (Math.random() - 0.5) * 3; // Add some randomness
+        // Position vine with random X - truly scattered
+        const xOffset = (Math.random() - 0.5) * 16; // Random position from -8 to +8
         vine.position.set(xOffset, 0, z);
         vine.userData.anchorPoint.x = xOffset;
 
@@ -793,9 +789,11 @@
           this.state.phase = 'flying';
           this.state.currentVine = null;
 
-          // Arms forward while flying
-          this.arms.left.rotation.x = -Math.PI / 2;
-          this.arms.right.rotation.x = -Math.PI / 2;
+          // Arms forward while flying - reaching out
+          this.arms.left.rotation.x = -Math.PI / 3;
+          this.arms.right.rotation.x = -Math.PI / 3;
+          this.arms.left.rotation.z = -0.3;
+          this.arms.right.rotation.z = 0.3;
         }
       }
 
@@ -818,19 +816,31 @@
         const dy = this.monkey.position.y - this.state.vineGrabPoint.y;
         this.state.swingAngle = Math.atan2(dx, -dy);
 
+        // Limit initial angle so monkey doesn't wrap around
+        this.state.swingAngle = Math.max(-1.2, Math.min(1.2, this.state.swingAngle));
+
         // Initial swing velocity from momentum
-        this.state.swingVelocity = this.state.velocity.x * 0.3;
+        this.state.swingVelocity = this.state.velocity.x * 0.2;
 
         this.state.velocity.set(0, 0, 0);
 
         // Hide grab indicator
         vine.userData.grabIndicator.visible = false;
 
+        // IMMEDIATELY position monkey on the vine
+        this.monkey.position.set(
+          vine.position.x,
+          vine.userData.grabY - 1.2,
+          vine.position.z + 0.5
+        );
+        this.monkey.rotation.z = this.state.swingAngle * 0.8;
+        this.monkey.rotation.x = 0;
+
         // Arms up grabbing the vine!
         this.arms.left.rotation.x = Math.PI;
         this.arms.right.rotation.x = Math.PI;
-        this.arms.left.rotation.z = 0.15;
-        this.arms.right.rotation.z = -0.15;
+        this.arms.left.rotation.z = 0.2;
+        this.arms.right.rotation.z = -0.2;
       }
 
       tryGrabNearbyVine() {
@@ -906,7 +916,7 @@
           // Pendulum physics
           const gravity = 15;
           const damping = 0.995;
-          const swingRadius = 3; // How far monkey swings side to side
+          const swingRadius = 3;
 
           // Angular acceleration from gravity
           const angularAccel = -(gravity / swingRadius) * Math.sin(state.swingAngle);
@@ -914,30 +924,34 @@
           state.swingVelocity *= damping;
           state.swingAngle += state.swingVelocity * dt;
 
-          // Clamp swing angle - allow wider swings
-          const maxAngle = Math.PI * 0.85;
+          // Clamp swing angle
+          const maxAngle = Math.PI * 0.7;
           if (Math.abs(state.swingAngle) > maxAngle) {
             state.swingAngle = Math.sign(state.swingAngle) * maxAngle;
             state.swingVelocity *= -0.5;
           }
 
-          // Position monkey directly on the vine, hands gripping it
+          // Position monkey ON the vine - body hugging the vine
           const vine = state.currentVine;
           const vineX = vine.position.x;
           const vineZ = vine.position.z;
 
-          // Monkey swings side to side while holding the vine - wider swing
-          const swingOffset = Math.sin(state.swingAngle) * 4;
-
+          // Monkey hangs from vine and swings - positioned AT the vine
           this.monkey.position.set(
-            vineX + swingOffset,
-            state.vineGrabPoint.y - 1.5, // Hands at grab point, body below
-            vineZ + 0.8 // Slightly in front of vine
+            vineX, // Directly on vine X
+            state.vineGrabPoint.y - 1.2, // Hands at grab point, body below
+            vineZ + 0.5 // Slightly in front of vine
           );
 
-          // Rotate monkey to match swing - more dramatic rotation
-          this.monkey.rotation.z = state.swingAngle * 0.7;
+          // Swing body side to side
+          this.monkey.rotation.z = state.swingAngle * 0.8;
           this.monkey.rotation.x = 0;
+
+          // Keep arms reaching UP to grab vine
+          this.arms.left.rotation.x = Math.PI;
+          this.arms.right.rotation.x = Math.PI;
+          this.arms.left.rotation.z = 0.2;
+          this.arms.right.rotation.z = -0.2;
 
         } else if (state.phase === 'flying' || state.phase === 'falling') {
           // Apply gravity
@@ -1018,7 +1032,7 @@
         // Spawn new vines ahead with varied spacing
         const furthestZ = Math.min(...this.vines.map(v => v.position.z));
         if (this.monkey.position.z - furthestZ < 50) {
-          const spacing = 6 + Math.random() * 4; // 6-10 units apart
+          const spacing = 5 + Math.random() * 6; // 5-11 units apart
           this.createVine(furthestZ - spacing);
         }
 
@@ -1144,9 +1158,9 @@
 
         // Recreate vines with varied spacing
         let z = -5;
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 12; i++) {
           this.createVine(z);
-          z -= 6 + Math.random() * 4;
+          z -= 5 + Math.random() * 6;
         }
 
         // Reset state
