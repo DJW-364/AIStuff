@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>JUNGLE SWING - So Easy Monkey Can Do It</title>
+  <title>Swinger Monkey - So Easy Monkey Can Do It</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐵</text></svg>">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
@@ -277,7 +277,7 @@
     <div id="touch-hint">TAP TO SWING!</div>
 
     <div id="start-screen">
-      <div id="game-title">JUNGLE SWING</div>
+      <div id="game-title">SWINGER MONKEY</div>
       <div id="game-subtitle">🐵 A Monkey Adventure 🌴</div>
       <button class="start-btn" onclick="game.start()">PLAY!</button>
       <div id="instructions">
@@ -529,20 +529,11 @@
 
         this.scene.add(this.monkey);
 
-        // Rope line (connects monkey to vine when swinging)
-        const ropeMat = new THREE.LineBasicMaterial({ color: 0x8B4513, linewidth: 3 });
-        const ropeGeo = new THREE.BufferGeometry();
-        ropeGeo.setAttribute('position', new THREE.Float32BufferAttribute([0,0,0, 0,0,0], 3));
-        this.ropeConnection = new THREE.Line(ropeGeo, ropeMat);
-        this.ropeConnection.visible = false;
-        this.scene.add(this.ropeConnection);
-
         // Game state
         this.state = {
           phase: 'swinging', // 'swinging', 'flying', 'falling'
           currentVine: null,
           vineGrabPoint: new THREE.Vector3(),
-          ropeLength: 4,
           swingAngle: -Math.PI / 4, // Start angle
           swingVelocity: 0,
           velocity: new THREE.Vector3(),
@@ -579,9 +570,11 @@
         this.vines = [];
         this.bananaObjects = [];
 
-        // Create initial vines spaced out ahead
+        // Create initial vines with varied spacing
+        let z = -5;
         for (let i = 0; i < 10; i++) {
-          this.createVine(-5 + i * 8);
+          this.createVine(z);
+          z -= 6 + Math.random() * 4; // 6-10 units apart
         }
 
         // Attach to first vine
@@ -633,8 +626,12 @@
         vine.userData.grabIndicator = grabPoint;
         vine.userData.grabY = anchorY - vineHeight + 2;
 
-        // Position vine with some X variation
-        const xOffset = (Math.random() - 0.5) * 6;
+        // Position vine with significant X variation for staggered layout
+        // Alternate left/right with randomness for more interesting patterns
+        const vineIndex = this.vines.length;
+        const side = (vineIndex % 2 === 0) ? -1 : 1; // Alternate sides
+        const baseOffset = side * (4 + Math.random() * 4); // 4-8 units left or right
+        const xOffset = baseOffset + (Math.random() - 0.5) * 3; // Add some randomness
         vine.position.set(xOffset, 0, z);
         vine.userData.anchorPoint.x = xOffset;
 
@@ -726,7 +723,6 @@
 
           this.state.phase = 'flying';
           this.state.currentVine = null;
-          this.ropeConnection.visible = false;
 
           // Arms forward while flying
           this.arms.left.rotation.x = -Math.PI / 2;
@@ -747,7 +743,6 @@
           vine.userData.grabY,
           vine.position.z
         );
-        this.state.ropeLength = 4;
 
         // Calculate initial swing angle based on approach
         const dx = this.monkey.position.x - this.state.vineGrabPoint.x;
@@ -758,16 +753,15 @@
         this.state.swingVelocity = this.state.velocity.x * 0.3;
 
         this.state.velocity.set(0, 0, 0);
-        this.ropeConnection.visible = true;
 
         // Hide grab indicator
         vine.userData.grabIndicator.visible = false;
 
-        // Arms up!
+        // Arms up grabbing the vine!
         this.arms.left.rotation.x = Math.PI;
         this.arms.right.rotation.x = Math.PI;
-        this.arms.left.rotation.z = 0.3;
-        this.arms.right.rotation.z = 0.3;
+        this.arms.left.rotation.z = 0.15;
+        this.arms.right.rotation.z = -0.15;
       }
 
       tryGrabNearbyVine() {
@@ -866,9 +860,10 @@
           // Pendulum physics
           const gravity = 15;
           const damping = 0.995;
+          const swingRadius = 3; // How far monkey swings side to side
 
           // Angular acceleration from gravity
-          const angularAccel = -(gravity / state.ropeLength) * Math.sin(state.swingAngle);
+          const angularAccel = -(gravity / swingRadius) * Math.sin(state.swingAngle);
           state.swingVelocity += angularAccel * dt;
           state.swingVelocity *= damping;
           state.swingAngle += state.swingVelocity * dt;
@@ -880,27 +875,23 @@
             state.swingVelocity *= -0.5;
           }
 
-          // Position monkey at end of rope
-          const grabPt = state.vineGrabPoint;
+          // Position monkey directly on the vine, hands gripping it
+          const vine = state.currentVine;
+          const vineX = vine.position.x;
+          const vineZ = vine.position.z;
+
+          // Monkey swings side to side while holding the vine
+          const swingOffset = Math.sin(state.swingAngle) * 1.5;
+
           this.monkey.position.set(
-            grabPt.x + Math.sin(state.swingAngle) * state.ropeLength,
-            grabPt.y - Math.cos(state.swingAngle) * state.ropeLength,
-            grabPt.z + 0.5
+            vineX + swingOffset,
+            state.vineGrabPoint.y - 1.5, // Hands at grab point, body below
+            vineZ + 0.8 // Slightly in front of vine
           );
 
           // Rotate monkey to match swing
-          this.monkey.rotation.z = state.swingAngle * 0.7;
+          this.monkey.rotation.z = state.swingAngle * 0.5;
           this.monkey.rotation.x = 0;
-
-          // Update rope visual
-          const ropePositions = this.ropeConnection.geometry.attributes.position.array;
-          ropePositions[0] = grabPt.x;
-          ropePositions[1] = grabPt.y;
-          ropePositions[2] = grabPt.z;
-          ropePositions[3] = this.monkey.position.x;
-          ropePositions[4] = this.monkey.position.y + 1.5;
-          ropePositions[5] = this.monkey.position.z;
-          this.ropeConnection.geometry.attributes.position.needsUpdate = true;
 
         } else if (state.phase === 'flying' || state.phase === 'falling') {
           // Apply gravity
@@ -978,10 +969,11 @@
           }
         });
 
-        // Spawn new vines ahead
+        // Spawn new vines ahead with varied spacing
         const furthestZ = Math.min(...this.vines.map(v => v.position.z));
         if (this.monkey.position.z - furthestZ < 50) {
-          this.createVine(furthestZ - 8);
+          const spacing = 6 + Math.random() * 4; // 6-10 units apart
+          this.createVine(furthestZ - spacing);
         }
 
         // Update bananas
@@ -1058,9 +1050,11 @@
         this.bananaObjects.forEach(b => this.scene.remove(b));
         this.bananaObjects = [];
 
-        // Recreate vines
+        // Recreate vines with varied spacing
+        let z = -5;
         for (let i = 0; i < 10; i++) {
-          this.createVine(-5 + i * 8);
+          this.createVine(z);
+          z -= 6 + Math.random() * 4;
         }
 
         // Reset state
@@ -1068,7 +1062,6 @@
           phase: 'swinging',
           currentVine: null,
           vineGrabPoint: new THREE.Vector3(),
-          ropeLength: 4,
           swingAngle: -Math.PI / 4,
           swingVelocity: 0,
           velocity: new THREE.Vector3(),
