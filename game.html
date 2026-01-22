@@ -341,51 +341,262 @@
       }
 
       createEnvironment() {
-        // Ground
-        const groundGeo = new THREE.PlaneGeometry(300, 300);
-        const groundMat = new THREE.MeshLambertMaterial({ color: 0x1a4a25 });
+        // Ground with texture variation
+        const groundGeo = new THREE.PlaneGeometry(300, 300, 20, 20);
+        const groundMat = new THREE.MeshLambertMaterial({ color: 0x2d5a1a });
         const ground = new THREE.Mesh(groundGeo, groundMat);
         ground.rotation.x = -Math.PI / 2;
         ground.position.y = -10;
         ground.receiveShadow = true;
         this.scene.add(ground);
 
-        // Trees
+        // Grass tufts on the ground
+        this.groundDetails = [];
+        const grassColors = [0x3a7a2a, 0x4a8a3a, 0x2a6a1a];
+        for (let i = 0; i < 100; i++) {
+          const grass = new THREE.Group();
+          const bladeCount = 3 + Math.floor(Math.random() * 4);
+          for (let j = 0; j < bladeCount; j++) {
+            const bladeGeo = new THREE.ConeGeometry(0.15, 1.5 + Math.random(), 4);
+            const bladeMat = new THREE.MeshLambertMaterial({
+              color: grassColors[Math.floor(Math.random() * grassColors.length)]
+            });
+            const blade = new THREE.Mesh(bladeGeo, bladeMat);
+            blade.position.set((Math.random() - 0.5) * 0.5, 0.5, (Math.random() - 0.5) * 0.5);
+            blade.rotation.set((Math.random() - 0.5) * 0.3, 0, (Math.random() - 0.5) * 0.3);
+            grass.add(blade);
+          }
+          grass.position.set(
+            (Math.random() - 0.5) * 60,
+            -10,
+            (Math.random() - 0.5) * 150
+          );
+          this.scene.add(grass);
+          this.groundDetails.push(grass);
+        }
+
+        // Bushes
+        const bushColors = [0x2d6a30, 0x3a8a40, 0x1a5a20];
+        for (let i = 0; i < 40; i++) {
+          const bush = new THREE.Group();
+          const sphereCount = 2 + Math.floor(Math.random() * 3);
+          for (let j = 0; j < sphereCount; j++) {
+            const bushGeo = new THREE.SphereGeometry(0.8 + Math.random() * 0.6, 8, 8);
+            const bushMat = new THREE.MeshLambertMaterial({
+              color: bushColors[Math.floor(Math.random() * bushColors.length)]
+            });
+            const sphere = new THREE.Mesh(bushGeo, bushMat);
+            sphere.position.set((Math.random() - 0.5) * 1.5, Math.random() * 0.5, (Math.random() - 0.5) * 1.5);
+            sphere.scale.y = 0.7;
+            bush.add(sphere);
+          }
+          const side = Math.random() > 0.5 ? 1 : -1;
+          bush.position.set(
+            side * (8 + Math.random() * 25),
+            -9.5,
+            -50 + Math.random() * 150
+          );
+          this.scene.add(bush);
+          this.groundDetails.push(bush);
+        }
+
+        // Rocks
+        for (let i = 0; i < 25; i++) {
+          const rockGeo = new THREE.DodecahedronGeometry(0.5 + Math.random() * 0.8, 0);
+          const rockMat = new THREE.MeshLambertMaterial({ color: 0x555555 + Math.random() * 0x222222 });
+          const rock = new THREE.Mesh(rockGeo, rockMat);
+          rock.position.set(
+            (Math.random() - 0.5) * 50,
+            -9.5,
+            (Math.random() - 0.5) * 150
+          );
+          rock.rotation.set(Math.random(), Math.random(), Math.random());
+          rock.scale.y = 0.6;
+          this.scene.add(rock);
+          this.groundDetails.push(rock);
+        }
+
+        // Trees - closer to action with layers
         this.trees = [];
-        for (let i = 0; i < 50; i++) {
+        // Foreground trees (closer, sides of play area)
+        for (let i = 0; i < 30; i++) {
           const tree = this.createTree();
           const side = Math.random() > 0.5 ? 1 : -1;
           tree.position.set(
-            side * (12 + Math.random() * 20),
+            side * (10 + Math.random() * 8),
             -10,
             -50 + Math.random() * 150
           );
           tree.rotation.y = Math.random() * Math.PI * 2;
-          const scale = 0.8 + Math.random() * 0.6;
+          const scale = 0.9 + Math.random() * 0.5;
+          tree.scale.set(scale, scale, scale);
+          this.scene.add(tree);
+          this.trees.push(tree);
+        }
+        // Background trees (further, smaller)
+        for (let i = 0; i < 40; i++) {
+          const tree = this.createTree();
+          const side = Math.random() > 0.5 ? 1 : -1;
+          tree.position.set(
+            side * (25 + Math.random() * 20),
+            -10,
+            -50 + Math.random() * 150
+          );
+          tree.rotation.y = Math.random() * Math.PI * 2;
+          const scale = 0.5 + Math.random() * 0.4;
           tree.scale.set(scale, scale, scale);
           this.scene.add(tree);
           this.trees.push(tree);
         }
 
-        // Particles
-        this.particles = [];
-        const particleGeo = new THREE.SphereGeometry(0.1, 4, 4);
-        const particleMat = new THREE.MeshBasicMaterial({ color: 0xffffaa });
-
+        // Jungle canopy at top of screen
+        this.canopy = [];
+        const canopyLeafGeo = new THREE.SphereGeometry(3, 8, 8);
+        const canopyColors = [0x1a5a20, 0x2d6a30, 0x3a7a40, 0x1a4a15];
         for (let i = 0; i < 60; i++) {
-          const particle = new THREE.Mesh(particleGeo, particleMat);
-          particle.position.set(
-            (Math.random() - 0.5) * 50,
-            Math.random() * 20,
-            (Math.random() - 0.5) * 80
+          const leafMat = new THREE.MeshLambertMaterial({
+            color: canopyColors[Math.floor(Math.random() * canopyColors.length)],
+            transparent: true,
+            opacity: 0.9
+          });
+          const leaf = new THREE.Mesh(canopyLeafGeo, leafMat);
+          leaf.position.set(
+            (Math.random() - 0.5) * 80,
+            18 + Math.random() * 10,
+            -60 + Math.random() * 100
           );
-          particle.userData = {
-            baseY: particle.position.y,
-            speed: 0.5 + Math.random(),
-            offset: Math.random() * Math.PI * 2
+          leaf.scale.set(1 + Math.random(), 0.5 + Math.random() * 0.3, 1 + Math.random());
+          this.scene.add(leaf);
+          this.canopy.push(leaf);
+        }
+
+        // Hanging vines from canopy (decorative)
+        for (let i = 0; i < 30; i++) {
+          const hangingVine = new THREE.Group();
+          const vineLength = 5 + Math.random() * 8;
+          const vineGeo = new THREE.CylinderGeometry(0.05, 0.03, vineLength, 6);
+          const vineMat = new THREE.MeshLambertMaterial({ color: 0x2d5a1a });
+          const vine = new THREE.Mesh(vineGeo, vineMat);
+          vine.position.y = -vineLength / 2;
+          hangingVine.add(vine);
+
+          // Small leaves on hanging vine
+          for (let j = 0; j < 3; j++) {
+            const leafGeo = new THREE.SphereGeometry(0.2, 4, 4);
+            const leafMat = new THREE.MeshLambertMaterial({ color: 0x3a8a30 });
+            const leaf = new THREE.Mesh(leafGeo, leafMat);
+            leaf.position.set(0.15, -1 - j * 1.5, 0);
+            leaf.scale.set(1, 0.5, 0.6);
+            hangingVine.add(leaf);
+          }
+
+          const side = Math.random() > 0.5 ? 1 : -1;
+          hangingVine.position.set(
+            side * (12 + Math.random() * 15),
+            22 + Math.random() * 5,
+            -50 + Math.random() * 120
+          );
+          this.scene.add(hangingVine);
+          this.canopy.push(hangingVine);
+        }
+
+        // Fireflies (only in air, glowing)
+        this.particles = [];
+        for (let i = 0; i < 30; i++) {
+          const fireflyGeo = new THREE.SphereGeometry(0.08, 6, 6);
+          const fireflyMat = new THREE.MeshBasicMaterial({
+            color: 0xffff88,
+            transparent: true,
+            opacity: 0.8
+          });
+          const firefly = new THREE.Mesh(fireflyGeo, fireflyMat);
+
+          // Add glow
+          const glowGeo = new THREE.SphereGeometry(0.2, 6, 6);
+          const glowMat = new THREE.MeshBasicMaterial({
+            color: 0xffff44,
+            transparent: true,
+            opacity: 0.3
+          });
+          const glow = new THREE.Mesh(glowGeo, glowMat);
+          firefly.add(glow);
+
+          firefly.position.set(
+            (Math.random() - 0.5) * 40,
+            5 + Math.random() * 15, // Only in the air
+            (Math.random() - 0.5) * 60
+          );
+          firefly.userData = {
+            baseY: firefly.position.y,
+            baseX: firefly.position.x,
+            speed: 0.3 + Math.random() * 0.5,
+            offset: Math.random() * Math.PI * 2,
+            glowSpeed: 2 + Math.random() * 2
           };
-          this.scene.add(particle);
-          this.particles.push(particle);
+          this.scene.add(firefly);
+          this.particles.push(firefly);
+        }
+
+        // Butterflies
+        this.butterflies = [];
+        const butterflyColors = [0xff6b9d, 0x6bb5ff, 0xffdb4d, 0xff8c42];
+        for (let i = 0; i < 15; i++) {
+          const butterfly = new THREE.Group();
+          const wingGeo = new THREE.CircleGeometry(0.3, 6);
+          const wingColor = butterflyColors[Math.floor(Math.random() * butterflyColors.length)];
+          const wingMat = new THREE.MeshBasicMaterial({
+            color: wingColor,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.8
+          });
+
+          const leftWing = new THREE.Mesh(wingGeo, wingMat);
+          leftWing.position.x = -0.15;
+          leftWing.rotation.y = 0.5;
+          butterfly.add(leftWing);
+
+          const rightWing = new THREE.Mesh(wingGeo, wingMat);
+          rightWing.position.x = 0.15;
+          rightWing.rotation.y = -0.5;
+          butterfly.add(rightWing);
+
+          // Body
+          const bodyGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.3, 4);
+          const bodyMat = new THREE.MeshBasicMaterial({ color: 0x333333 });
+          const body = new THREE.Mesh(bodyGeo, bodyMat);
+          body.rotation.z = Math.PI / 2;
+          butterfly.add(body);
+
+          butterfly.position.set(
+            (Math.random() - 0.5) * 30,
+            3 + Math.random() * 12,
+            (Math.random() - 0.5) * 50
+          );
+          butterfly.userData = {
+            basePos: butterfly.position.clone(),
+            speed: 0.5 + Math.random() * 0.5,
+            offset: Math.random() * Math.PI * 2,
+            wingSpeed: 8 + Math.random() * 4,
+            leftWing: leftWing,
+            rightWing: rightWing
+          };
+          this.scene.add(butterfly);
+          this.butterflies.push(butterfly);
+        }
+
+        // Distant mountain/hill silhouettes for depth
+        const hillGeo = new THREE.SphereGeometry(30, 16, 16);
+        const hillMat = new THREE.MeshBasicMaterial({ color: 0x1a3a25 });
+        for (let i = 0; i < 5; i++) {
+          const hill = new THREE.Mesh(hillGeo, hillMat);
+          hill.position.set(
+            -80 + i * 40,
+            -20,
+            -80
+          );
+          hill.scale.set(1 + Math.random() * 0.5, 0.4 + Math.random() * 0.3, 1);
+          this.scene.add(hill);
         }
       }
 
@@ -671,24 +882,38 @@
       createBanana(x, y, z) {
         const banana = new THREE.Group();
 
-        const bananaMat = new THREE.MeshLambertMaterial({ color: 0xffe135 });
-        const bananaGeo = new THREE.TorusGeometry(0.3, 0.12, 8, 12, Math.PI * 0.8);
+        // Brighter banana with emissive-like effect
+        const bananaMat = new THREE.MeshBasicMaterial({ color: 0xffdd00 });
+        const bananaGeo = new THREE.TorusGeometry(0.35, 0.14, 8, 12, Math.PI * 0.8);
 
         for (let i = 0; i < 3; i++) {
           const b = new THREE.Mesh(bananaGeo, bananaMat);
           b.rotation.set(0, 0, Math.PI / 2 + (i - 1) * 0.25);
-          b.position.x = (i - 1) * 0.12;
+          b.position.x = (i - 1) * 0.14;
           banana.add(b);
         }
 
-        // Glow
-        const glowGeo = new THREE.SphereGeometry(0.6, 8, 8);
-        const glowMat = new THREE.MeshBasicMaterial({
-          color: 0xffff44,
+        // Inner glow (bright)
+        const innerGlowGeo = new THREE.SphereGeometry(0.5, 8, 8);
+        const innerGlowMat = new THREE.MeshBasicMaterial({
+          color: 0xffff00,
+          transparent: true,
+          opacity: 0.5
+        });
+        banana.add(new THREE.Mesh(innerGlowGeo, innerGlowMat));
+
+        // Outer glow (soft, larger)
+        const outerGlowGeo = new THREE.SphereGeometry(1.0, 8, 8);
+        const outerGlowMat = new THREE.MeshBasicMaterial({
+          color: 0xffaa00,
           transparent: true,
           opacity: 0.25
         });
-        banana.add(new THREE.Mesh(glowGeo, glowMat));
+        banana.add(new THREE.Mesh(outerGlowGeo, outerGlowMat));
+
+        // Point light to illuminate surroundings
+        const bananaLight = new THREE.PointLight(0xffdd00, 0.5, 5);
+        banana.add(bananaLight);
 
         banana.position.set(x, y, z);
         banana.userData = { collected: false, baseY: y };
@@ -994,16 +1219,78 @@
           }
         });
 
-        // Update particles
+        // Update fireflies (particles)
+        const time = Date.now() * 0.001;
         this.particles.forEach(p => {
-          p.position.y = p.userData.baseY + Math.sin(Date.now() * 0.001 * p.userData.speed + p.userData.offset) * 0.5;
+          p.position.y = p.userData.baseY + Math.sin(time * p.userData.speed + p.userData.offset) * 1.5;
+          p.position.x = p.userData.baseX + Math.sin(time * p.userData.speed * 0.7 + p.userData.offset) * 2;
+          // Blinking glow
+          const glow = p.children[0];
+          if (glow) {
+            glow.material.opacity = 0.2 + Math.sin(time * p.userData.glowSpeed) * 0.3;
+          }
+          p.material.opacity = 0.6 + Math.sin(time * p.userData.glowSpeed) * 0.4;
         });
+
+        // Update butterflies
+        if (this.butterflies) {
+          this.butterflies.forEach(b => {
+            // Fluttering movement
+            b.position.x = b.userData.basePos.x + Math.sin(time * b.userData.speed + b.userData.offset) * 3;
+            b.position.y = b.userData.basePos.y + Math.sin(time * b.userData.speed * 1.5 + b.userData.offset) * 1.5;
+            b.position.z = b.userData.basePos.z + Math.cos(time * b.userData.speed * 0.5 + b.userData.offset) * 2;
+            // Wing flapping
+            b.userData.leftWing.rotation.y = 0.3 + Math.sin(time * b.userData.wingSpeed) * 0.7;
+            b.userData.rightWing.rotation.y = -0.3 - Math.sin(time * b.userData.wingSpeed) * 0.7;
+            // Face direction of movement
+            b.rotation.y = Math.sin(time * b.userData.speed + b.userData.offset) * 0.5;
+          });
+        }
 
         // Recycle trees
         this.trees.forEach(tree => {
           if (tree.position.z > this.monkey.position.z + 40) {
             tree.position.z -= 150;
-            tree.position.x = (Math.random() > 0.5 ? 1 : -1) * (12 + Math.random() * 20);
+            tree.position.x = (Math.random() > 0.5 ? 1 : -1) * (10 + Math.random() * 25);
+          }
+        });
+
+        // Recycle canopy elements
+        if (this.canopy) {
+          this.canopy.forEach(leaf => {
+            if (leaf.position.z > this.monkey.position.z + 50) {
+              leaf.position.z -= 150;
+              leaf.position.x = (Math.random() - 0.5) * 80;
+            }
+            // Gentle swaying
+            leaf.rotation.z = Math.sin(time * 0.5 + leaf.position.x * 0.1) * 0.1;
+          });
+        }
+
+        // Recycle ground details
+        if (this.groundDetails) {
+          this.groundDetails.forEach(detail => {
+            if (detail.position.z > this.monkey.position.z + 50) {
+              detail.position.z -= 150;
+            }
+          });
+        }
+
+        // Move butterflies with player roughly
+        if (this.butterflies) {
+          this.butterflies.forEach(b => {
+            if (b.userData.basePos.z > this.monkey.position.z + 30) {
+              b.userData.basePos.z -= 80;
+              b.userData.basePos.x = (Math.random() - 0.5) * 30;
+            }
+          });
+        }
+
+        // Move fireflies with player roughly
+        this.particles.forEach(p => {
+          if (p.userData.baseY && p.position.z > this.monkey.position.z + 40) {
+            p.position.z -= 80;
+            p.userData.baseX = (Math.random() - 0.5) * 40;
           }
         });
       }
