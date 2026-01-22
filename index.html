@@ -399,94 +399,78 @@
       top: 0;
     }
 
-    /* Chain monkey - barrel of monkeys style */
+    /* Chain monkey - classic barrel of monkeys silhouette */
     .chain-monkey {
       position: relative;
-      width: 36px;
-      height: 30px;
+      width: 32px;
+      height: 28px;
       flex-shrink: 0;
     }
 
-    /* Monkey body + head as one shape */
+    /* Body - oval */
     .chain-monkey::before {
       content: '';
       position: absolute;
-      top: 6px;
-      left: 10px;
-      width: 16px;
-      height: 20px;
+      top: 10px;
+      left: 11px;
+      width: 10px;
+      height: 12px;
       background: var(--terracotta);
-      border-radius: 8px 8px 6px 6px;
+      border-radius: 50%;
     }
 
-    /* Head */
+    /* Head - circle */
     .chain-monkey::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 9px;
-      width: 18px;
-      height: 14px;
+      top: 3px;
+      left: 10px;
+      width: 12px;
+      height: 10px;
       background: var(--terracotta);
-      border-radius: 9px 9px 4px 4px;
+      border-radius: 50%;
     }
 
-    /* Left arm - S curve going up */
+    /* Arm up - hooks to previous monkey */
     .monkey-arm-left {
       position: absolute;
-      top: 8px;
+      top: 0;
       left: 0;
-      width: 10px;
-      height: 4px;
-      background: var(--terracotta);
-      border-radius: 2px;
-      transform: rotate(-30deg);
+      width: 14px;
+      height: 14px;
+      border: 3px solid var(--terracotta);
+      border-radius: 50%;
+      border-bottom-color: transparent;
+      border-right-color: transparent;
+      background: transparent;
     }
 
-    .monkey-arm-left::after {
-      content: '';
-      position: absolute;
-      top: -8px;
-      left: 0;
-      width: 4px;
-      height: 10px;
-      background: var(--terracotta);
-      border-radius: 2px;
-    }
-
-    /* Right arm - S curve going down */
+    /* Arm down - hooks to next monkey */
     .monkey-arm-right {
       position: absolute;
-      top: 18px;
+      bottom: 0;
       right: 0;
-      width: 10px;
-      height: 4px;
-      background: var(--terracotta);
-      border-radius: 2px;
-      transform: rotate(-30deg);
+      width: 14px;
+      height: 14px;
+      border: 3px solid var(--terracotta);
+      border-radius: 50%;
+      border-top-color: transparent;
+      border-left-color: transparent;
+      background: transparent;
     }
 
-    .monkey-arm-right::after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      right: 0;
-      width: 4px;
-      height: 10px;
-      background: var(--terracotta);
-      border-radius: 2px;
-    }
-
-    /* Tail */
+    /* Tail - small curl */
     .monkey-tail {
       position: absolute;
-      bottom: 2px;
-      left: 6px;
+      bottom: 6px;
+      left: 5px;
       width: 8px;
-      height: 4px;
-      background: var(--terracotta);
-      border-radius: 2px;
-      transform: rotate(45deg);
+      height: 8px;
+      border: 3px solid var(--terracotta);
+      border-radius: 50%;
+      border-top-color: transparent;
+      border-right-color: transparent;
+      background: transparent;
     }
 
     @keyframes monkeyScroll {
