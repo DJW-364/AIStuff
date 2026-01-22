@@ -25,7 +25,6 @@
       height: 100vh;
     }
 
-    /* UI Overlay */
     #ui {
       position: fixed;
       top: 0;
@@ -36,7 +35,6 @@
       z-index: 100;
     }
 
-    /* Score display */
     #score-display {
       position: absolute;
       top: 20px;
@@ -48,9 +46,7 @@
     #score {
       font-size: 3.5rem;
       color: #ffd700;
-      text-shadow:
-        3px 3px 0 #ff6b00,
-        6px 6px 0 rgba(0,0,0,0.3);
+      text-shadow: 3px 3px 0 #ff6b00, 6px 6px 0 rgba(0,0,0,0.3);
       letter-spacing: 4px;
     }
 
@@ -63,12 +59,8 @@
       transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    #combo.show {
-      opacity: 1;
-      transform: scale(1);
-    }
+    #combo.show { opacity: 1; transform: scale(1); }
 
-    /* Banana counter */
     #banana-counter {
       position: absolute;
       top: 20px;
@@ -95,7 +87,6 @@
       text-shadow: 3px 3px 0 #cc9900, 5px 5px 0 rgba(0,0,0,0.3);
     }
 
-    /* Start screen */
     #start-screen {
       position: absolute;
       top: 0;
@@ -106,26 +97,17 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(180deg,
-        rgba(26,10,46,0.9) 0%,
-        rgba(10,40,30,0.85) 100%
-      );
+      background: linear-gradient(180deg, rgba(26,10,46,0.9) 0%, rgba(10,40,30,0.85) 100%);
       pointer-events: auto;
       transition: opacity 0.5s, visibility 0.5s;
     }
 
-    #start-screen.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
+    #start-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
     #game-title {
       font-size: 5rem;
       color: #00ff88;
-      text-shadow:
-        4px 4px 0 #008844,
-        8px 8px 0 rgba(0,0,0,0.4);
+      text-shadow: 4px 4px 0 #008844, 8px 8px 0 rgba(0,0,0,0.4);
       margin-bottom: 10px;
       animation: titlePulse 2s ease-in-out infinite;
     }
@@ -152,25 +134,19 @@
       border-radius: 50px;
       cursor: pointer;
       text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
-      box-shadow:
-        0 8px 0 #8b1a1a,
-        0 15px 30px rgba(0,0,0,0.4);
+      box-shadow: 0 8px 0 #8b1a1a, 0 15px 30px rgba(0,0,0,0.4);
       transition: all 0.1s;
       letter-spacing: 3px;
     }
 
     .start-btn:hover {
       transform: translateY(-3px);
-      box-shadow:
-        0 11px 0 #8b1a1a,
-        0 20px 40px rgba(0,0,0,0.5);
+      box-shadow: 0 11px 0 #8b1a1a, 0 20px 40px rgba(0,0,0,0.5);
     }
 
     .start-btn:active {
       transform: translateY(4px);
-      box-shadow:
-        0 4px 0 #8b1a1a,
-        0 8px 20px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 0 #8b1a1a, 0 8px 20px rgba(0,0,0,0.4);
     }
 
     #instructions {
@@ -183,7 +159,6 @@
       text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
     }
 
-    /* Game over screen */
     #game-over {
       position: absolute;
       top: 0;
@@ -194,52 +169,33 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(180deg,
-        rgba(46,10,26,0.95) 0%,
-        rgba(20,10,30,0.95) 100%
-      );
+      background: linear-gradient(180deg, rgba(46,10,26,0.95) 0%, rgba(20,10,30,0.95) 100%);
       pointer-events: auto;
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.5s, visibility 0.5s;
     }
 
-    #game-over.show {
-      opacity: 1;
-      visibility: visible;
-    }
+    #game-over.show { opacity: 1; visibility: visible; }
 
     #game-over-title {
       font-size: 4rem;
       color: #ff4444;
-      text-shadow:
-        4px 4px 0 #880000,
-        8px 8px 0 rgba(0,0,0,0.4);
+      text-shadow: 4px 4px 0 #880000, 8px 8px 0 rgba(0,0,0,0.4);
       margin-bottom: 20px;
     }
 
-    #final-score-label {
-      font-size: 1.5rem;
-      color: #ffaa00;
-      margin-bottom: 10px;
-    }
+    #final-score-label { font-size: 1.5rem; color: #ffaa00; margin-bottom: 10px; }
 
     #final-score {
       font-size: 5rem;
       color: #ffd700;
-      text-shadow:
-        4px 4px 0 #ff8800,
-        8px 8px 0 rgba(0,0,0,0.4);
+      text-shadow: 4px 4px 0 #ff8800, 8px 8px 0 rgba(0,0,0,0.4);
       margin-bottom: 15px;
     }
 
-    #high-score {
-      font-size: 1.3rem;
-      color: #00ffaa;
-      margin-bottom: 40px;
-    }
+    #high-score { font-size: 1.3rem; color: #00ffaa; margin-bottom: 40px; }
 
-    /* Feedback text */
     #feedback {
       position: absolute;
       top: 50%;
@@ -247,33 +203,14 @@
       transform: translate(-50%, -50%);
       font-size: 4rem;
       color: #00ff88;
-      text-shadow:
-        3px 3px 0 #008844,
-        6px 6px 0 rgba(0,0,0,0.4);
+      text-shadow: 3px 3px 0 #008844, 6px 6px 0 rgba(0,0,0,0.4);
       opacity: 0;
       pointer-events: none;
     }
 
-    #feedback.perfect {
-      color: #ffd700;
-      text-shadow:
-        3px 3px 0 #ff8800,
-        6px 6px 0 rgba(0,0,0,0.4);
-      animation: feedbackPop 0.6s ease-out forwards;
-    }
-
-    #feedback.good {
-      color: #00ff88;
-      animation: feedbackPop 0.6s ease-out forwards;
-    }
-
-    #feedback.miss {
-      color: #ff4444;
-      text-shadow:
-        3px 3px 0 #880000,
-        6px 6px 0 rgba(0,0,0,0.4);
-      animation: feedbackPop 0.6s ease-out forwards;
-    }
+    #feedback.perfect { color: #ffd700; text-shadow: 3px 3px 0 #ff8800, 6px 6px 0 rgba(0,0,0,0.4); animation: feedbackPop 0.6s ease-out forwards; }
+    #feedback.good { color: #00ff88; animation: feedbackPop 0.6s ease-out forwards; }
+    #feedback.miss { color: #ff4444; text-shadow: 3px 3px 0 #880000, 6px 6px 0 rgba(0,0,0,0.4); animation: feedbackPop 0.6s ease-out forwards; }
 
     @keyframes feedbackPop {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
@@ -281,7 +218,6 @@
       100% { opacity: 0; transform: translate(-50%, -70%) scale(1); }
     }
 
-    /* Mobile touch hint */
     #touch-hint {
       position: absolute;
       bottom: 100px;
@@ -293,14 +229,9 @@
       animation: hintPulse 1.5s ease-in-out infinite;
     }
 
-    @keyframes hintPulse {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 0.8; }
-    }
-
+    @keyframes hintPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
     #touch-hint.hidden { display: none; }
 
-    /* Back link */
     .back-link {
       position: absolute;
       top: 20px;
@@ -313,38 +244,7 @@
       transition: color 0.2s;
     }
 
-    .back-link:hover {
-      color: #00ff88;
-    }
-
-    /* Speed lines effect */
-    #speed-lines {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      opacity: 0;
-      background: repeating-linear-gradient(
-        90deg,
-        transparent 0px,
-        transparent 50px,
-        rgba(255,255,255,0.03) 50px,
-        rgba(255,255,255,0.03) 51px
-      );
-      transition: opacity 0.3s;
-    }
-
-    #speed-lines.active {
-      opacity: 1;
-      animation: speedLinesMove 0.1s linear infinite;
-    }
-
-    @keyframes speedLinesMove {
-      0% { background-position: 0 0; }
-      100% { background-position: 51px 0; }
-    }
+    .back-link:hover { color: #00ff88; }
 
     @media (max-width: 768px) {
       #game-title { font-size: 3rem; }
@@ -374,7 +274,6 @@
     </div>
 
     <div id="feedback"></div>
-    <div id="speed-lines"></div>
     <div id="touch-hint">TAP TO SWING!</div>
 
     <div id="start-screen">
@@ -382,9 +281,9 @@
       <div id="game-subtitle">🐵 A Monkey Adventure 🌴</div>
       <button class="start-btn" onclick="game.start()">PLAY!</button>
       <div id="instructions">
-        CLICK or TAP to grab vines<br>
-        Collect bananas • Avoid falling<br>
-        Time your swings perfectly!
+        TAP or CLICK to jump to next vine<br>
+        Time it right for bonus points!<br>
+        Collect bananas • Don't fall!
       </div>
     </div>
 
@@ -398,8 +297,7 @@
   </div>
 
   <script>
-    // ==================== JUNGLE SWING 3D ====================
-    // A modern retro-style 3D monkey swinging game
+    // ==================== JUNGLE SWING 3D - IMPROVED ====================
 
     class JungleSwing {
       constructor() {
@@ -415,23 +313,20 @@
         this.initLights();
         this.createEnvironment();
         this.createMonkey();
-        this.createVines();
+        this.createVineSystem();
         this.setupControls();
         this.animate();
       }
 
       initThree() {
-        // Scene
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x1a0a2e);
-        this.scene.fog = new THREE.Fog(0x1a0a2e, 30, 80);
+        this.scene.fog = new THREE.Fog(0x1a0a2e, 40, 100);
 
-        // Camera
         this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.camera.position.set(0, 5, 18);
-        this.camera.lookAt(0, 3, 0);
+        this.camera.position.set(0, 8, 25);
+        this.camera.lookAt(0, 5, 0);
 
-        // Renderer
         this.renderer = new THREE.WebGLRenderer({
           canvas: this.canvas,
           antialias: true,
@@ -442,7 +337,6 @@
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-        // Handle resize
         window.addEventListener('resize', () => {
           this.camera.aspect = window.innerWidth / window.innerHeight;
           this.camera.updateProjectionMatrix();
@@ -451,77 +345,72 @@
       }
 
       initLights() {
-        // Ambient light
-        const ambient = new THREE.AmbientLight(0x404060, 0.5);
+        const ambient = new THREE.AmbientLight(0x404080, 0.6);
         this.scene.add(ambient);
 
-        // Main directional light (sun)
-        const sun = new THREE.DirectionalLight(0xffffaa, 1);
-        sun.position.set(10, 20, 10);
+        const sun = new THREE.DirectionalLight(0xffffcc, 1.2);
+        sun.position.set(15, 30, 20);
         sun.castShadow = true;
         sun.shadow.mapSize.width = 2048;
         sun.shadow.mapSize.height = 2048;
         sun.shadow.camera.near = 0.5;
-        sun.shadow.camera.far = 50;
-        sun.shadow.camera.left = -20;
-        sun.shadow.camera.right = 20;
-        sun.shadow.camera.top = 20;
-        sun.shadow.camera.bottom = -20;
+        sun.shadow.camera.far = 100;
+        sun.shadow.camera.left = -30;
+        sun.shadow.camera.right = 30;
+        sun.shadow.camera.top = 30;
+        sun.shadow.camera.bottom = -30;
         this.scene.add(sun);
 
-        // Rim light for dramatic effect
-        const rim = new THREE.DirectionalLight(0x00ffaa, 0.3);
-        rim.position.set(-5, 5, -10);
+        const rim = new THREE.DirectionalLight(0x00ffaa, 0.4);
+        rim.position.set(-10, 10, -20);
         this.scene.add(rim);
 
-        // Point light on monkey
-        this.monkeyLight = new THREE.PointLight(0xffaa00, 0.5, 10);
+        this.monkeyLight = new THREE.PointLight(0xffaa00, 0.8, 15);
         this.scene.add(this.monkeyLight);
       }
 
       createEnvironment() {
         // Ground
-        const groundGeo = new THREE.PlaneGeometry(200, 200);
-        const groundMat = new THREE.MeshLambertMaterial({
-          color: 0x1a3a20,
-          side: THREE.DoubleSide
-        });
+        const groundGeo = new THREE.PlaneGeometry(300, 300);
+        const groundMat = new THREE.MeshLambertMaterial({ color: 0x1a4a25 });
         const ground = new THREE.Mesh(groundGeo, groundMat);
         ground.rotation.x = -Math.PI / 2;
-        ground.position.y = -5;
+        ground.position.y = -10;
         ground.receiveShadow = true;
         this.scene.add(ground);
 
-        // Create low-poly trees
+        // Trees
         this.trees = [];
-        for (let i = 0; i < 40; i++) {
+        for (let i = 0; i < 50; i++) {
           const tree = this.createTree();
           const side = Math.random() > 0.5 ? 1 : -1;
           tree.position.set(
-            side * (8 + Math.random() * 15),
-            -5,
-            -40 + Math.random() * 100
+            side * (12 + Math.random() * 20),
+            -10,
+            -50 + Math.random() * 150
           );
           tree.rotation.y = Math.random() * Math.PI * 2;
+          const scale = 0.8 + Math.random() * 0.6;
+          tree.scale.set(scale, scale, scale);
           this.scene.add(tree);
           this.trees.push(tree);
         }
 
-        // Floating particles (fireflies/pollen)
+        // Particles
         this.particles = [];
-        const particleGeo = new THREE.SphereGeometry(0.08, 4, 4);
-        const particleMat = new THREE.MeshBasicMaterial({ color: 0xffff88 });
+        const particleGeo = new THREE.SphereGeometry(0.1, 4, 4);
+        const particleMat = new THREE.MeshBasicMaterial({ color: 0xffffaa });
 
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 60; i++) {
           const particle = new THREE.Mesh(particleGeo, particleMat);
           particle.position.set(
-            (Math.random() - 0.5) * 40,
-            Math.random() * 15,
-            (Math.random() - 0.5) * 60
+            (Math.random() - 0.5) * 50,
+            Math.random() * 20,
+            (Math.random() - 0.5) * 80
           );
           particle.userData = {
             baseY: particle.position.y,
-            speed: 0.5 + Math.random() * 1,
+            speed: 0.5 + Math.random(),
             offset: Math.random() * Math.PI * 2
           };
           this.scene.add(particle);
@@ -532,22 +421,20 @@
       createTree() {
         const tree = new THREE.Group();
 
-        // Trunk (low-poly cylinder)
-        const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, 8, 6);
-        const trunkMat = new THREE.MeshLambertMaterial({ color: 0x4a3020 });
+        const trunkGeo = new THREE.CylinderGeometry(0.4, 0.6, 12, 8);
+        const trunkMat = new THREE.MeshLambertMaterial({ color: 0x5a3a20 });
         const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-        trunk.position.y = 4;
+        trunk.position.y = 6;
         trunk.castShadow = true;
         tree.add(trunk);
 
-        // Foliage layers (low-poly cones)
-        const colors = [0x2d5a27, 0x3a7a35, 0x4a9a45];
+        const colors = [0x2d6a30, 0x3a8a40, 0x4aaa50];
         for (let i = 0; i < 3; i++) {
-          const size = 3 - i * 0.7;
-          const foliageGeo = new THREE.ConeGeometry(size, size * 1.5, 6);
+          const size = 4 - i * 1;
+          const foliageGeo = new THREE.ConeGeometry(size, size * 2, 8);
           const foliageMat = new THREE.MeshLambertMaterial({ color: colors[i] });
           const foliage = new THREE.Mesh(foliageGeo, foliageMat);
-          foliage.position.y = 6 + i * 2;
+          foliage.position.y = 10 + i * 3;
           foliage.castShadow = true;
           tree.add(foliage);
         }
@@ -559,220 +446,257 @@
         this.monkey = new THREE.Group();
 
         // Body
-        const bodyGeo = new THREE.SphereGeometry(0.6, 8, 6);
+        const bodyGeo = new THREE.SphereGeometry(0.7, 12, 10);
         const bodyMat = new THREE.MeshLambertMaterial({ color: 0xd4712a });
         const body = new THREE.Mesh(bodyGeo, bodyMat);
-        body.scale.y = 1.2;
+        body.scale.set(1, 1.3, 0.9);
         body.castShadow = true;
         this.monkey.add(body);
 
         // Head
-        const headGeo = new THREE.SphereGeometry(0.5, 8, 6);
-        const headMat = new THREE.MeshLambertMaterial({ color: 0xd4712a });
-        const head = new THREE.Mesh(headGeo, headMat);
-        head.position.y = 0.9;
+        const headGeo = new THREE.SphereGeometry(0.55, 12, 10);
+        const head = new THREE.Mesh(headGeo, bodyMat);
+        head.position.y = 1.1;
         head.castShadow = true;
         this.monkey.add(head);
 
         // Face
-        const faceGeo = new THREE.SphereGeometry(0.35, 8, 6);
+        const faceGeo = new THREE.SphereGeometry(0.4, 10, 10);
         const faceMat = new THREE.MeshLambertMaterial({ color: 0xf4c99a });
         const face = new THREE.Mesh(faceGeo, faceMat);
-        face.position.set(0, 0.85, 0.3);
-        face.scale.z = 0.7;
+        face.position.set(0, 1.05, 0.35);
+        face.scale.set(1, 0.9, 0.6);
         this.monkey.add(face);
 
         // Eyes
-        const eyeGeo = new THREE.SphereGeometry(0.1, 6, 6);
-        const eyeMat = new THREE.MeshBasicMaterial({ color: 0x222222 });
-        const eyeWhiteGeo = new THREE.SphereGeometry(0.14, 6, 6);
+        const eyeWhiteGeo = new THREE.SphereGeometry(0.15, 8, 8);
         const eyeWhiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
+        const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
 
-        [-0.15, 0.15].forEach(x => {
+        [-0.18, 0.18].forEach(x => {
           const eyeWhite = new THREE.Mesh(eyeWhiteGeo, eyeWhiteMat);
-          eyeWhite.position.set(x, 1, 0.4);
+          eyeWhite.position.set(x, 1.2, 0.45);
           this.monkey.add(eyeWhite);
-
           const eye = new THREE.Mesh(eyeGeo, eyeMat);
-          eye.position.set(x, 1, 0.5);
+          eye.position.set(x, 1.2, 0.55);
           this.monkey.add(eye);
         });
 
         // Ears
-        const earGeo = new THREE.SphereGeometry(0.2, 6, 6);
-        const earMat = new THREE.MeshLambertMaterial({ color: 0xd4712a });
-        [-0.5, 0.5].forEach(x => {
-          const ear = new THREE.Mesh(earGeo, earMat);
-          ear.position.set(x, 1, 0);
+        const earGeo = new THREE.SphereGeometry(0.22, 8, 8);
+        [-0.55, 0.55].forEach(x => {
+          const ear = new THREE.Mesh(earGeo, bodyMat);
+          ear.position.set(x, 1.15, 0);
           this.monkey.add(ear);
+          const earInner = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), faceMat);
+          earInner.position.set(x, 1.15, 0.05);
+          this.monkey.add(earInner);
         });
 
-        // Arms
-        this.leftArm = this.createArm();
-        this.leftArm.position.set(-0.5, 0.3, 0);
-        this.monkey.add(this.leftArm);
+        // Arms - these will animate
+        this.arms = { left: this.createArm(), right: this.createArm() };
+        this.arms.left.position.set(-0.6, 0.5, 0);
+        this.arms.right.position.set(0.6, 0.5, 0);
+        this.arms.right.scale.x = -1;
+        this.monkey.add(this.arms.left);
+        this.monkey.add(this.arms.right);
 
-        this.rightArm = this.createArm();
-        this.rightArm.position.set(0.5, 0.3, 0);
-        this.monkey.add(this.rightArm);
+        // Legs
+        const legGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.6, 8);
+        [-0.25, 0.25].forEach(x => {
+          const leg = new THREE.Mesh(legGeo, bodyMat);
+          leg.position.set(x, -0.7, 0);
+          leg.rotation.x = 0.3;
+          this.monkey.add(leg);
+        });
 
         // Tail
-        const tailCurve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(0, -0.3, -0.3),
-          new THREE.Vector3(0, -0.8, -0.6),
-          new THREE.Vector3(0.3, -1.2, -0.4),
-          new THREE.Vector3(0.5, -1, 0)
-        ]);
-        const tailGeo = new THREE.TubeGeometry(tailCurve, 12, 0.08, 6, false);
-        const tailMat = new THREE.MeshLambertMaterial({ color: 0xd4712a });
-        const tail = new THREE.Mesh(tailGeo, tailMat);
+        const tailPoints = [];
+        for (let i = 0; i <= 10; i++) {
+          const t = i / 10;
+          tailPoints.push(new THREE.Vector3(
+            0,
+            -0.5 - t * 0.8,
+            -0.4 - Math.sin(t * Math.PI) * 0.8
+          ));
+        }
+        const tailCurve = new THREE.CatmullRomCurve3(tailPoints);
+        const tailGeo = new THREE.TubeGeometry(tailCurve, 20, 0.08, 8, false);
+        const tail = new THREE.Mesh(tailGeo, bodyMat);
         tail.castShadow = true;
         this.monkey.add(tail);
 
-        // Position monkey
-        this.monkey.position.set(0, 5, 0);
         this.scene.add(this.monkey);
 
-        // Physics state
-        this.monkeyState = {
-          swinging: false,
-          falling: false,
-          velocity: new THREE.Vector3(),
+        // Rope line (connects monkey to vine when swinging)
+        const ropeMat = new THREE.LineBasicMaterial({ color: 0x8B4513, linewidth: 3 });
+        const ropeGeo = new THREE.BufferGeometry();
+        ropeGeo.setAttribute('position', new THREE.Float32BufferAttribute([0,0,0, 0,0,0], 3));
+        this.ropeConnection = new THREE.Line(ropeGeo, ropeMat);
+        this.ropeConnection.visible = false;
+        this.scene.add(this.ropeConnection);
+
+        // Game state
+        this.state = {
+          phase: 'swinging', // 'swinging', 'flying', 'falling'
           currentVine: null,
-          swingAngle: 0,
-          swingSpeed: 0
+          vineGrabPoint: new THREE.Vector3(),
+          ropeLength: 4,
+          swingAngle: -Math.PI / 4, // Start angle
+          swingVelocity: 0,
+          velocity: new THREE.Vector3(),
+          gravity: 35
         };
       }
 
       createArm() {
         const arm = new THREE.Group();
-        const armGeo = new THREE.CylinderGeometry(0.1, 0.08, 0.8, 6);
+
+        // Upper arm
+        const upperGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.5, 8);
         const armMat = new THREE.MeshLambertMaterial({ color: 0xd4712a });
-        const armMesh = new THREE.Mesh(armGeo, armMat);
-        armMesh.position.y = -0.4;
-        armMesh.castShadow = true;
-        arm.add(armMesh);
+        const upper = new THREE.Mesh(upperGeo, armMat);
+        upper.position.y = -0.25;
+        arm.add(upper);
+
+        // Lower arm
+        const lower = new THREE.Mesh(upperGeo, armMat);
+        lower.position.y = -0.7;
+        arm.add(lower);
 
         // Hand
-        const handGeo = new THREE.SphereGeometry(0.12, 6, 6);
+        const handGeo = new THREE.SphereGeometry(0.14, 8, 8);
         const handMat = new THREE.MeshLambertMaterial({ color: 0xf4c99a });
         const hand = new THREE.Mesh(handGeo, handMat);
-        hand.position.y = -0.8;
+        hand.position.y = -0.95;
         arm.add(hand);
 
         return arm;
       }
 
-      createVines() {
+      createVineSystem() {
         this.vines = [];
         this.bananaObjects = [];
 
-        // Create initial vines
-        for (let i = 0; i < 8; i++) {
-          this.addVine(i * 5 - 5);
+        // Create initial vines spaced out ahead
+        for (let i = 0; i < 10; i++) {
+          this.createVine(-5 + i * 8);
         }
 
-        this.currentVineIndex = 1;
-        this.attachToVine(this.vines[this.currentVineIndex]);
+        // Attach to first vine
+        this.attachToVine(this.vines[0]);
       }
 
-      addVine(z) {
+      createVine(z) {
         const vine = new THREE.Group();
+
+        // Vine anchor point (at top)
+        const anchorY = 18;
         vine.userData = {
+          anchorPoint: new THREE.Vector3(0, anchorY, z),
           grabbed: false,
-          z: z,
-          swingOffset: Math.random() * Math.PI * 2,
-          hasBanana: Math.random() > 0.4
+          swingPhase: Math.random() * Math.PI * 2
         };
 
-        // Vine rope
-        const ropeGeo = new THREE.CylinderGeometry(0.05, 0.05, 8, 6);
-        const ropeMat = new THREE.MeshLambertMaterial({ color: 0x3a7a35 });
+        // Main vine rope
+        const vineHeight = 12;
+        const ropeGeo = new THREE.CylinderGeometry(0.08, 0.06, vineHeight, 8);
+        const ropeMat = new THREE.MeshLambertMaterial({ color: 0x2d5a1a });
         const rope = new THREE.Mesh(ropeGeo, ropeMat);
-        rope.position.y = 4;
+        rope.position.y = anchorY - vineHeight / 2;
         vine.add(rope);
 
-        // Leaves on vine
-        const leafGeo = new THREE.ConeGeometry(0.3, 0.6, 4);
-        const leafMat = new THREE.MeshLambertMaterial({ color: 0x4a9a45 });
-        for (let i = 0; i < 4; i++) {
+        // Leaves along vine
+        const leafGeo = new THREE.SphereGeometry(0.3, 6, 6);
+        leafGeo.scale(1, 0.4, 0.6);
+        const leafMat = new THREE.MeshLambertMaterial({ color: 0x3a8a30 });
+
+        for (let i = 0; i < 6; i++) {
           const leaf = new THREE.Mesh(leafGeo, leafMat);
-          leaf.position.y = 2 + i * 1.5;
-          leaf.position.x = (i % 2 === 0 ? 0.2 : -0.2);
+          const yPos = anchorY - 2 - i * 1.8;
+          leaf.position.set((i % 2 === 0 ? 0.3 : -0.3), yPos, 0);
           leaf.rotation.z = (i % 2 === 0 ? -0.5 : 0.5);
           vine.add(leaf);
         }
 
-        // Grab point (invisible)
-        vine.userData.grabPoint = new THREE.Vector3(0, 0, 0);
+        // Grab point indicator (glowing orb)
+        const grabGeo = new THREE.SphereGeometry(0.4, 12, 12);
+        const grabMat = new THREE.MeshBasicMaterial({
+          color: 0x00ff88,
+          transparent: true,
+          opacity: 0.6
+        });
+        const grabPoint = new THREE.Mesh(grabGeo, grabMat);
+        grabPoint.position.y = anchorY - vineHeight + 2;
+        vine.add(grabPoint);
+        vine.userData.grabIndicator = grabPoint;
+        vine.userData.grabY = anchorY - vineHeight + 2;
 
-        // Position
-        const xOffset = (Math.random() - 0.5) * 4;
-        vine.position.set(xOffset, 8, z);
-
-        // Banana
-        if (vine.userData.hasBanana) {
-          const banana = this.createBanana();
-          banana.position.set(xOffset + (Math.random() - 0.5) * 2, 4 + Math.random() * 3, z);
-          banana.userData.collected = false;
-          banana.userData.vineZ = z;
-          this.scene.add(banana);
-          this.bananaObjects.push(banana);
-        }
+        // Position vine with some X variation
+        const xOffset = (Math.random() - 0.5) * 6;
+        vine.position.set(xOffset, 0, z);
+        vine.userData.anchorPoint.x = xOffset;
 
         this.scene.add(vine);
         this.vines.push(vine);
 
+        // Maybe add banana near this vine
+        if (Math.random() > 0.3) {
+          this.createBanana(xOffset + (Math.random() - 0.5) * 4, 8 + Math.random() * 6, z);
+        }
+
         return vine;
       }
 
-      createBanana() {
+      createBanana(x, y, z) {
         const banana = new THREE.Group();
 
-        // Banana bunch
-        const bananaGeo = new THREE.TorusGeometry(0.25, 0.1, 6, 8, Math.PI);
         const bananaMat = new THREE.MeshLambertMaterial({ color: 0xffe135 });
+        const bananaGeo = new THREE.TorusGeometry(0.3, 0.12, 8, 12, Math.PI * 0.8);
 
         for (let i = 0; i < 3; i++) {
           const b = new THREE.Mesh(bananaGeo, bananaMat);
-          b.rotation.z = Math.PI / 2 + (i - 1) * 0.3;
-          b.position.x = (i - 1) * 0.15;
+          b.rotation.set(0, 0, Math.PI / 2 + (i - 1) * 0.25);
+          b.position.x = (i - 1) * 0.12;
           banana.add(b);
         }
 
         // Glow
-        const glowGeo = new THREE.SphereGeometry(0.5, 8, 8);
+        const glowGeo = new THREE.SphereGeometry(0.6, 8, 8);
         const glowMat = new THREE.MeshBasicMaterial({
-          color: 0xffff00,
+          color: 0xffff44,
           transparent: true,
-          opacity: 0.2
+          opacity: 0.25
         });
-        const glow = new THREE.Mesh(glowGeo, glowMat);
-        banana.add(glow);
+        banana.add(new THREE.Mesh(glowGeo, glowMat));
 
-        banana.userData.baseY = 0;
-        banana.userData.rotSpeed = 0.02 + Math.random() * 0.02;
+        banana.position.set(x, y, z);
+        banana.userData = { collected: false, baseY: y };
 
-        return banana;
+        this.scene.add(banana);
+        this.bananaObjects.push(banana);
       }
 
       setupControls() {
-        const handleInput = () => {
+        const handleInput = (e) => {
+          if (e.target.tagName === 'BUTTON') return;
           if (!this.isPlaying) return;
-          this.swing();
+          this.jump();
         };
 
         document.addEventListener('click', handleInput);
         document.addEventListener('touchstart', (e) => {
+          if (e.target.tagName === 'BUTTON') return;
           e.preventDefault();
-          handleInput();
+          handleInput(e);
         }, { passive: false });
 
         document.addEventListener('keydown', (e) => {
           if (e.code === 'Space') {
             e.preventDefault();
             if (this.isPlaying) {
-              this.swing();
+              this.jump();
             } else if (!document.getElementById('start-screen').classList.contains('hidden')) {
               this.start();
             } else {
@@ -782,300 +706,314 @@
         });
       }
 
-      swing() {
-        const state = this.monkeyState;
-        if (state.falling) return;
+      jump() {
+        if (this.state.phase === 'falling') return;
 
-        // Release from current vine
-        if (state.swinging) {
-          state.swinging = false;
+        document.getElementById('touch-hint').classList.add('hidden');
 
-          // Calculate release velocity based on swing
-          const speed = Math.abs(state.swingSpeed) * 0.5 + this.gameSpeed * 3;
-          state.velocity.set(
-            state.swingSpeed * 0.5,
-            Math.abs(state.swingSpeed) * 0.3 + 2,
-            -speed
+        if (this.state.phase === 'swinging') {
+          // Release from vine - calculate launch velocity based on swing
+          const angle = this.state.swingAngle;
+          const speed = Math.abs(this.state.swingVelocity) * 2;
+
+          // Launch in direction of swing
+          const launchAngle = angle + Math.PI / 2; // Perpendicular to rope
+          this.state.velocity.set(
+            Math.cos(launchAngle) * speed * 0.5,
+            Math.sin(launchAngle) * speed * 0.8 + 8,
+            -12 - this.gameSpeed * 3
           );
 
-          // Remove touch hint after first swing
-          document.getElementById('touch-hint').classList.add('hidden');
-        }
+          this.state.phase = 'flying';
+          this.state.currentVine = null;
+          this.ropeConnection.visible = false;
 
-        // Try to grab next vine
-        this.tryGrabVine();
-      }
-
-      tryGrabVine() {
-        const state = this.monkeyState;
-        const monkeyPos = this.monkey.position;
-
-        // Find closest ungrabbed vine in front
-        let closestVine = null;
-        let closestDist = Infinity;
-
-        for (const vine of this.vines) {
-          if (vine.userData.grabbed) continue;
-
-          const vinePos = vine.position;
-          const dist = Math.sqrt(
-            Math.pow(monkeyPos.x - vinePos.x, 2) +
-            Math.pow(monkeyPos.z - vinePos.z, 2)
-          );
-
-          if (vinePos.z < monkeyPos.z && dist < closestDist && dist < 6) {
-            closestDist = dist;
-            closestVine = vine;
-          }
-        }
-
-        if (closestVine) {
-          this.attachToVine(closestVine);
-
-          // Score based on timing
-          if (closestDist < 1.5) {
-            this.addScore(100);
-            this.showFeedback('PERFECT!', 'perfect');
-            this.combo++;
-          } else if (closestDist < 3) {
-            this.addScore(50);
-            this.showFeedback('GOOD!', 'good');
-            this.combo++;
-          } else {
-            this.addScore(20);
-            this.combo = 0;
-          }
-
-          // Update combo display
-          this.updateCombo();
+          // Arms forward while flying
+          this.arms.left.rotation.x = -Math.PI / 2;
+          this.arms.right.rotation.x = -Math.PI / 2;
         }
       }
 
       attachToVine(vine) {
-        const state = this.monkeyState;
+        if (vine.userData.grabbed) return;
 
         vine.userData.grabbed = true;
-        state.swinging = true;
-        state.falling = false;
-        state.currentVine = vine;
-        state.swingAngle = 0;
-        state.swingSpeed = 2;
-        state.velocity.set(0, 0, 0);
+        this.state.currentVine = vine;
+        this.state.phase = 'swinging';
 
-        // Arms up animation
-        this.leftArm.rotation.z = Math.PI;
-        this.rightArm.rotation.z = -Math.PI;
+        // Set grab point
+        this.state.vineGrabPoint.set(
+          vine.position.x,
+          vine.userData.grabY,
+          vine.position.z
+        );
+        this.state.ropeLength = 4;
+
+        // Calculate initial swing angle based on approach
+        const dx = this.monkey.position.x - this.state.vineGrabPoint.x;
+        const dy = this.monkey.position.y - this.state.vineGrabPoint.y;
+        this.state.swingAngle = Math.atan2(dx, -dy);
+
+        // Initial swing velocity from momentum
+        this.state.swingVelocity = this.state.velocity.x * 0.3;
+
+        this.state.velocity.set(0, 0, 0);
+        this.ropeConnection.visible = true;
+
+        // Hide grab indicator
+        vine.userData.grabIndicator.visible = false;
+
+        // Arms up!
+        this.arms.left.rotation.x = Math.PI;
+        this.arms.right.rotation.x = Math.PI;
+        this.arms.left.rotation.z = 0.3;
+        this.arms.right.rotation.z = 0.3;
+      }
+
+      tryGrabNearbyVine() {
+        const pos = this.monkey.position;
+
+        for (const vine of this.vines) {
+          if (vine.userData.grabbed) continue;
+
+          const grabPos = new THREE.Vector3(
+            vine.position.x,
+            vine.userData.grabY,
+            vine.position.z
+          );
+
+          const dist = pos.distanceTo(grabPos);
+
+          if (dist < 3.5) {
+            this.attachToVine(vine);
+
+            // Score based on accuracy
+            if (dist < 1.5) {
+              this.addScore(100);
+              this.showFeedback('PERFECT!', 'perfect');
+              this.combo++;
+            } else if (dist < 2.5) {
+              this.addScore(50);
+              this.showFeedback('GOOD!', 'good');
+              this.combo++;
+            } else {
+              this.addScore(25);
+              this.combo = 0;
+            }
+            this.updateCombo();
+            return true;
+          }
+        }
+        return false;
       }
 
       showFeedback(text, type) {
-        const feedback = document.getElementById('feedback');
-        feedback.textContent = text;
-        feedback.className = type;
-
-        // Reset animation
-        void feedback.offsetWidth;
-        feedback.className = type;
+        const el = document.getElementById('feedback');
+        el.textContent = text;
+        el.className = '';
+        void el.offsetWidth;
+        el.className = type;
       }
 
       updateCombo() {
-        const comboEl = document.getElementById('combo');
+        const el = document.getElementById('combo');
         if (this.combo > 1) {
-          comboEl.textContent = `${this.combo}x COMBO!`;
-          comboEl.classList.add('show');
+          el.textContent = `${this.combo}x COMBO!`;
+          el.classList.add('show');
         } else {
-          comboEl.classList.remove('show');
+          el.classList.remove('show');
         }
       }
 
       addScore(points) {
-        const multiplier = Math.min(this.combo + 1, 5);
-        this.score += points * multiplier;
+        const mult = Math.min(this.combo + 1, 5);
+        this.score += points * mult;
         document.getElementById('score').textContent = this.score;
       }
 
       collectBanana(banana) {
         if (banana.userData.collected) return;
-
         banana.userData.collected = true;
         this.bananas++;
         document.getElementById('banana-count').textContent = this.bananas;
-        this.addScore(25);
+        this.addScore(30);
 
-        // Collect animation
-        const targetY = banana.position.y + 3;
-        const startY = banana.position.y;
-        const startScale = 1;
+        // Animate collection
+        const startPos = banana.position.clone();
         let t = 0;
-
-        const animateCollect = () => {
-          t += 0.1;
+        const animate = () => {
+          t += 0.08;
           if (t >= 1) {
             this.scene.remove(banana);
             return;
           }
-
-          banana.position.y = startY + (targetY - startY) * t;
-          const scale = startScale * (1 - t);
-          banana.scale.set(scale, scale, scale);
-          banana.rotation.y += 0.3;
-
-          requestAnimationFrame(animateCollect);
+          banana.position.y = startPos.y + t * 4;
+          banana.scale.setScalar(1 - t);
+          banana.rotation.y += 0.2;
+          requestAnimationFrame(animate);
         };
-
-        animateCollect();
+        animate();
       }
 
-      update(deltaTime) {
+      update(dt) {
         if (!this.isPlaying) return;
 
-        const state = this.monkeyState;
+        const state = this.state;
+        this.gameSpeed = Math.min(1 + this.score / 3000, 2);
 
-        // Update game speed over time
-        this.gameSpeed = Math.min(1 + this.score / 5000, 2.5);
+        if (state.phase === 'swinging' && state.currentVine) {
+          // Pendulum physics
+          const gravity = 15;
+          const damping = 0.995;
 
-        // Speed lines effect at high speed
-        const speedLines = document.getElementById('speed-lines');
-        if (this.gameSpeed > 1.5) {
-          speedLines.classList.add('active');
-        } else {
-          speedLines.classList.remove('active');
-        }
+          // Angular acceleration from gravity
+          const angularAccel = -(gravity / state.ropeLength) * Math.sin(state.swingAngle);
+          state.swingVelocity += angularAccel * dt;
+          state.swingVelocity *= damping;
+          state.swingAngle += state.swingVelocity * dt;
 
-        if (state.swinging && state.currentVine) {
-          // Swing physics
-          state.swingAngle += state.swingSpeed * deltaTime;
-          state.swingSpeed = Math.sin(state.swingAngle) * 3;
-
-          const vine = state.currentVine;
-          const swingRadius = 3;
-          const swingX = Math.sin(state.swingAngle * 0.5) * swingRadius;
-          const swingY = -Math.abs(Math.cos(state.swingAngle * 0.5)) * swingRadius * 0.3;
-
-          this.monkey.position.x = vine.position.x + swingX;
-          this.monkey.position.y = 5 + swingY;
-          this.monkey.position.z = vine.position.z + 1;
-
-          // Monkey rotation while swinging
-          this.monkey.rotation.z = state.swingAngle * 0.2;
-
-          // Auto-release if swinging too long
-          if (Math.abs(state.swingAngle) > Math.PI * 3) {
-            this.swing();
-          }
-        } else {
-          // Flying/falling physics
-          state.velocity.y -= 15 * deltaTime; // Gravity
-          state.velocity.z -= this.gameSpeed * 0.5 * deltaTime; // Forward momentum
-
-          this.monkey.position.add(state.velocity.clone().multiplyScalar(deltaTime));
-
-          // Rotation while flying
-          this.monkey.rotation.z = Math.sin(Date.now() * 0.01) * 0.2;
-          this.monkey.rotation.x = state.velocity.y * 0.05;
-
-          // Arms down while flying
-          this.leftArm.rotation.z = 0.3;
-          this.rightArm.rotation.z = -0.3;
-
-          // Check if fallen
-          if (this.monkey.position.y < -3) {
-            this.gameOver();
-            return;
+          // Clamp swing angle
+          const maxAngle = Math.PI * 0.6;
+          if (Math.abs(state.swingAngle) > maxAngle) {
+            state.swingAngle = Math.sign(state.swingAngle) * maxAngle;
+            state.swingVelocity *= -0.5;
           }
 
-          // Auto-grab if close to vine
-          if (!state.swinging && state.velocity.y < 0) {
-            this.tryGrabVine();
+          // Position monkey at end of rope
+          const grabPt = state.vineGrabPoint;
+          this.monkey.position.set(
+            grabPt.x + Math.sin(state.swingAngle) * state.ropeLength,
+            grabPt.y - Math.cos(state.swingAngle) * state.ropeLength,
+            grabPt.z + 0.5
+          );
+
+          // Rotate monkey to match swing
+          this.monkey.rotation.z = state.swingAngle * 0.7;
+          this.monkey.rotation.x = 0;
+
+          // Update rope visual
+          const ropePositions = this.ropeConnection.geometry.attributes.position.array;
+          ropePositions[0] = grabPt.x;
+          ropePositions[1] = grabPt.y;
+          ropePositions[2] = grabPt.z;
+          ropePositions[3] = this.monkey.position.x;
+          ropePositions[4] = this.monkey.position.y + 1.5;
+          ropePositions[5] = this.monkey.position.z;
+          this.ropeConnection.geometry.attributes.position.needsUpdate = true;
+
+        } else if (state.phase === 'flying' || state.phase === 'falling') {
+          // Apply gravity
+          state.velocity.y -= state.gravity * dt;
+
+          // Move monkey
+          this.monkey.position.add(state.velocity.clone().multiplyScalar(dt));
+
+          // Rotate based on velocity
+          this.monkey.rotation.z = Math.sin(Date.now() * 0.01) * 0.3;
+          this.monkey.rotation.x = -state.velocity.y * 0.02;
+
+          // Try to grab vine when moving downward
+          if (state.phase === 'flying' && state.velocity.y < 2) {
+            this.tryGrabNearbyVine();
+          }
+
+          // Check if fallen too far
+          if (this.monkey.position.y < -5) {
+            state.phase = 'falling';
+            if (this.monkey.position.y < -15) {
+              this.gameOver();
+              return;
+            }
           }
         }
 
         // Update monkey light
         this.monkeyLight.position.copy(this.monkey.position);
-        this.monkeyLight.position.y += 2;
+        this.monkeyLight.position.y += 3;
 
         // Camera follow
-        const targetCamZ = this.monkey.position.z + 18;
-        const targetCamX = this.monkey.position.x * 0.3;
-        this.camera.position.z += (targetCamZ - this.camera.position.z) * 0.05;
-        this.camera.position.x += (targetCamX - this.camera.position.x) * 0.1;
+        const targetZ = this.monkey.position.z + 22;
+        const targetX = this.monkey.position.x * 0.4;
+        const targetY = Math.max(this.monkey.position.y + 5, 8);
+
+        this.camera.position.x += (targetX - this.camera.position.x) * 0.08;
+        this.camera.position.y += (targetY - this.camera.position.y) * 0.05;
+        this.camera.position.z += (targetZ - this.camera.position.z) * 0.08;
+
         this.camera.lookAt(
           this.monkey.position.x * 0.5,
-          4,
-          this.monkey.position.z - 5
+          this.monkey.position.y + 2,
+          this.monkey.position.z - 10
         );
 
-        // Update vines (swing animation)
+        // Update vines - sway ungrabbed ones
         this.vines.forEach(vine => {
           if (!vine.userData.grabbed) {
-            vine.rotation.z = Math.sin(Date.now() * 0.002 + vine.userData.swingOffset) * 0.1;
+            vine.rotation.z = Math.sin(Date.now() * 0.001 + vine.userData.swingPhase) * 0.08;
+            vine.userData.grabIndicator.visible = true;
+
+            // Pulse grab indicator
+            const scale = 1 + Math.sin(Date.now() * 0.005) * 0.2;
+            vine.userData.grabIndicator.scale.setScalar(scale);
           }
 
-          // Remove vines that are too far behind
-          if (vine.position.z > this.monkey.position.z + 20) {
+          // Remove vines far behind
+          if (vine.position.z > this.monkey.position.z + 30) {
             this.scene.remove(vine);
             this.vines = this.vines.filter(v => v !== vine);
           }
         });
 
-        // Add new vines ahead
+        // Spawn new vines ahead
         const furthestZ = Math.min(...this.vines.map(v => v.position.z));
-        if (this.monkey.position.z - furthestZ < 30) {
-          this.addVine(furthestZ - 5);
+        if (this.monkey.position.z - furthestZ < 50) {
+          this.createVine(furthestZ - 8);
         }
 
         // Update bananas
-        this.bananaObjects.forEach((banana, index) => {
+        this.bananaObjects.forEach((banana, i) => {
           if (banana.userData.collected) return;
 
-          // Rotate and bob
-          banana.rotation.y += banana.userData.rotSpeed;
-          banana.position.y = banana.userData.baseY || banana.position.y;
-          banana.position.y += Math.sin(Date.now() * 0.003 + index) * 0.02;
+          banana.rotation.y += 0.02;
+          banana.position.y = banana.userData.baseY + Math.sin(Date.now() * 0.003 + i) * 0.3;
 
           // Check collection
-          const dist = this.monkey.position.distanceTo(banana.position);
-          if (dist < 1.5) {
+          if (this.monkey.position.distanceTo(banana.position) < 1.8) {
             this.collectBanana(banana);
           }
 
-          // Remove if too far behind
-          if (banana.position.z > this.monkey.position.z + 15) {
+          // Remove if behind
+          if (banana.position.z > this.monkey.position.z + 20) {
             this.scene.remove(banana);
             this.bananaObjects = this.bananaObjects.filter(b => b !== banana);
           }
         });
 
         // Update particles
-        this.particles.forEach(particle => {
-          particle.position.y = particle.userData.baseY +
-            Math.sin(Date.now() * 0.001 * particle.userData.speed + particle.userData.offset) * 0.5;
-          particle.position.x += Math.sin(Date.now() * 0.0005 + particle.userData.offset) * 0.01;
+        this.particles.forEach(p => {
+          p.position.y = p.userData.baseY + Math.sin(Date.now() * 0.001 * p.userData.speed + p.userData.offset) * 0.5;
         });
 
-        // Move trees that are too far behind to front
+        // Recycle trees
         this.trees.forEach(tree => {
-          if (tree.position.z > this.monkey.position.z + 30) {
-            tree.position.z -= 100;
-            tree.position.x = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 15);
+          if (tree.position.z > this.monkey.position.z + 40) {
+            tree.position.z -= 150;
+            tree.position.x = (Math.random() > 0.5 ? 1 : -1) * (12 + Math.random() * 20);
           }
         });
       }
 
       gameOver() {
         this.isPlaying = false;
-        this.monkeyState.falling = true;
 
-        // Update high score
         if (this.score > this.highScore) {
           this.highScore = this.score;
           localStorage.setItem('jungleSwingHighScore', this.highScore);
         }
 
-        // Show game over screen
         document.getElementById('final-score').textContent = this.score;
         document.getElementById('high-score').textContent = `BEST: ${this.highScore}`;
         document.getElementById('game-over').classList.add('show');
-        document.getElementById('speed-lines').classList.remove('active');
 
         this.showFeedback('OOPS!', 'miss');
       }
@@ -1096,35 +1034,38 @@
       restart() {
         document.getElementById('game-over').classList.remove('show');
 
-        // Reset monkey position
-        this.monkey.position.set(0, 5, 0);
+        // Reset monkey
+        this.monkey.position.set(0, 10, 0);
         this.monkey.rotation.set(0, 0, 0);
-        this.monkeyState = {
-          swinging: false,
-          falling: false,
-          velocity: new THREE.Vector3(),
-          currentVine: null,
-          swingAngle: 0,
-          swingSpeed: 0
-        };
 
-        // Clear and recreate vines
-        this.vines.forEach(vine => this.scene.remove(vine));
+        // Clear vines
+        this.vines.forEach(v => this.scene.remove(v));
         this.vines = [];
-        this.bananaObjects.forEach(banana => this.scene.remove(banana));
+        this.bananaObjects.forEach(b => this.scene.remove(b));
         this.bananaObjects = [];
 
-        for (let i = 0; i < 8; i++) {
-          this.addVine(i * 5 - 5);
+        // Recreate vines
+        for (let i = 0; i < 10; i++) {
+          this.createVine(-5 + i * 8);
         }
 
-        this.currentVineIndex = 1;
-        this.attachToVine(this.vines[this.currentVineIndex]);
+        // Reset state
+        this.state = {
+          phase: 'swinging',
+          currentVine: null,
+          vineGrabPoint: new THREE.Vector3(),
+          ropeLength: 4,
+          swingAngle: -Math.PI / 4,
+          swingVelocity: 0,
+          velocity: new THREE.Vector3(),
+          gravity: 35
+        };
+
+        this.attachToVine(this.vines[0]);
 
         // Reset camera
-        this.camera.position.set(0, 5, 18);
+        this.camera.position.set(0, 8, 25);
 
-        // Start game
         this.score = 0;
         this.bananas = 0;
         this.combo = 0;
@@ -1141,13 +1082,13 @@
       animate() {
         let lastTime = performance.now();
 
-        const loop = (currentTime) => {
+        const loop = (now) => {
           requestAnimationFrame(loop);
 
-          const deltaTime = Math.min((currentTime - lastTime) / 1000, 0.1);
-          lastTime = currentTime;
+          const dt = Math.min((now - lastTime) / 1000, 0.05);
+          lastTime = now;
 
-          this.update(deltaTime);
+          this.update(dt);
           this.renderer.render(this.scene, this.camera);
         };
 
@@ -1155,7 +1096,6 @@
       }
     }
 
-    // Initialize game
     const game = new JungleSwing();
   </script>
 </body>
