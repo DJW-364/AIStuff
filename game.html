@@ -40,7 +40,9 @@
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #score {
@@ -50,41 +52,16 @@
       letter-spacing: 4px;
     }
 
-    #combo {
-      font-size: 1.5rem;
-      color: #00ffaa;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
-      opacity: 0;
-      transform: scale(0.5);
-      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    #combo.show { opacity: 1; transform: scale(1); }
-
-    #banana-counter {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
     .banana-icon {
       font-size: 2.5rem;
       filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.4));
       animation: bananaWiggle 0.5s ease-in-out infinite;
+      margin-right: 10px;
     }
 
     @keyframes bananaWiggle {
       0%, 100% { transform: rotate(-5deg); }
       50% { transform: rotate(5deg); }
-    }
-
-    #banana-count {
-      font-size: 2.5rem;
-      color: #ffec00;
-      text-shadow: 3px 3px 0 #cc9900, 5px 5px 0 rgba(0,0,0,0.3);
     }
 
     #start-screen {
@@ -264,13 +241,8 @@
     <a href="index.html" class="back-link">< HOME</a>
 
     <div id="score-display">
-      <div id="score">0</div>
-      <div id="combo"></div>
-    </div>
-
-    <div id="banana-counter">
       <span class="banana-icon">🍌</span>
-      <span id="banana-count">0</span>
+      <div id="score">0</div>
     </div>
 
     <div id="feedback"></div>
@@ -289,7 +261,7 @@
 
     <div id="game-over">
       <div id="game-over-title">GAME OVER</div>
-      <div id="final-score-label">SCORE</div>
+      <div id="final-score-label">🍌 BANANAS 🍌</div>
       <div id="final-score">0</div>
       <div id="high-score">BEST: 0</div>
       <button class="start-btn" onclick="game.restart()">RETRY!</button>
@@ -304,8 +276,7 @@
         this.canvas = document.getElementById('game-canvas');
         this.score = 0;
         this.bananas = 0;
-        this.combo = 0;
-        this.highScore = parseInt(localStorage.getItem('jungleSwingHighScore')) || 0;
+        this.highScore = parseInt(localStorage.getItem('swingerMonkeyHighScore')) || 0;
         this.isPlaying = false;
         this.gameSpeed = 1;
 
@@ -421,22 +392,71 @@
       createTree() {
         const tree = new THREE.Group();
 
-        const trunkGeo = new THREE.CylinderGeometry(0.4, 0.6, 12, 8);
-        const trunkMat = new THREE.MeshLambertMaterial({ color: 0x5a3a20 });
+        // Jungle palm tree trunk - taller and curved
+        const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, 18, 8);
+        const trunkMat = new THREE.MeshLambertMaterial({ color: 0x8B5A2B });
         const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-        trunk.position.y = 6;
+        trunk.position.y = 9;
         trunk.castShadow = true;
         tree.add(trunk);
 
-        const colors = [0x2d6a30, 0x3a8a40, 0x4aaa50];
+        // Trunk rings/texture
+        for (let i = 0; i < 8; i++) {
+          const ringGeo = new THREE.TorusGeometry(0.35, 0.08, 6, 12);
+          const ringMat = new THREE.MeshLambertMaterial({ color: 0x6B4423 });
+          const ring = new THREE.Mesh(ringGeo, ringMat);
+          ring.position.y = 2 + i * 2;
+          ring.rotation.x = Math.PI / 2;
+          tree.add(ring);
+        }
+
+        // Palm fronds (large tropical leaves)
+        const frondMat = new THREE.MeshLambertMaterial({ color: 0x228B22, side: THREE.DoubleSide });
+        const numFronds = 7;
+        for (let i = 0; i < numFronds; i++) {
+          const frond = new THREE.Group();
+
+          // Create elongated leaf shape
+          const leafGeo = new THREE.ConeGeometry(0.8, 6, 4);
+          const leaf = new THREE.Mesh(leafGeo, frondMat);
+          leaf.rotation.x = Math.PI / 2;
+          leaf.position.z = 3;
+          leaf.scale.set(1, 0.15, 1);
+          frond.add(leaf);
+
+          // Add smaller leaves along the frond
+          for (let j = 0; j < 5; j++) {
+            const smallLeaf = new THREE.Mesh(
+              new THREE.ConeGeometry(0.4, 2, 3),
+              new THREE.MeshLambertMaterial({ color: 0x2E8B2E })
+            );
+            smallLeaf.position.set(0.3, 0, 1 + j * 1);
+            smallLeaf.rotation.set(0, 0, -0.5);
+            frond.add(smallLeaf);
+
+            const smallLeaf2 = smallLeaf.clone();
+            smallLeaf2.position.x = -0.3;
+            smallLeaf2.rotation.z = 0.5;
+            frond.add(smallLeaf2);
+          }
+
+          frond.position.y = 18;
+          frond.rotation.y = (i / numFronds) * Math.PI * 2;
+          frond.rotation.x = 0.4 + Math.random() * 0.3; // Droop down
+          tree.add(frond);
+        }
+
+        // Coconuts
+        const coconutGeo = new THREE.SphereGeometry(0.4, 8, 8);
+        const coconutMat = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
         for (let i = 0; i < 3; i++) {
-          const size = 4 - i * 1;
-          const foliageGeo = new THREE.ConeGeometry(size, size * 2, 8);
-          const foliageMat = new THREE.MeshLambertMaterial({ color: colors[i] });
-          const foliage = new THREE.Mesh(foliageGeo, foliageMat);
-          foliage.position.y = 10 + i * 3;
-          foliage.castShadow = true;
-          tree.add(foliage);
+          const coconut = new THREE.Mesh(coconutGeo, coconutMat);
+          coconut.position.set(
+            Math.cos(i * 2) * 0.5,
+            17,
+            Math.sin(i * 2) * 0.5
+          );
+          tree.add(coconut);
         }
 
         return tree;
@@ -584,47 +604,49 @@
       createVine(z) {
         const vine = new THREE.Group();
 
-        // Vine anchor point (at top)
-        const anchorY = 18;
+        // Vine anchor point (at top) - way above screen
+        const anchorY = 40;
         vine.userData = {
           anchorPoint: new THREE.Vector3(0, anchorY, z),
           grabbed: false,
           swingPhase: Math.random() * Math.PI * 2
         };
 
-        // Main vine rope
-        const vineHeight = 12;
-        const ropeGeo = new THREE.CylinderGeometry(0.08, 0.06, vineHeight, 8);
+        // Main vine rope - much taller, extends off screen
+        const vineHeight = 35;
+        const ropeGeo = new THREE.CylinderGeometry(0.12, 0.08, vineHeight, 8);
         const ropeMat = new THREE.MeshLambertMaterial({ color: 0x2d5a1a });
         const rope = new THREE.Mesh(ropeGeo, ropeMat);
         rope.position.y = anchorY - vineHeight / 2;
         vine.add(rope);
 
-        // Leaves along vine
-        const leafGeo = new THREE.SphereGeometry(0.3, 6, 6);
-        leafGeo.scale(1, 0.4, 0.6);
+        // Leaves along vine - more leaves for longer vine
+        const leafGeo = new THREE.SphereGeometry(0.35, 6, 6);
+        leafGeo.scale(1.2, 0.4, 0.6);
         const leafMat = new THREE.MeshLambertMaterial({ color: 0x3a8a30 });
 
-        for (let i = 0; i < 6; i++) {
-          const leaf = new THREE.Mesh(leafGeo, leafMat);
-          const yPos = anchorY - 2 - i * 1.8;
-          leaf.position.set((i % 2 === 0 ? 0.3 : -0.3), yPos, 0);
-          leaf.rotation.z = (i % 2 === 0 ? -0.5 : 0.5);
+        for (let i = 0; i < 12; i++) {
+          const leaf = new THREE.Mesh(leafGeo, leafMat.clone());
+          leaf.material.color.setHex(i % 2 === 0 ? 0x3a8a30 : 0x2d7a25);
+          const yPos = anchorY - 4 - i * 2.5;
+          leaf.position.set((i % 2 === 0 ? 0.4 : -0.4), yPos, 0);
+          leaf.rotation.z = (i % 2 === 0 ? -0.6 : 0.6);
           vine.add(leaf);
         }
 
-        // Grab point indicator (glowing orb)
-        const grabGeo = new THREE.SphereGeometry(0.4, 12, 12);
+        // Grab point indicator - smaller, subtle glow
+        const grabGeo = new THREE.SphereGeometry(0.25, 8, 8);
         const grabMat = new THREE.MeshBasicMaterial({
           color: 0x00ff88,
           transparent: true,
-          opacity: 0.6
+          opacity: 0.4
         });
         const grabPoint = new THREE.Mesh(grabGeo, grabMat);
-        grabPoint.position.y = anchorY - vineHeight + 2;
+        const grabY = 8; // Fixed grab height in playable area
+        grabPoint.position.y = grabY;
         vine.add(grabPoint);
         vine.userData.grabIndicator = grabPoint;
-        vine.userData.grabY = anchorY - vineHeight + 2;
+        vine.userData.grabY = grabY;
 
         // Position vine with significant X variation for staggered layout
         // Alternate left/right with randomness for more interesting patterns
@@ -782,20 +804,12 @@
           if (dist < 6) {
             this.attachToVine(vine);
 
-            // Score based on accuracy
+            // Show feedback based on accuracy
             if (dist < 1.5) {
-              this.addScore(100);
               this.showFeedback('PERFECT!', 'perfect');
-              this.combo++;
             } else if (dist < 2.5) {
-              this.addScore(50);
               this.showFeedback('GOOD!', 'good');
-              this.combo++;
-            } else {
-              this.addScore(25);
-              this.combo = 0;
             }
-            this.updateCombo();
             return true;
           }
         }
@@ -810,28 +824,13 @@
         el.className = type;
       }
 
-      updateCombo() {
-        const el = document.getElementById('combo');
-        if (this.combo > 1) {
-          el.textContent = `${this.combo}x COMBO!`;
-          el.classList.add('show');
-        } else {
-          el.classList.remove('show');
-        }
-      }
-
-      addScore(points) {
-        const mult = Math.min(this.combo + 1, 5);
-        this.score += points * mult;
-        document.getElementById('score').textContent = this.score;
-      }
 
       collectBanana(banana) {
         if (banana.userData.collected) return;
         banana.userData.collected = true;
         this.bananas++;
-        document.getElementById('banana-count').textContent = this.bananas;
-        this.addScore(30);
+        this.score = this.bananas; // Score IS bananas
+        document.getElementById('score').textContent = this.score;
 
         // Animate collection
         const startPos = banana.position.clone();
@@ -1014,7 +1013,7 @@
 
         if (this.score > this.highScore) {
           this.highScore = this.score;
-          localStorage.setItem('jungleSwingHighScore', this.highScore);
+          localStorage.setItem('swingerMonkeyHighScore', this.highScore);
         }
 
         document.getElementById('final-score').textContent = this.score;
@@ -1029,12 +1028,9 @@
         this.isPlaying = true;
         this.score = 0;
         this.bananas = 0;
-        this.combo = 0;
         this.gameSpeed = 1;
 
         document.getElementById('score').textContent = '0';
-        document.getElementById('banana-count').textContent = '0';
-        document.getElementById('combo').classList.remove('show');
       }
 
       restart() {
@@ -1075,12 +1071,9 @@
 
         this.score = 0;
         this.bananas = 0;
-        this.combo = 0;
         this.gameSpeed = 1;
 
         document.getElementById('score').textContent = '0';
-        document.getElementById('banana-count').textContent = '0';
-        document.getElementById('combo').classList.remove('show');
         document.getElementById('touch-hint').classList.remove('hidden');
 
         this.isPlaying = true;
