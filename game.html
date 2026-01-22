@@ -652,21 +652,24 @@
 
         // Vine anchor point (at top) - way above screen
         const anchorY = 40;
+        const vineHeight = 35;
+        const grabYWorld = 8; // Where monkey grabs in world coords
+
         vine.userData = {
           anchorPoint: new THREE.Vector3(0, anchorY, z),
           grabbed: false,
           swingPhase: Math.random() * Math.PI * 2
         };
 
-        // Main vine rope - much taller, extends off screen
-        const vineHeight = 35;
+        // Main vine rope - positioned so top is at local origin (0,0,0)
+        // This makes the vine pivot from the top when rotated
         const ropeGeo = new THREE.CylinderGeometry(0.12, 0.08, vineHeight, 8);
         const ropeMat = new THREE.MeshLambertMaterial({ color: 0x2d5a1a });
         const rope = new THREE.Mesh(ropeGeo, ropeMat);
-        rope.position.y = anchorY - vineHeight / 2;
+        rope.position.y = -vineHeight / 2; // Hang down from origin
         vine.add(rope);
 
-        // Leaves along vine - more leaves for longer vine
+        // Leaves along vine - positioned relative to top (0)
         const leafGeo = new THREE.SphereGeometry(0.35, 6, 6);
         leafGeo.scale(1.2, 0.4, 0.6);
         const leafMat = new THREE.MeshLambertMaterial({ color: 0x3a8a30 });
@@ -674,13 +677,13 @@
         for (let i = 0; i < 12; i++) {
           const leaf = new THREE.Mesh(leafGeo, leafMat.clone());
           leaf.material.color.setHex(i % 2 === 0 ? 0x3a8a30 : 0x2d7a25);
-          const yPos = anchorY - 4 - i * 2.5;
+          const yPos = -4 - i * 2.5; // Relative to top
           leaf.position.set((i % 2 === 0 ? 0.4 : -0.4), yPos, 0);
           leaf.rotation.z = (i % 2 === 0 ? -0.6 : 0.6);
           vine.add(leaf);
         }
 
-        // Grab point indicator - smaller, subtle glow
+        // Grab point indicator - positioned relative to top
         const grabGeo = new THREE.SphereGeometry(0.25, 8, 8);
         const grabMat = new THREE.MeshBasicMaterial({
           color: 0x00ff88,
@@ -688,15 +691,14 @@
           opacity: 0.4
         });
         const grabPoint = new THREE.Mesh(grabGeo, grabMat);
-        const grabY = 8; // Fixed grab height in playable area
-        grabPoint.position.y = grabY;
+        grabPoint.position.y = grabYWorld - anchorY; // Relative to top
         vine.add(grabPoint);
         vine.userData.grabIndicator = grabPoint;
-        vine.userData.grabY = grabY;
+        vine.userData.grabY = grabYWorld; // World Y for grabbing
 
-        // Position vine with random X - truly scattered
-        const xOffset = (Math.random() - 0.5) * 16; // Random position from -8 to +8
-        vine.position.set(xOffset, 0, z);
+        // Position vine GROUP at anchor point (top of vine)
+        const xOffset = (Math.random() - 0.5) * 16;
+        vine.position.set(xOffset, anchorY, z); // Y at anchor point!
         vine.userData.anchorPoint.x = xOffset;
 
         this.scene.add(vine);
