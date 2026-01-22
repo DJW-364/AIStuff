@@ -716,12 +716,12 @@
           const angle = this.state.swingAngle;
           const speed = Math.abs(this.state.swingVelocity) * 2;
 
-          // Launch in direction of swing
+          // Launch in direction of swing - more forgiving with stronger forward momentum
           const launchAngle = angle + Math.PI / 2; // Perpendicular to rope
           this.state.velocity.set(
             Math.cos(launchAngle) * speed * 0.5,
-            Math.sin(launchAngle) * speed * 0.8 + 8,
-            -12 - this.gameSpeed * 3
+            Math.sin(launchAngle) * speed * 0.8 + 12, // More upward boost
+            -18 - this.gameSpeed * 3 // More forward momentum
           );
 
           this.state.phase = 'flying';
@@ -784,7 +784,8 @@
 
           const dist = pos.distanceTo(grabPos);
 
-          if (dist < 3.5) {
+          // Much more forgiving grab radius
+          if (dist < 6) {
             this.attachToVine(vine);
 
             // Score based on accuracy
@@ -912,8 +913,21 @@
           this.monkey.rotation.z = Math.sin(Date.now() * 0.01) * 0.3;
           this.monkey.rotation.x = -state.velocity.y * 0.02;
 
-          // Try to grab vine when moving downward
-          if (state.phase === 'flying' && state.velocity.y < 2) {
+          // Try to grab vine - always check when flying (not just when falling)
+          if (state.phase === 'flying') {
+            // Magnet effect - gently pull toward nearby vines
+            for (const vine of this.vines) {
+              if (vine.userData.grabbed) continue;
+              const grabPos = new THREE.Vector3(vine.position.x, vine.userData.grabY, vine.position.z);
+              const dist = this.monkey.position.distanceTo(grabPos);
+              if (dist < 8 && dist > 1) {
+                // Pull toward vine
+                const pullStrength = 0.15 * (1 - dist / 8);
+                const dir = grabPos.clone().sub(this.monkey.position).normalize();
+                state.velocity.x += dir.x * pullStrength;
+                state.velocity.y += dir.y * pullStrength * 0.5;
+              }
+            }
             this.tryGrabNearbyVine();
           }
 
