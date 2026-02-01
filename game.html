@@ -821,10 +821,14 @@
         // Limit initial angle so monkey doesn't wrap around
         this.state.swingAngle = Math.max(-1.2, Math.min(1.2, this.state.swingAngle));
 
-        // Initial swing velocity from momentum
-        this.state.swingVelocity = this.state.velocity.x * 0.2;
+        // Start with no swing velocity - let gravity build the swing naturally
+        this.state.swingVelocity = 0;
 
         this.state.velocity.set(0, 0, 0);
+
+        // Record vine's current idle rotation for smooth transition
+        vine.userData.grabIdleRotation = vine.rotation.z;
+        vine.userData.grabTransition = 0; // 0 = just grabbed, 1 = fully swinging
 
         // Hide grab indicator
         vine.userData.grabIndicator.visible = false;
@@ -940,8 +944,14 @@
           const vineTopY = vine.position.y; // Anchor point at top
           const distToGrab = vineTopY - state.vineGrabPoint.y; // Distance from top to grab point
 
+          // Use the same blend as the vine transition
+          const blend = vine.userData.grabTransition || 1;
+          const easedBlend = blend * blend * (3 - 2 * blend); // smoothstep
+          const idleRot = vine.userData.grabIdleRotation || 0;
+          const swingRot = state.swingAngle * 0.6;
+          const vineAngle = idleRot * (1 - easedBlend) + swingRot * easedBlend;
+
           // Calculate where grab point is based on vine rotation
-          const vineAngle = state.swingAngle * 0.6; // Vine rotation
           const grabOffsetX = Math.sin(vineAngle) * distToGrab;
           const grabOffsetY = Math.cos(vineAngle) * distToGrab;
 
@@ -952,8 +962,8 @@
             vineZ + 0.5
           );
 
-          // Swing body to match vine angle
-          this.monkey.rotation.z = state.swingAngle * 0.8;
+          // Swing body to match vine angle (also blended)
+          this.monkey.rotation.z = vineAngle * 1.33; // scale to match original ratio
           this.monkey.rotation.x = 0;
 
           // Keep arms reaching UP to grab vine
@@ -1031,8 +1041,14 @@
             const scale = 1 + Math.sin(Date.now() * 0.005) * 0.2;
             vine.userData.grabIndicator.scale.setScalar(scale);
           } else if (vine === state.currentVine) {
-            // Grabbed vine swings with the monkey!
-            vine.rotation.z = state.swingAngle * 0.6;
+            // Smooth transition: vine starts still, then follows pendulum swing
+            vine.userData.grabTransition = Math.min(1, (vine.userData.grabTransition || 0) + dt * 2.5);
+            const blend = vine.userData.grabTransition;
+            // Smooth ease-in so the vine gradually picks up the swing
+            const easedBlend = blend * blend * (3 - 2 * blend); // smoothstep
+            const idleRot = vine.userData.grabIdleRotation || 0;
+            const swingRot = state.swingAngle * 0.6;
+            vine.rotation.z = idleRot * (1 - easedBlend) + swingRot * easedBlend;
           }
 
           // Remove vines far behind
