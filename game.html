@@ -352,9 +352,10 @@
         const ctx = canvas.getContext('2d');
         const gradient = ctx.createLinearGradient(0, 0, 0, 256);
         gradient.addColorStop(0, '#0a1a3a');
-        gradient.addColorStop(0.4, '#1a3a5a');
-        gradient.addColorStop(0.55, '#d4842a');
-        gradient.addColorStop(1, '#d4842a');
+        gradient.addColorStop(0.5, '#1a4a6a');
+        gradient.addColorStop(0.72, '#4a7a8a');
+        gradient.addColorStop(0.85, '#d4942a');
+        gradient.addColorStop(1, '#6a4a2a');
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, 1, 256);
 
@@ -483,7 +484,7 @@
           const tree = this.createTree();
           const side = Math.random() > 0.5 ? 1 : -1;
           tree.position.set(
-            side * (12 + Math.random() * 15),
+            side * (16 + Math.random() * 15),
             -10,
             -50 + Math.random() * 150
           );
@@ -659,23 +660,9 @@
             new THREE.Vector3(-0.2, 12, -0.1),
             new THREE.Vector3(0.1, 18, 0.1)
           ]);
-          const frondGeos = [];
-          for (let i = 0; i < 6; i++) {
-            const angle = (i / 6) * Math.PI * 2;
-            const pts = [];
-            for (let j = 0; j <= 6; j++) {
-              const t = j / 6;
-              pts.push(new THREE.Vector3(
-                Math.sin(angle) * t * 3.5,
-                18 + t * 0.5 - t * t * 3.5,
-                Math.cos(angle) * t * 3.5
-              ));
-            }
-            frondGeos.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 6, 0.1, 4, false));
-          }
           this._treeGeos = {
             trunk: new THREE.TubeGeometry(trunkCurve, 8, 0.35, 6, false),
-            fronds: frondGeos,
+            frond: new THREE.SphereGeometry(1, 5, 4),
             coconut: new THREE.SphereGeometry(0.2, 5, 5),
             top: new THREE.SphereGeometry(2, 6, 6)
           };
@@ -694,9 +681,14 @@
         });
         tree.add(new THREE.Mesh(this._treeGeos.trunk, trunkMat));
 
-        // Curved drooping palm fronds
+        // Palm fronds - flat elongated leaves fanning outward
         for (let i = 0; i < 6; i++) {
-          tree.add(new THREE.Mesh(this._treeGeos.fronds[i], this._frondMats[i % 3]));
+          const angle = (i / 6) * Math.PI * 2;
+          const frond = new THREE.Mesh(this._treeGeos.frond, this._frondMats[i % 3]);
+          frond.position.set(Math.sin(angle) * 2, 17.2, Math.cos(angle) * 2);
+          frond.scale.set(0.6, 0.15, 2.5);
+          frond.rotation.set(0.35, angle, 0);
+          tree.add(frond);
         }
 
         // Coconut cluster near frond base
@@ -1334,7 +1326,7 @@
           this.trees.forEach(tree => {
             if (tree.position.z > recycleZ) {
               tree.position.z -= 150;
-              tree.position.x = (Math.random() > 0.5 ? 1 : -1) * (12 + Math.random() * 15);
+              tree.position.x = (Math.random() > 0.5 ? 1 : -1) * (16 + Math.random() * 15);
             }
           });
 
@@ -1444,7 +1436,7 @@
         this.trees.forEach((tree, i) => {
           const side = Math.random() > 0.5 ? 1 : -1;
           tree.position.set(
-            side * (12 + Math.random() * 15),
+            side * (16 + Math.random() * 15),
             -10,
             -50 + Math.random() * 150
           );
