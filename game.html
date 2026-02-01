@@ -12,7 +12,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #1a0a2e;
+      background: #1a2a3a;
       overflow: hidden;
       font-family: 'Bangers', cursive;
       cursor: pointer;
@@ -291,8 +291,8 @@
 
       initThree() {
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x1a0a2e);
-        this.scene.fog = new THREE.Fog(0x1a0a2e, 40, 100);
+        this.scene.background = new THREE.Color(0x1a2a3a);
+        this.scene.fog = new THREE.Fog(0x1a3a2a, 30, 80);
 
         this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.position.set(0, 8, 25);
@@ -316,10 +316,13 @@
       }
 
       initLights() {
-        const ambient = new THREE.AmbientLight(0x404080, 0.6);
+        const ambient = new THREE.AmbientLight(0x404080, 0.4);
         this.scene.add(ambient);
 
-        const sun = new THREE.DirectionalLight(0xffffcc, 1.2);
+        const hemi = new THREE.HemisphereLight(0xffd580, 0x2d5a1a, 0.6);
+        this.scene.add(hemi);
+
+        const sun = new THREE.DirectionalLight(0xffd080, 1.4);
         sun.position.set(15, 30, 20);
         sun.castShadow = true;
         sun.shadow.mapSize.width = 1024;
@@ -338,12 +341,38 @@
 
         this.monkeyLight = new THREE.PointLight(0xffaa00, 0.8, 15);
         this.scene.add(this.monkeyLight);
+
+        this.createSkyDome();
+      }
+
+      createSkyDome() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 256);
+        gradient.addColorStop(0, '#0a1a3a');
+        gradient.addColorStop(0.4, '#1a3a5a');
+        gradient.addColorStop(0.55, '#d4842a');
+        gradient.addColorStop(1, '#d4842a');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1, 256);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        const skyGeo = new THREE.SphereGeometry(180, 16, 16);
+        const skyMat = new THREE.MeshBasicMaterial({
+          map: texture,
+          side: THREE.BackSide,
+          depthWrite: false,
+          fog: false
+        });
+        this.scene.add(new THREE.Mesh(skyGeo, skyMat));
       }
 
       createEnvironment() {
         // Ground
         const groundGeo = new THREE.PlaneGeometry(300, 300);
-        const groundMat = new THREE.MeshLambertMaterial({ color: 0x2d5a1a });
+        const groundMat = new THREE.MeshLambertMaterial({ color: 0x3a7a2a });
         const ground = new THREE.Mesh(groundGeo, groundMat);
         ground.rotation.x = -Math.PI / 2;
         ground.position.y = -10;
@@ -369,6 +398,85 @@
           this.groundDetails.push(bush);
         }
 
+        // Grass tufts
+        this.grassTufts = [];
+        const grassGeo = new THREE.ConeGeometry(0.15, 0.6, 4);
+        const grassMat = new THREE.MeshLambertMaterial({ color: 0x4a9a2a });
+        for (let i = 0; i < 35; i++) {
+          const tuft = new THREE.Group();
+          for (let j = 0; j < 3; j++) {
+            const blade = new THREE.Mesh(grassGeo, grassMat);
+            blade.position.set((j - 1) * 0.12, 0.3, 0);
+            blade.rotation.z = (j - 1) * 0.2;
+            tuft.add(blade);
+          }
+          const side = Math.random() > 0.5 ? 1 : -1;
+          tuft.position.set(
+            side * (3 + Math.random() * 25),
+            -9.7,
+            -50 + Math.random() * 150
+          );
+          this.scene.add(tuft);
+          this.grassTufts.push(tuft);
+        }
+
+        // Rocks
+        this.rocks = [];
+        const rockGeo = new THREE.DodecahedronGeometry(0.5, 0);
+        const rockMat = new THREE.MeshLambertMaterial({ color: 0x5a5a5a });
+        for (let i = 0; i < 18; i++) {
+          const rock = new THREE.Mesh(rockGeo, rockMat);
+          const side = Math.random() > 0.5 ? 1 : -1;
+          const s = 0.5 + Math.random() * 1;
+          rock.position.set(
+            side * (4 + Math.random() * 22),
+            -9.5,
+            -50 + Math.random() * 150
+          );
+          rock.scale.set(s, s * 0.6, s);
+          rock.rotation.set(Math.random(), Math.random(), 0);
+          this.scene.add(rock);
+          this.rocks.push(rock);
+        }
+
+        // Small flowers
+        this.flowers = [];
+        const flowerColors = [0xff4466, 0xffaa22, 0xff66cc, 0xaabb00];
+        const flowerMats = flowerColors.map(c => new THREE.MeshBasicMaterial({ color: c }));
+        const flowerHeadGeo = new THREE.SphereGeometry(0.12, 5, 5);
+        const stemGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.5, 4);
+        const stemMat = new THREE.MeshLambertMaterial({ color: 0x3a7a2a });
+        for (let i = 0; i < 12; i++) {
+          const flower = new THREE.Group();
+          const stem = new THREE.Mesh(stemGeo, stemMat);
+          stem.position.y = 0.25;
+          flower.add(stem);
+          const head = new THREE.Mesh(flowerHeadGeo, flowerMats[i % flowerMats.length]);
+          head.position.y = 0.55;
+          flower.add(head);
+          const side = Math.random() > 0.5 ? 1 : -1;
+          flower.position.set(
+            side * (4 + Math.random() * 20),
+            -9.7,
+            -50 + Math.random() * 150
+          );
+          this.scene.add(flower);
+          this.flowers.push(flower);
+        }
+
+        // Ground fog layer
+        const fogPlaneGeo = new THREE.PlaneGeometry(300, 300);
+        const fogPlaneMat = new THREE.MeshBasicMaterial({
+          color: 0x88aa88,
+          transparent: true,
+          opacity: 0.15,
+          depthWrite: false
+        });
+        this.groundFog = new THREE.Mesh(fogPlaneGeo, fogPlaneMat);
+        this.groundFog.rotation.x = -Math.PI / 2;
+        this.groundFog.position.y = -8;
+        this.scene.add(this.groundFog);
+
         // Trees - reduced count, simpler placement
         this.trees = [];
         for (let i = 0; i < 25; i++) {
@@ -386,20 +494,42 @@
           this.trees.push(tree);
         }
 
-        // Jungle canopy at top - simplified
+        // Jungle canopy at top - varied shapes and colors
         this.canopy = [];
-        const canopyGeo = new THREE.SphereGeometry(4, 6, 6);
-        const canopyMat = new THREE.MeshLambertMaterial({ color: 0x1a5a20 });
+        this.hangingVines = [];
+        const canopyGreens = [0x1a5a20, 0x2d6a30, 0x1a7a25];
+        const canopyGeoWide = new THREE.SphereGeometry(4, 6, 6);
+        const canopyGeoTall = new THREE.SphereGeometry(3, 6, 6);
+        const hangVineGeo = new THREE.CylinderGeometry(0.04, 0.04, 4, 4);
+        const hangVineMat = new THREE.MeshBasicMaterial({ color: 0x2d5a1a });
         for (let i = 0; i < 25; i++) {
-          const leaf = new THREE.Mesh(canopyGeo, canopyMat);
+          const isWide = Math.random() > 0.4;
+          const cMat = new THREE.MeshLambertMaterial({ color: canopyGreens[i % 3] });
+          const leaf = new THREE.Mesh(isWide ? canopyGeoWide : canopyGeoTall, cMat);
           leaf.position.set(
             (Math.random() - 0.5) * 60,
             20 + Math.random() * 8,
             -60 + Math.random() * 100
           );
-          leaf.scale.set(1 + Math.random(), 0.4, 1 + Math.random());
+          if (isWide) {
+            leaf.scale.set(1 + Math.random(), 0.35, 1 + Math.random());
+          } else {
+            leaf.scale.set(0.6 + Math.random() * 0.4, 0.8, 0.6 + Math.random() * 0.4);
+          }
           this.scene.add(leaf);
           this.canopy.push(leaf);
+
+          // Hanging vines from some canopy pieces
+          if (Math.random() > 0.5) {
+            const hv = new THREE.Mesh(hangVineGeo, hangVineMat);
+            hv.position.set(
+              leaf.position.x + (Math.random() - 0.5) * 2,
+              leaf.position.y - 3,
+              leaf.position.z
+            );
+            this.scene.add(hv);
+            this.hangingVines.push(hv);
+          }
         }
 
         // Fireflies - reduced count, no child glow mesh
@@ -463,44 +593,122 @@
           this.butterflies.push(butterfly);
         }
 
-        // Distant hills - simplified
-        const hillGeo = new THREE.SphereGeometry(30, 8, 8);
-        const hillMat = new THREE.MeshBasicMaterial({ color: 0x1a3a25 });
+        // Far mountains - dark blue-green, low opacity
+        const mountainGeo = new THREE.SphereGeometry(40, 8, 8);
+        const mountainMat = new THREE.MeshBasicMaterial({ color: 0x1a3a45, transparent: true, opacity: 0.6, fog: false });
         for (let i = 0; i < 3; i++) {
-          const hill = new THREE.Mesh(hillGeo, hillMat);
-          hill.position.set(-60 + i * 60, -20, -80);
-          hill.scale.set(1.2, 0.4, 1);
-          this.scene.add(hill);
+          const m = new THREE.Mesh(mountainGeo, mountainMat);
+          m.position.set(-80 + i * 80, -25, -120);
+          m.scale.set(1.4, 0.5, 1);
+          this.scene.add(m);
         }
+
+        // Mid hills - forest green
+        const midHillGeo = new THREE.SphereGeometry(30, 8, 8);
+        const midHillMat = new THREE.MeshBasicMaterial({ color: 0x1a5a25 });
+        for (let i = 0; i < 4; i++) {
+          const h = new THREE.Mesh(midHillGeo, midHillMat);
+          h.position.set(-70 + i * 50, -18, -90);
+          h.scale.set(1.2, 0.4, 1);
+          this.scene.add(h);
+        }
+
+        // Near hills - brighter green
+        const nearHillGeo = new THREE.SphereGeometry(20, 8, 8);
+        const nearHillMat = new THREE.MeshBasicMaterial({ color: 0x2d7a30 });
+        for (let i = 0; i < 3; i++) {
+          const h = new THREE.Mesh(nearHillGeo, nearHillMat);
+          h.position.set(-50 + i * 55, -15, -70);
+          h.scale.set(1, 0.35, 1);
+          this.scene.add(h);
+        }
+
+        // Clouds - slowly drifting ellipsoids
+        this.clouds = [];
+        const cloudGeo = new THREE.SphereGeometry(3, 6, 6);
+        const cloudMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35, fog: false });
+        for (let i = 0; i < 9; i++) {
+          const cloud = new THREE.Mesh(cloudGeo, cloudMat);
+          cloud.position.set(
+            -50 + Math.random() * 100,
+            35 + Math.random() * 15,
+            -60 - Math.random() * 40
+          );
+          cloud.scale.set(2 + Math.random() * 2, 0.4 + Math.random() * 0.2, 1 + Math.random());
+          cloud.userData.driftSpeed = 0.5 + Math.random() * 1;
+          this.scene.add(cloud);
+          this.clouds.push(cloud);
+        }
+
+        // Sun glow behind distant hills
+        const sunGlowGeo = new THREE.SphereGeometry(8, 12, 12);
+        const sunGlowMat = new THREE.MeshBasicMaterial({ color: 0xffcc44, transparent: true, opacity: 0.4, fog: false });
+        const sunGlow = new THREE.Mesh(sunGlowGeo, sunGlowMat);
+        sunGlow.position.set(30, 5, -115);
+        this.scene.add(sunGlow);
       }
 
       createTree() {
         const tree = new THREE.Group();
 
-        // Simple palm trunk
-        const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, 18, 6);
-        const trunkMat = new THREE.MeshLambertMaterial({ color: 0x8B5A2B });
-        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-        trunk.position.y = 9;
-        tree.add(trunk);
+        // Shared geometries (created once, reused for all trees)
+        if (!this._treeGeos) {
+          const trunkCurve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0.4, 6, 0.2),
+            new THREE.Vector3(-0.2, 12, -0.1),
+            new THREE.Vector3(0.1, 18, 0.1)
+          ]);
+          const frondGeos = [];
+          for (let i = 0; i < 6; i++) {
+            const angle = (i / 6) * Math.PI * 2;
+            const pts = [];
+            for (let j = 0; j <= 6; j++) {
+              const t = j / 6;
+              pts.push(new THREE.Vector3(
+                Math.sin(angle) * t * 3.5,
+                18 + t * 0.5 - t * t * 3.5,
+                Math.cos(angle) * t * 3.5
+              ));
+            }
+            frondGeos.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 6, 0.1, 4, false));
+          }
+          this._treeGeos = {
+            trunk: new THREE.TubeGeometry(trunkCurve, 8, 0.35, 6, false),
+            fronds: frondGeos,
+            coconut: new THREE.SphereGeometry(0.2, 5, 5),
+            top: new THREE.SphereGeometry(2, 6, 6)
+          };
+          this._frondMats = [
+            new THREE.MeshLambertMaterial({ color: 0x228B22 }),
+            new THREE.MeshLambertMaterial({ color: 0x2d8a30 }),
+            new THREE.MeshLambertMaterial({ color: 0x1a7a25 })
+          ];
+          this._coconutMat = new THREE.MeshLambertMaterial({ color: 0x5a3a1a });
+          this._treeTopMat = new THREE.MeshLambertMaterial({ color: 0x2d6a30 });
+        }
 
-        // Simplified palm fronds - just cones
-        const frondMat = new THREE.MeshLambertMaterial({ color: 0x228B22 });
-        const frondGeo = new THREE.ConeGeometry(1, 5, 4);
-        for (let i = 0; i < 5; i++) {
-          const frond = new THREE.Mesh(frondGeo, frondMat);
-          frond.position.y = 18;
-          frond.rotation.y = (i / 5) * Math.PI * 2;
-          frond.rotation.x = 0.8;
-          frond.position.x = Math.sin(frond.rotation.y) * 2;
-          frond.position.z = Math.cos(frond.rotation.y) * 2;
-          tree.add(frond);
+        // Curved trunk with varied color
+        const trunkMat = new THREE.MeshLambertMaterial({
+          color: new THREE.Color().setHSL(0.07, 0.5, 0.3 + Math.random() * 0.1)
+        });
+        tree.add(new THREE.Mesh(this._treeGeos.trunk, trunkMat));
+
+        // Curved drooping palm fronds
+        for (let i = 0; i < 6; i++) {
+          tree.add(new THREE.Mesh(this._treeGeos.fronds[i], this._frondMats[i % 3]));
+        }
+
+        // Coconut cluster near frond base
+        for (let i = 0; i < 3; i++) {
+          const c = new THREE.Mesh(this._treeGeos.coconut, this._coconutMat);
+          const a = (i / 3) * Math.PI * 2;
+          c.position.set(Math.sin(a) * 0.4, 17.5, Math.cos(a) * 0.4);
+          tree.add(c);
         }
 
         // Top foliage cluster
-        const topGeo = new THREE.SphereGeometry(2, 6, 6);
-        const topMat = new THREE.MeshLambertMaterial({ color: 0x2d6a30 });
-        const top = new THREE.Mesh(topGeo, topMat);
+        const top = new THREE.Mesh(this._treeGeos.top, this._treeTopMat);
         top.position.y = 18;
         top.scale.y = 0.6;
         tree.add(top);
@@ -1106,6 +1314,19 @@
           });
         }
 
+        // Update clouds - slow drift
+        if (this.clouds) {
+          this.clouds.forEach(cloud => {
+            cloud.position.x += cloud.userData.driftSpeed * dt;
+            if (cloud.position.x > 60) cloud.position.x = -60;
+          });
+        }
+
+        // Ground fog follows monkey
+        if (this.groundFog) {
+          this.groundFog.position.z = this.monkey.position.z;
+        }
+
         // Recycle environment elements (batch check every few frames for performance)
         if (Math.random() < 0.1) {
           const recycleZ = this.monkey.position.z + 40;
@@ -1130,6 +1351,30 @@
               if (detail.position.z > recycleZ + 10) {
                 detail.position.z -= 150;
               }
+            });
+          }
+
+          if (this.grassTufts) {
+            this.grassTufts.forEach(g => {
+              if (g.position.z > recycleZ + 10) g.position.z -= 150;
+            });
+          }
+
+          if (this.rocks) {
+            this.rocks.forEach(r => {
+              if (r.position.z > recycleZ + 10) r.position.z -= 150;
+            });
+          }
+
+          if (this.flowers) {
+            this.flowers.forEach(f => {
+              if (f.position.z > recycleZ + 10) f.position.z -= 150;
+            });
+          }
+
+          if (this.hangingVines) {
+            this.hangingVines.forEach(v => {
+              if (v.position.z > recycleZ + 10) v.position.z -= 150;
             });
           }
 
@@ -1210,6 +1455,19 @@
             const side = Math.random() > 0.5 ? 1 : -1;
             detail.position.z = -50 + Math.random() * 150;
           });
+        }
+
+        if (this.grassTufts) {
+          this.grassTufts.forEach(g => { g.position.z = -50 + Math.random() * 150; });
+        }
+        if (this.rocks) {
+          this.rocks.forEach(r => { r.position.z = -50 + Math.random() * 150; });
+        }
+        if (this.flowers) {
+          this.flowers.forEach(f => { f.position.z = -50 + Math.random() * 150; });
+        }
+        if (this.hangingVines) {
+          this.hangingVines.forEach(v => { v.position.z = -50 + Math.random() * 150; });
         }
 
         if (this.canopy) {
