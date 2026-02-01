@@ -12,7 +12,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #1a2a3a;
+      background: #4a8aaa;
       overflow: hidden;
       font-family: 'Bangers', cursive;
       cursor: pointer;
@@ -291,8 +291,8 @@
 
       initThree() {
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x1a2a3a);
-        this.scene.fog = new THREE.Fog(0x1a3a2a, 30, 80);
+        this.scene.background = new THREE.Color(0x4a8aaa);
+        this.scene.fog = new THREE.Fog(0x5a9a7a, 35, 90);
 
         this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.position.set(0, 8, 25);
@@ -351,11 +351,11 @@
         canvas.height = 256;
         const ctx = canvas.getContext('2d');
         const gradient = ctx.createLinearGradient(0, 0, 0, 256);
-        gradient.addColorStop(0, '#0a1a3a');
-        gradient.addColorStop(0.5, '#1a4a6a');
-        gradient.addColorStop(0.72, '#4a7a8a');
-        gradient.addColorStop(0.85, '#d4942a');
-        gradient.addColorStop(1, '#6a4a2a');
+        gradient.addColorStop(0, '#1a4a7a');
+        gradient.addColorStop(0.45, '#4a8aba');
+        gradient.addColorStop(0.68, '#8abace');
+        gradient.addColorStop(0.82, '#ffcc66');
+        gradient.addColorStop(1, '#cc9944');
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, 1, 256);
 
@@ -367,12 +367,13 @@
           depthWrite: false,
           fog: false
         });
-        this.scene.add(new THREE.Mesh(skyGeo, skyMat));
+        this.skyDome = new THREE.Mesh(skyGeo, skyMat);
+        this.scene.add(this.skyDome);
       }
 
       createEnvironment() {
         // Ground
-        const groundGeo = new THREE.PlaneGeometry(300, 300);
+        const groundGeo = new THREE.PlaneGeometry(800, 800);
         const groundMat = new THREE.MeshLambertMaterial({ color: 0x3a7a2a });
         this.ground = new THREE.Mesh(groundGeo, groundMat);
         this.ground.rotation.x = -Math.PI / 2;
@@ -466,7 +467,7 @@
         }
 
         // Ground fog layer
-        const fogPlaneGeo = new THREE.PlaneGeometry(300, 300);
+        const fogPlaneGeo = new THREE.PlaneGeometry(800, 800);
         const fogPlaneMat = new THREE.MeshBasicMaterial({
           color: 0x88aa88,
           transparent: true,
@@ -594,40 +595,44 @@
           this.butterflies.push(butterfly);
         }
 
+        // Background group - follows monkey so it's always visible
+        this.background = new THREE.Group();
+        this.scene.add(this.background);
+
         // Far mountains - dark blue-green, low opacity
         const mountainGeo = new THREE.SphereGeometry(40, 8, 8);
-        const mountainMat = new THREE.MeshBasicMaterial({ color: 0x1a3a45, transparent: true, opacity: 0.6, fog: false });
+        const mountainMat = new THREE.MeshBasicMaterial({ color: 0x2a5a55, transparent: true, opacity: 0.6, fog: false });
         for (let i = 0; i < 3; i++) {
           const m = new THREE.Mesh(mountainGeo, mountainMat);
           m.position.set(-80 + i * 80, -25, -120);
           m.scale.set(1.4, 0.5, 1);
-          this.scene.add(m);
+          this.background.add(m);
         }
 
         // Mid hills - forest green
         const midHillGeo = new THREE.SphereGeometry(30, 8, 8);
-        const midHillMat = new THREE.MeshBasicMaterial({ color: 0x1a5a25 });
+        const midHillMat = new THREE.MeshBasicMaterial({ color: 0x2a6a35 });
         for (let i = 0; i < 4; i++) {
           const h = new THREE.Mesh(midHillGeo, midHillMat);
           h.position.set(-70 + i * 50, -18, -90);
           h.scale.set(1.2, 0.4, 1);
-          this.scene.add(h);
+          this.background.add(h);
         }
 
         // Near hills - brighter green
         const nearHillGeo = new THREE.SphereGeometry(20, 8, 8);
-        const nearHillMat = new THREE.MeshBasicMaterial({ color: 0x2d7a30 });
+        const nearHillMat = new THREE.MeshBasicMaterial({ color: 0x3a8a40 });
         for (let i = 0; i < 3; i++) {
           const h = new THREE.Mesh(nearHillGeo, nearHillMat);
           h.position.set(-50 + i * 55, -15, -70);
           h.scale.set(1, 0.35, 1);
-          this.scene.add(h);
+          this.background.add(h);
         }
 
         // Clouds - slowly drifting ellipsoids
         this.clouds = [];
         const cloudGeo = new THREE.SphereGeometry(3, 6, 6);
-        const cloudMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35, fog: false });
+        const cloudMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4, fog: false });
         for (let i = 0; i < 9; i++) {
           const cloud = new THREE.Mesh(cloudGeo, cloudMat);
           cloud.position.set(
@@ -637,16 +642,23 @@
           );
           cloud.scale.set(2 + Math.random() * 2, 0.4 + Math.random() * 0.2, 1 + Math.random());
           cloud.userData.driftSpeed = 0.5 + Math.random() * 1;
-          this.scene.add(cloud);
+          this.background.add(cloud);
           this.clouds.push(cloud);
         }
 
-        // Sun glow behind distant hills
-        const sunGlowGeo = new THREE.SphereGeometry(8, 12, 12);
-        const sunGlowMat = new THREE.MeshBasicMaterial({ color: 0xffcc44, transparent: true, opacity: 0.4, fog: false });
+        // Morning sun in sky
+        const sunGlowGeo = new THREE.SphereGeometry(14, 12, 12);
+        const sunGlowMat = new THREE.MeshBasicMaterial({ color: 0xffdd66, transparent: true, opacity: 0.5, fog: false });
         const sunGlow = new THREE.Mesh(sunGlowGeo, sunGlowMat);
-        sunGlow.position.set(30, 5, -115);
-        this.scene.add(sunGlow);
+        sunGlow.position.set(40, 30, -110);
+        this.background.add(sunGlow);
+
+        // Sun halo
+        const haloGeo = new THREE.SphereGeometry(22, 12, 12);
+        const haloMat = new THREE.MeshBasicMaterial({ color: 0xffeeaa, transparent: true, opacity: 0.12, fog: false });
+        const halo = new THREE.Mesh(haloGeo, haloMat);
+        halo.position.set(40, 30, -112);
+        this.background.add(halo);
       }
 
       createTree() {
@@ -1314,12 +1326,18 @@
           });
         }
 
-        // Ground and fog follow monkey
+        // Ground, fog, background, sky dome follow monkey
         if (this.ground) {
           this.ground.position.z = this.monkey.position.z;
         }
         if (this.groundFog) {
           this.groundFog.position.z = this.monkey.position.z;
+        }
+        if (this.background) {
+          this.background.position.z = this.monkey.position.z;
+        }
+        if (this.skyDome) {
+          this.skyDome.position.copy(this.camera.position);
         }
 
         // Recycle environment elements (batch check every few frames for performance)
