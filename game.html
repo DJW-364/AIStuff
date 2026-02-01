@@ -813,13 +813,13 @@
           vine.position.z
         );
 
-        // Calculate initial swing angle based on approach
+        // Calculate initial swing angle based on approach (reduced for gentler start)
         const dx = this.monkey.position.x - this.state.vineGrabPoint.x;
         const dy = this.monkey.position.y - this.state.vineGrabPoint.y;
-        this.state.swingAngle = Math.atan2(dx, -dy);
+        this.state.swingAngle = Math.atan2(dx, -dy) * 0.5;
 
-        // Limit initial angle so monkey doesn't wrap around
-        this.state.swingAngle = Math.max(-1.2, Math.min(1.2, this.state.swingAngle));
+        // Limit initial angle for a controlled first swing
+        this.state.swingAngle = Math.max(-0.6, Math.min(0.6, this.state.swingAngle));
 
         // Start with no swing velocity - let gravity build the swing naturally
         this.state.swingVelocity = 0;
@@ -921,8 +921,11 @@
         if (state.phase === 'swinging' && state.currentVine) {
           // Pendulum physics
           const gravity = 15;
-          const damping = 0.995;
           const swingRadius = 3;
+
+          // Extra damping while vine is still settling (transition < 1)
+          const transition = state.currentVine.userData.grabTransition || 1;
+          const damping = transition < 1 ? 0.96 : 0.995;
 
           // Angular acceleration from gravity
           const angularAccel = -(gravity / swingRadius) * Math.sin(state.swingAngle);
@@ -1042,7 +1045,7 @@
             vine.userData.grabIndicator.scale.setScalar(scale);
           } else if (vine === state.currentVine) {
             // Smooth transition: vine starts still, then follows pendulum swing
-            vine.userData.grabTransition = Math.min(1, (vine.userData.grabTransition || 0) + dt * 2.5);
+            vine.userData.grabTransition = Math.min(1, (vine.userData.grabTransition || 0) + dt * 1.8);
             const blend = vine.userData.grabTransition;
             // Smooth ease-in so the vine gradually picks up the swing
             const easedBlend = blend * blend * (3 - 2 * blend); // smoothstep
